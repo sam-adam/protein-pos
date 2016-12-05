@@ -14,6 +14,18 @@ require('laravel-elixir-vue-2');
  */
 
 elixir(mix => {
-    mix.sass('app.scss')
+    mix.sass('app.scss', 'public/css/main.css')
        .webpack('app.js');
+
+    mix.less([
+        'sb-admin-2.less'
+    ], 'public/css/theme.css');
+
+    mix.styles([
+        '../../../node_modules/metismenu/dist/metisMenu.min.css',
+        '../../../public/css/main.css',
+        '../../../public/css/theme.css'
+    ], 'public/css/app.css');
+
+    mix.version('public/css/app.css');
 });
