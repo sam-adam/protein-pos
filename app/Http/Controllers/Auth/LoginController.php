@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -25,7 +29,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -41,5 +45,15 @@ class LoginController extends Controller
     public function username()
     {
         return 'username';
+    }
+
+    /** {@inheritDoc} */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if (!Session::has('flashes.error')) {
+            Session::flash('flashes.error', Lang::get('auth.failed'));
+        }
+
+        return redirect()->back()->withInput($request->only($this->username(), 'remember'));
     }
 }

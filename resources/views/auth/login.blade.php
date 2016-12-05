@@ -4,6 +4,12 @@
     @parent
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
+            @foreach(Session::get('flashes', []) as $type => $value)
+                <div class="alert alert-{{ $type === 'error' ? 'danger' : $type }}">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    {{ $value }}
+                </div>
+            @endforeach
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Please Sign In</h3>

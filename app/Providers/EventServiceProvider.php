@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Event;
+use App\Listeners\LoginSessionLogger;
+use Illuminate\Auth\Events\Login as LoginEvent;
+use Illuminate\Auth\Events\Logout as LogoutEvent;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -13,9 +15,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\SomeEvent' => [
-            'App\Listeners\EventListener',
-        ],
+        LoginEvent::class  => [LoginSessionLogger::class],
+        LogoutEvent::class => [LoginSessionLogger::class],
     ];
 
     /**
@@ -26,7 +27,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-
         //
     }
 }

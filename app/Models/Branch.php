@@ -15,4 +15,14 @@ class Branch extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function loginSessions()
+    {
+        return $this->hasMany(LoginSession::class);
+    }
+
+    public function currentlyLoggedInSessions()
+    {
+        return $this->loginSessions()->whereNull('logged_out_at');
+    }
 }
