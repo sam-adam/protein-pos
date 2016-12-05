@@ -19,7 +19,11 @@ elixir(mix => {
         'app.scss'
     ], 'public/css/main.css');
 
-   mix.webpack('app.js', 'public/js/app.js');
+    mix.webpack('app.js', 'public/js/main.js');
+    mix.scripts([
+        '../../../public/js/main.js',
+        '../../../node_modules/metismenu/dist/metisMenu.min.js'
+    ], 'public/js/app.js');
 
     mix.less([
         'sb-admin-2.less'
