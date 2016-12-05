@@ -43,7 +43,7 @@
                                 <select class="form-control" id="role" name="role" required>
                                     <option value>Select Role</option>
                                     @foreach(['cashier', 'manager', 'admin', 'tech_admin'] as $role)
-                                        <option value="{{ $role }}" @if(old('role') ?: $user->role === $role) selected @endif>{{ title_case($role) }}</option>
+                                        <option value="{{ $role }}" @if((old('role') ?: $user->role) === $role) selected @endif>{{ title_case($role) }}</option>
                                     @endforeach
                                 </select>
                                 @foreach($errors->get('role') as $error)
@@ -57,7 +57,7 @@
                                 <select class="form-control" id="branch" name="branch_id" required>
                                     <option value>Select Branch</option>
                                     @foreach($branches as $branch)
-                                        <option value="{{ $branch->id }}" @if(old('branch_id') ?: $user->branch_id == $branch->id) selected @endif>{{ $branch->name }}</option>
+                                        <option value="{{ $branch->id }}" @if((old('branch_id') ?: $user->branch_id) == $branch->id) selected @endif>{{ $branch->name }}</option>
                                     @endforeach
                                 </select>
                                 @foreach($errors->get('branch_id') as $error)
