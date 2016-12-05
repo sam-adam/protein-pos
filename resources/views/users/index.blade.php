@@ -34,7 +34,7 @@
                                     <td>{{ $user->branch->name }}</td>
                                     <td>{{ title_case($user->role) }}</td>
                                     <td>
-                                        <a href="" class="btn btn-primary btn-sm">
+                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary btn-sm">
                                             <i class="fa fa-pencil"></i>
                                             Edit
                                         </a>

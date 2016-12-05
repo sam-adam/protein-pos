@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Class StoreUser
@@ -28,14 +30,22 @@ class StoreUser extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name'                  => 'bail|required|unique:users,name',
-            'username'              => 'bail|required|unique:users,username|alpha_dash',
-            'password'              => 'bail|required|min:6',
+        $user  = User::find(Route::input('user'));
+        $rules = [
             'role'                  => 'bail|required|in:cashier,manager,admin,tech_admin',
             'branch_id'             => 'bail|required|exists:branches,id',
             'minimum_discount_type' => 'bail|required_with:minimum_discount',
             'maximum_discount_type' => 'bail|required_with:maximum_discount'
         ];
+
+        if ($this->isMethod('post')) {
+            $rules['name']     = 'bail|required|unique:users,name'.($user ? ','.$user->name : '');
+            $rules['username'] = 'bail|required|alpha_dash|unique:users,username'.($user ? ','.$user->username : '');
+            $rules['password'] = 'bail|required|min:6';
+        } elseif ($this->isMethod('put')) {
+            $rules['password'] = 'bail|present|min:6';
+        }
+
+        return $rules;
     }
 }
