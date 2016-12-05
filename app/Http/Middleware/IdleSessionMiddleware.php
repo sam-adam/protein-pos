@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Session;
  */
 class IdleSessionMiddleware
 {
-    public function handle($request, Closure $next, $guard = null)
+    public function handle($request, Closure $next)
     {
         if (Auth::user()) {
             $timeoutInMinutes = null;
