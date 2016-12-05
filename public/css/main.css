@@ -10733,4 +10733,8 @@ button.close {
   }
 }
 
+.pagination {
+  margin: 0;
+}
+
 /*# sourceMappingURL=main.css.map */

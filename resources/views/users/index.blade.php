@@ -22,6 +22,7 @@
                                 <th>Username</th>
                                 <th>Branch</th>
                                 <th>Role</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -32,12 +33,28 @@
                                     <td>{{ $user->username }}</td>
                                     <td>{{ $user->branch->name }}</td>
                                     <td>{{ title_case($user->role) }}</td>
+                                    <td>
+                                        <a href="" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-pencil"></i>
+                                            Edit
+                                        </a>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
                     </div>
-                    {{ $users->render() }}
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <a href="{{ url('users/create') }}" class="btn btn-primary">
+                                <i class="fa fa-plus"></i>
+                                Add new user
+                            </a>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            {{ $users->render() }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
