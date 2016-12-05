@@ -12,6 +12,6 @@ class DashboardController extends AuthenticatedController
 {
     public function index()
     {
-
+        return view('dashboard.index');
     }
 }
