@@ -1,7 +1,17 @@
-@extends('layouts.base')
-
-@section('content')
-    @parent
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Protein POS - Login</title>
+    <link href="{{ elixir('css/app.css') }}" rel="stylesheet">
+</head>
+<body>
+<div id="preloader">
+    <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
+</div>
+<div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
             @foreach(Session::get('flashes', []) as $type => $value)
@@ -31,4 +41,6 @@
             </div>
         </div>
     </div>
-@endsection
+</div>
+</body>
+</html>
