@@ -39,10 +39,12 @@ class StoreUser extends FormRequest
         ];
 
         if ($this->isMethod('post')) {
-            $rules['name']     = 'bail|required|unique:users,name'.($user ? ','.$user->name : '');
-            $rules['username'] = 'bail|required|alpha_dash|unique:users,username'.($user ? ','.$user->username : '');
+            $rules['name']     = 'bail|required|unique:users,name';
+            $rules['username'] = 'bail|required|alpha_dash|unique:users,username';
             $rules['password'] = 'bail|required|min:6';
         } elseif ($this->isMethod('put')) {
+            $rules['name']     = 'bail|required|unique:users,name,'.$user->id;
+            $rules['username'] = 'bail|required|alpha_dash|unique:users,username,'.$user->id;
             $rules['password'] = 'bail|present|min:6';
         }
 

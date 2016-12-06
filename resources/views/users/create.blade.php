@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
-                            <label for="username" class="col-sm-2 control-label">Password</label>
+                            <label for="password" class="col-sm-2 control-label">Password</label>
                             <div class="col-sm-5">
                                 <input type="text" id="password" name="password" class="form-control" placeholder="Eg: lJq124!MMv" required value="{{ old('password') }}" />
                                 @foreach($errors->get('password') as $error)

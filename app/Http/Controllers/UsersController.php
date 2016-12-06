@@ -11,7 +11,7 @@ use App\Models\User;
  *
  * @package App\Http\Controllers
  */
-class UsersController extends Controller
+class UsersController extends AuthenticatedController
 {
     public function index()
     {
