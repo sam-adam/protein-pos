@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    - branches List
+    - Branches List
 @endsection
 
 @section('content')

@@ -45,18 +45,22 @@
                             <a href="{{ url('/') }}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
-                            <a href="#">
-                                <i class="fa fa-cubes fa-fw"></i> Users and Branches<span class="fa arrow"></span>
+                            <a href="{{ url('users') }}">
+                                <i class="fa fa-fw fa-users"></i>
+                                Users
                             </a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="{{ url('users') }}">Users</a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('branches') }}">Branches</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
+                        </li>
+                        <li>
+                            <a href="{{ url('branches') }}">
+                                <i class="fa fa-fw fa-building"></i>
+                                Branches
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('brands') }}">
+                                <i class="fa fa-fw fa-tags"></i>
+                                Brands
+                            </a>
                         </li>
                     </ul>
                 </div>

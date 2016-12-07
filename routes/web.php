@@ -10,3 +10,4 @@ Route::resource('/users', 'UsersController');
 Route::resource('/branches', 'BranchesController');
 Route::post('/branches/{branchId}/license', 'BranchesController@license')->name('branches.license');
 Route::post('/branches/{branchId}/activate', 'BranchesController@activate')->name('branches.activate');
+Route::resource('/brands', 'BrandsController');
