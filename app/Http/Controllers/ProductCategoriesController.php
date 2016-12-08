@@ -14,7 +14,7 @@ class ProductCategoriesController extends AuthenticatedController
 {
     public function index()
     {
-        return view('categories.index', ['categories' => ProductCategory::paginate()]);
+        return view('categories.index', ['roots' => ProductCategory::roots()->with('children')->get()]);
     }
 
     public function create()

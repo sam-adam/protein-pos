@@ -34,8 +34,8 @@ class StoreProductCategory extends FormRequest
         ];
 
         if ($this->isMethod('put')) {
-            $rules['name']      .= ','.$brand->id;
-            $rules['parent_id'] = 'bail|valid_child|valid_parent';
+            $rules['name'] .= ','.$brand->id;
+            $rules['parent_id'] = 'bail|present|valid_child';
         }
 
         return $rules;
@@ -44,35 +44,29 @@ class StoreProductCategory extends FormRequest
     /** {@inheritDoc} */
     public function validator(ValidationFactory $factory)
     {
-        $factory->extend('valid_child', [$this, 'validateChild'], 'Cannot assign parent to root categories with child');
-        $factory->extend('valid_parent', [$this, 'validateRoot'], 'Parent is not root category');
+        $factory->extend('valid_child', function ($attribute, $value, $parameters) {
+            if ($category = $this->getCategory()) {
+                if (((int) $category->parent_id !== (int) $value) && $category->children()->exists()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }, 'Cannot assign parent to root categories with child');
+        $factory->extend('valid_parent', function ($attribute, $value, $parameters) {
+            if ($category = $this->getCategory()) {
+                if ($parent = ProductCategory::find($value)) {
+                    return ($parent->parent_id === null);
+                }
+            }
+
+            return true;
+        }, 'Parent is not root category');
 
         return $factory->make(
             $this->validationData(), $this->container->call([$this, 'rules']),
             $this->messages(), $this->attributes()
         );
-    }
-
-    protected function validateChild($attribute, $value, $parameters)
-    {
-        if ($category = $this->getCategory()) {
-            if ($value && $category->children()->exists()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    protected function validateRoot($attribute, $value, $parameters)
-    {
-        if ($category = $this->getCategory()) {
-            if ($parent = ProductCategory::find($value)) {
-                return ($parent->parent_id === null);
-            }
-        }
-
-        return true;
     }
 
     protected function getCategory()

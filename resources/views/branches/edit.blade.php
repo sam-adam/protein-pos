@@ -66,7 +66,7 @@
                                 <button type="submit" class="btn btn-success btn-block">Update</button>
                             </div>
                             <div class="col-sm-2">
-                                <a href="{{ URL::previous() }}" class="btn btn-danger btn-block">Cancel</a>
+                                <a href="{{ URL::previous() === route('branches.edit', $branch->id) ? route('branches.index') : URL::previous() }}" class="btn btn-danger btn-block">Cancel</a>
                             </div>
                         </div>
                     </form>

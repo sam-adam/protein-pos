@@ -44,7 +44,7 @@
                                 <button type="submit" class="btn btn-success btn-block">Update</button>
                             </div>
                             <div class="col-sm-2">
-                                <a href="{{ URL::previous() }}" class="btn btn-danger btn-block">Cancel</a>
+                                <a href="{{ URL::previous() === route('categories.edit', $category->id) ? route('categories.index') : URL::previous() }}" class="btn btn-danger btn-block">Cancel</a>
                             </div>
                         </div>
                     </form>
