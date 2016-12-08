@@ -62,6 +62,12 @@
                                 Brands
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ url('categories') }}">
+                                <i class="fa fa-fw fa-folder"></i>
+                                Categories
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
