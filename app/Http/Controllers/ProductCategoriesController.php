@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductCategory;
+use App\Models\Product;
 use App\Models\ProductCategory;
 
 /**
@@ -24,8 +25,9 @@ class ProductCategoriesController extends AuthenticatedController
 
     public function store(StoreProductCategory $request)
     {
-        $newCategory       = new ProductCategory();
-        $newCategory->name = $request->get('name');
+        $newCategory            = new ProductCategory();
+        $newCategory->parent_id = $request->get('parent_id') ?: null;
+        $newCategory->name      = $request->get('name');
         $newCategory->saveOrFail();
 
         return redirect(route('categories.index'))->with('flashes.success', 'Category added');
@@ -58,5 +60,28 @@ class ProductCategoriesController extends AuthenticatedController
         $category->saveOrFail();
 
         return redirect(route('categories.index'))->with('flashes.success', 'Category edited');
+    }
+
+    public function destroy($categoryId)
+    {
+        $category = ProductCategory::find($categoryId);
+
+        if (!$category) {
+            return redirect()->back()->with('flashes.error', 'Category not found');
+        }
+
+        $isCategoryUsed = Product::where('product_category_id', '=', $category->id)->exists();
+
+        if (!$isCategoryUsed && $category->children->count() > 0) {
+            $isCategoryUsed = Product::whereIn('product_category_id', '=', $category->children->pluck('id'))->exists();
+        }
+
+        if ($isCategoryUsed) {
+            return redirect()->back()->with('flashes.error', 'Cannot delete used category');
+        }
+
+        $category->delete();
+
+        return redirect(route('categories.index'))->with('flashes.success', 'Category deleted');
     }
 }

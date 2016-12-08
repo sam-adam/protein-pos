@@ -19,6 +19,14 @@
                                         <i class="fa fa-pencil"></i>
                                         Edit
                                     </a>
+                                    <form method="post" action="{{ route('categories.destroy', $root->id) }}" style="display: inline;" onsubmit="return confirm('Are you sure to delete this category?');">
+                                        {{ csrf_field() }}
+                                        {{ method_field('DELETE') }}
+                                        <button type="submit" class="btn btn-danger btn-xs">
+                                            <i class="fa fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </form>
                                 </div>
                                 @if($root->children->count() > 0)
                                     <ul>
@@ -30,6 +38,14 @@
                                                         <i class="fa fa-pencil"></i>
                                                         Edit
                                                     </a>
+                                                    <form method="post" action="{{ route('categories.destroy', $child->id) }}" style="display: inline;" onsubmit="return confirm('Are you sure to delete this category?');">
+                                                        {{ csrf_field() }}
+                                                        {{ method_field('DELETE') }}
+                                                        <button type="submit" class="btn btn-danger btn-xs">
+                                                            <i class="fa fa-trash"></i>
+                                                            Delete
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </li>
                                         @endforeach

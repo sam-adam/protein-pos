@@ -68,6 +68,12 @@
                                 Categories
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ url('products') }}">
+                                <i class="fa fa-fw fa-cube"></i>
+                                Products
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

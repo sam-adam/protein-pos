@@ -12,3 +12,4 @@ Route::post('/branches/{branchId}/license', 'BranchesController@license')->name(
 Route::post('/branches/{branchId}/activate', 'BranchesController@activate')->name('branches.activate');
 Route::resource('/brands', 'BrandsController');
 Route::resource('/categories', 'ProductCategoriesController');
+Route::resource('/products', 'ProductsController');
