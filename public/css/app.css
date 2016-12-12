@@ -10779,6 +10779,11 @@ ul.tree li:last-child {
   border-left: 2px solid transparent;
 }
 
+.product-list .product-item {
+  white-space: normal;
+  height: 150px;
+}
+
 /*# sourceMappingURL=main.css.map */
 
 body {

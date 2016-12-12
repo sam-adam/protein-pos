@@ -33,4 +33,9 @@ class ProductCategory extends BaseModel
     {
         return $this->hasMany(Product::class);
     }
+
+    public function isRoot()
+    {
+        return $this->parent_id === null;
+    }
 }
