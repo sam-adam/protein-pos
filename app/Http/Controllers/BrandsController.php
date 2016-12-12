@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBrand;
 use App\Models\Brand;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class BrandsController
@@ -54,5 +55,25 @@ class BrandsController extends AuthenticatedController
         $brand->saveOrFail();
 
         return redirect(route('brands.index'))->with('flashes.success', 'Brand edited');
+    }
+
+    public function destroy($brandId)
+    {
+        $brand = Brand::find($brandId);
+
+        if (!$brand) {
+            return redirect()->back()->with('flashes.error', 'Brand not found');
+        }
+
+        DB::transaction(function () use ($brand) {
+            foreach ($brand->products as $product) {
+                $product->brand_id = null;
+                $product->saveOrFail();
+            }
+
+            $brand->delete();
+        });
+
+        return redirect(route('brands.index'))->with('flashes.success', 'Brand deleted');
     }
 }

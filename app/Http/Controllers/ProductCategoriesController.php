@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductCategory;
-use App\Models\Product;
 use App\Models\ProductCategory;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ProductCategoriesController
@@ -70,15 +70,19 @@ class ProductCategoriesController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Category not found');
         }
 
-        $isCategoryUsed = Product::where('product_category_id', '=', $category->id)->exists();
+        DB::transaction(function () use ($category) {
+            foreach ($category->products as $product) {
+                $product->product_category_id = null;
+                $product->saveOrFail();
+            }
 
-        if (!$isCategoryUsed && $category->children->count() > 0) {
-            $isCategoryUsed = Product::whereIn('product_category_id', '=', $category->children->pluck('id'))->exists();
-        }
+            foreach ($category->children as $child) {
+                $child->parent_id = null;
+                $child->saveOrFail();
+            }
 
-        if ($isCategoryUsed) {
-            return redirect()->back()->with('flashes.error', 'Cannot delete used category');
-        }
+            $category->delete();
+        });
 
         $category->delete();
 

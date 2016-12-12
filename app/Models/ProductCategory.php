@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class ProductCategory
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class ProductCategory extends BaseModel
 {
+    use SoftDeletes;
+
     public function scopeRoots(Builder $query)
     {
         return $query->whereNull('parent_id');
@@ -24,5 +27,10 @@ class ProductCategory extends BaseModel
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

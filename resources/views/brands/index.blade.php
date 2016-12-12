@@ -32,6 +32,14 @@
                                             <i class="fa fa-pencil"></i>
                                             Edit
                                         </a>
+                                        <form method="post" action="{{ route('brands.destroy', $brand->id) }}" style="display: inline;" onsubmit="return confirm('Deleting brand! Are you sure?');">
+                                            {{ csrf_field() }}
+                                            {{ method_field('DELETE') }}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa fa-trash"></i>
+                                                Delete
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
