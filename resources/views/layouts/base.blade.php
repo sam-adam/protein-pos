@@ -63,16 +63,19 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url('categories') }}">
-                                <i class="fa fa-fw fa-folder"></i>
-                                Categories
+                            <a href="#">
+                                <i class="fa fa-cube fa-fw"></i>
+                                Products and Categories
+                                <span class="fa arrow"></span>
                             </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('products') }}">
-                                <i class="fa fa-fw fa-cube"></i>
-                                Products
-                            </a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="{{ url('products') }}">Products</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('categories') }}">Categories</a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

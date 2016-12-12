@@ -10,11 +10,10 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <ul>
+                    <ul class="tree">
                         @foreach($roots as $root)
                             <li>
                                 <div>
-                                    {{ $root->name }}
                                     <a href="{{ route('categories.edit', $root->id) }}" class="btn btn-primary btn-xs">
                                         <i class="fa fa-pencil"></i>
                                         Edit
@@ -27,13 +26,13 @@
                                             Delete
                                         </button>
                                     </form>
+                                    {{ $root->name }}
                                 </div>
                                 @if($root->children->count() > 0)
                                     <ul>
                                         @foreach($root->children as $child)
                                             <li>
                                                 <div>
-                                                    {{ $child->name }}
                                                     <a href="{{ route('categories.edit', $child->id) }}" class="btn btn-primary btn-xs">
                                                         <i class="fa fa-pencil"></i>
                                                         Edit
@@ -46,6 +45,7 @@
                                                             Delete
                                                         </button>
                                                     </form>
+                                                    {{ $child->name }}
                                                 </div>
                                             </li>
                                         @endforeach
