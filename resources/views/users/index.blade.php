@@ -38,6 +38,16 @@
                                             <i class="fa fa-pencil"></i>
                                             Edit
                                         </a>
+                                        @if($user->id !== Auth::id())
+                                            <form method="post" action="{{ route('users.destroy', $user->id) }}" style="display: inline;" onsubmit="return confirm('Deleting user! Are you sure?');">
+                                                {{ csrf_field() }}
+                                                {{ method_field('DELETE') }}
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

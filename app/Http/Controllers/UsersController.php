@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUser;
 use App\Models\Branch;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class UsersController
@@ -75,5 +76,22 @@ class UsersController extends AuthenticatedController
         $user->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User edited');
+    }
+
+    public function destroy($userId)
+    {
+        $user = User::find($userId);
+
+        if (!$user) {
+            return redirect()->back()->with('flashes.error', 'User not found');
+        }
+
+        if ($userId === Auth::id()) {
+            return redirect()->back()->with('flashes.error', 'Cannot delete self');
+        }
+
+        $user->delete();
+
+        return redirect(route('users.index'))->with('flashes.success', 'User deleted');
     }
 }
