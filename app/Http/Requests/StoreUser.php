@@ -30,22 +30,17 @@ class StoreUser extends FormRequest
      */
     public function rules()
     {
-        $user  = User::find(Route::input('user'));
         $rules = [
-            'role'                  => 'bail|required|in:cashier,manager,admin,tech_admin',
-            'branch_id'             => 'bail|required|exists:branches,id',
-            'minimum_discount_type' => 'bail|required_with:minimum_discount',
-            'maximum_discount_type' => 'bail|required_with:maximum_discount'
+            'role'                    => 'bail|required|in:cashier,manager,admin,tech_admin',
+            'branch_id'               => 'bail|required|exists:branches,id',
+            'max_percentage_discount' => 'bail|present|numeric|between:0,100',
+            'max_price_discount'      => 'bail|present|numeric'
         ];
 
         if ($this->isMethod('post')) {
             $rules['name']     = 'bail|required|unique:users,name';
             $rules['username'] = 'bail|required|alpha_dash|unique:users,username';
             $rules['password'] = 'bail|required|min:6';
-        } elseif ($this->isMethod('put')) {
-            $rules['name']     = 'bail|required|unique:users,name,'.$user->id;
-            $rules['username'] = 'bail|required|alpha_dash|unique:users,username,'.$user->id;
-            $rules['password'] = 'bail|present|min:6';
         }
 
         return $rules;

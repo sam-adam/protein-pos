@@ -9,35 +9,19 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
+                <div class="panel-heading">
+                    Products List - Record {{ $products->firstItem() }} to {{ $products->lastItem() }} from {{ $products->total() }} total records
+                </div>
                 <div class="panel-body">
-                    <ul>
-                        @foreach($roots as $root)
-                            <li>
-                                <div>
-                                    {{ $root->name }}
-                                    <a href="{{ route('products.edit', $root->id) }}" class="btn btn-primary btn-xs">
-                                        <i class="fa fa-pencil"></i>
-                                        Edit
-                                    </a>
-                                </div>
-                                @if($root->children->count() > 0)
-                                    <ul>
-                                        @foreach($root->children as $child)
-                                            <li>
-                                                <div>
-                                                    {{ $child->name }}
-                                                    <a href="{{ route('products.edit', $child->id) }}" class="btn btn-primary btn-xs">
-                                                        <i class="fa fa-pencil"></i>
-                                                        Edit
-                                                    </a>
-                                                </div>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                            </li>
+                    <div class="row">
+                        @foreach($products as $product)
+                            <button class="btn btn-default btn-lg btn-block">
+                                {{ $product->name }}
+                                <br/>
+                                {{ $product->price }}
+                            </button>
                         @endforeach
-                    </ul>
+                    </div>
                     <div class="row">
                         <div class="col-xs-6">
                             <a href="{{ url('products/create') }}" class="btn btn-primary">
@@ -45,8 +29,10 @@
                                 Add new product
                             </a>
                         </div>
+                        <div class="col-xs-6 text-right">
+                            {{ $products->render() }}
+                        </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>

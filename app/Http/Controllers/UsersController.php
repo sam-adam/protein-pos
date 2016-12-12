@@ -25,16 +25,16 @@ class UsersController extends AuthenticatedController
 
     public function store(StoreUser $request)
     {
-        $newUser                        = new User();
-        $newUser->name                  = $request->get('name');
-        $newUser->username              = $request->get('username');
-        $newUser->password              = bcrypt($request->get('password'));
-        $newUser->branch_id             = $request->get('branch_id');
-        $newUser->role                  = $request->get('role');
-        $newUser->minimum_discount      = $request->get('minimum_discount') ?: null;
-        $newUser->minimum_discount_type = $request->get('minimum_discount_type') ?: null;
-        $newUser->maximum_discount      = $request->get('maximum_discount') ?: null;
-        $newUser->maximum_discount_type = $request->get('maximum_discount_type') ?: null;
+        $newUser                              = new User();
+        $newUser->name                        = $request->get('name');
+        $newUser->username                    = $request->get('username');
+        $newUser->password                    = bcrypt($request->get('password'));
+        $newUser->branch_id                   = $request->get('branch_id');
+        $newUser->role                        = $request->get('role');
+        $newUser->max_price_discount          = $request->get('max_price_discount') ?: null;
+        $newUser->max_percentage_discount     = $request->get('max_percentage_discount') ?: null;
+        $newUser->can_give_discount           = $request->get('can_give_discount') ?: null;
+        $newUser->can_give_unlimited_discount = $request->get('can_give_unlimited_discount') ?: null;
         $newUser->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User added');
@@ -66,13 +66,12 @@ class UsersController extends AuthenticatedController
             $user->password = bcrypt($request->get('password'));
         }
 
-        $user->branch_id             = $request->get('branch_id');
-        $user->role                  = $request->get('role');
-        $user->minimum_discount      = $request->get('minimum_discount') ?: null;
-        $user->minimum_discount_type = $request->get('minimum_discount_type') ?: null;
-        $user->maximum_discount      = $request->get('maximum_discount') ?: null;
-        $user->maximum_discount_type = $request->get('maximum_discount_type') ?: null;
-
+        $user->branch_id                   = $request->get('branch_id');
+        $user->role                        = $request->get('role');
+        $user->max_price_discount          = $request->get('max_price_discount') ?: $user->max_price_discount;
+        $user->max_percentage_discount     = $request->get('max_percentage_discount') ?: $user->max_percentage_discount;
+        $user->can_give_discount           = $request->get('can_give_discount') ?: $user->can_give_discount;
+        $user->can_give_unlimited_discount = $request->get('can_give_unlimited_discount') ?: $user->can_give_unlimited_discount;
         $user->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User edited');

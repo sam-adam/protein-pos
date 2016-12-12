@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterUsersAddDiscountLimit extends Migration
+class AlterUsersAddSoftDelete extends Migration
 {
     /**
      * Run the migrations.
@@ -14,14 +14,10 @@ class AlterUsersAddDiscountLimit extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger('minimum_discount')
+            $table->timestamp('deleted_at')
                 ->nullable();
-            $table->enum('minimum_discount_type', ['percent', 'price'])
-                ->nullable();
-            $table->unsignedInteger('maximum_discount')
-                ->nullable();
-            $table->enum('maximum_discount_type', ['percent', 'price'])
-                ->nullable();
+
+            $table->index(['deleted_at']);
         });
     }
 
@@ -33,7 +29,7 @@ class AlterUsersAddDiscountLimit extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['minimum_discount', 'maximum_discount', 'minimum_discount_type', 'maximum_discount_type']);
+            $table->dropColumn('deleted_at');
         });
     }
 }

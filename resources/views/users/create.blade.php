@@ -70,42 +70,42 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('minimum_discount') || $errors->has('minimum_discount_type') ? 'has-error' : '' }}">
-                            <label for="minimum_discount" class="col-sm-2 control-label">Min Discount</label>
-                            <div class="col-sm-2">
-                                <input type="text" name="minimum_discount" id="minimum_discount" class="form-control" placeholder="Min discount limit" value="{{ old('minimum_discount') }}" />
-                                @foreach($errors->get('minimum_discount') as $error)
-                                    <span class="label label-danger">{{ $error }}</span>
-                                @endforeach
-                            </div>
-                            <div class="col-sm-3">
-                                <select class="form-control" id="minimum_discount_type" name="minimum_discount_type">
-                                    <option value>Discount Type</option>
-                                    @foreach(['percent', 'price'] as $type)
-                                        <option value="{{ $type }}" @if(old('minimum_discount_type') === $type) selected @endif>{{ title_case($type) }}</option>
-                                    @endforeach
-                                </select>
-                                @foreach($errors->get('minimum_discount_type') as $error)
+                        <div class="form-group {{ $errors->has('can_give_discount') ? 'has-error' : '' }}">
+                            <div class="col-sm-offset-2 col-sm-5">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="can_give_discount" value="1" @if(old('can_give_discount')) checked @endif> Can give discount?
+                                    </label>
+                                </div>
+                                @foreach($errors->get('can_give_discount') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('maximum_discount') || $errors->has('maximum_discount_type') ? 'has-error' : '' }}">
-                            <label for="maximum_discount" class="col-sm-2 control-label">Max Discount</label>
-                            <div class="col-sm-2">
-                                <input type="text" name="maximum_discount" id="maximum_discount" class="form-control" placeholder="Max discount limit" value="{{ old('maximum_discount') }}" />
-                                @foreach($errors->get('maximum_discount') as $error)
+                        <div class="form-group {{ $errors->has('can_give_unlimited_discount') ? 'has-error' : '' }}">
+                            <div class="col-sm-offset-2 col-sm-5">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="can_give_unlimited_discount" value="1" @if(old('can_give_unlimited_discount')) checked @endif> Can give unlimited discount?
+                                    </label>
+                                </div>
+                                @foreach($errors->get('can_give_unlimited_discount') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
                             </div>
-                            <div class="col-sm-3">
-                                <select class="form-control" id="maximum_discount_type" name="maximum_discount_type">
-                                    <option value>Discount Type</option>
-                                    @foreach(['percent', 'price'] as $type)
-                                        <option value="{{ $type }}" @if(old('maximum_discount_type') === $type) selected @endif>{{ title_case($type) }}</option>
-                                    @endforeach
-                                </select>
-                                @foreach($errors->get('maximum_discount_type') as $error)
+                        </div>
+                        <div class="form-group {{ $errors->has('max_price_discount') || $errors->has('max_percentage_discount') ? 'has-error' : '' }}">
+                            <label for="max_price_discount" class="col-sm-2 control-label">Max Discount (Price)</label>
+                            <div class="col-sm-2">
+                                <input type="text" name="max_price_discount" id="max_price_discount" class="form-control" placeholder="Eg: 1000" value="{{ old('max_price_discount') }}" />
+                                @foreach($errors->get('max_price_discount') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                            <label for="max_percentage_discount" class="col-sm-1 control-label">Percentage</label>
+                            <div class="col-sm-2">
+                                <input type="text" name="max_percentage_discount" id="max_percentage_discount" class="form-control" placeholder="0 - 100" value="{{ old('max_percentage_discount') }}" />
+                                @foreach($errors->get('max_percentage_discount') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
                             </div>

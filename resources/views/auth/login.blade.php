@@ -8,7 +8,7 @@
     <link href="{{ elixir('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
-<div id="preloader">
+<div id="preloader" class="hidden">
     <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
 </div>
 <div class="container">

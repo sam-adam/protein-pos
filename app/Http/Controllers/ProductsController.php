@@ -14,12 +14,12 @@ class ProductsController extends AuthenticatedController
 {
     public function index()
     {
-        return view('products.index', ['roots' => Product::paginate()]);
+        return view('products.index', ['products' => Product::paginate()]);
     }
 
     public function create()
     {
-        return view('products.create', ['roots' => Product::roots()->get()]);
+        return view('products.create', ['products' => Product::roots()->get()]);
     }
 
     public function store(StoreProduct $request)
@@ -41,7 +41,7 @@ class ProductsController extends AuthenticatedController
 
         return view('products.edit', [
             'product' => $product,
-            'roots'    => Product::roots()->get()->except($productId)
+            'roots'   => Product::roots()->get()->except($productId)
         ]);
     }
 
