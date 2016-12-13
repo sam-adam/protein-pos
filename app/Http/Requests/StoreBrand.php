@@ -25,14 +25,11 @@ class StoreBrand extends FormRequest
      */
     public function rules()
     {
-        $brand = Brand::find(Route::input('brand'));
-        $rules = [
-            'name' => 'bail|required|unique:brands,name'
+        $brand   = Brand::find(Route::input('brand'));
+        $brandId = $brand ? $brand->id : 'NULL';
+        $rules   = [
+            'name' => "bail|required|unique:brands,name,{$brandId},id,deleted_at,NULL"
         ];
-
-        if ($this->isMethod('put')) {
-            $rules['name'] .= ','.$brand->id;
-        }
 
         return $rules;
     }

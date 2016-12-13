@@ -57,15 +57,9 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url('brands') }}">
-                                <i class="fa fa-fw fa-tags"></i>
-                                Brands
-                            </a>
-                        </li>
-                        <li>
                             <a href="#">
                                 <i class="fa fa-cube fa-fw"></i>
-                                Products and Categories
+                                Inventories
                                 <span class="fa arrow"></span>
                             </a>
                             <ul class="nav nav-second-level">
@@ -74,6 +68,9 @@
                                 </li>
                                 <li>
                                     <a href="{{ url('categories') }}">Categories</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('brands') }}">Brands</a>
                                 </li>
                             </ul>
                         </li>

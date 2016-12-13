@@ -14,7 +14,7 @@
                         <div class="form-group form-group-lg">
                             <label class="col-md-2 control-label">Search</label>
                             <div class="col-md-10">
-                                <input type="text" class="form-control" name="query" placeholder="Input product name, code, or scan barcode" autofocus>
+                                <input type="text" class="form-control" name="query" placeholder="Input product name, code, or scan barcode" value="{{ Request::get('query') }}" autofocus>
                             </div>
                         </div>
                     </div>

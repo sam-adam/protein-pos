@@ -28,13 +28,13 @@ class StoreProductCategory extends FormRequest
      */
     public function rules()
     {
-        $brand = $this->getCategory();
-        $rules = [
-            'name' => 'bail|required|unique:brands,name'
+        $category   = $this->getCategory();
+        $categoryId = $category->id;
+        $rules      = [
+            'name' => "bail|required|unique:brands,name,{$categoryId},id,deleted_at,NULL"
         ];
 
         if ($this->isMethod('put')) {
-            $rules['name'] .= ','.$brand->id;
             $rules['parent_id'] = 'bail|present|valid_child';
         }
 
