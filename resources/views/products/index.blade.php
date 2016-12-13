@@ -14,7 +14,7 @@
                         <div class="form-group form-group-lg">
                             <label class="col-md-2 control-label">Search</label>
                             <div class="col-md-10">
-                                <input type="text" class="form-control" name="query" placeholder="Input product name, code, or scan barcode" value="{{ Request::get('query') }}" autofocus>
+                                <input type="text" id="query" class="form-control" name="query" placeholder="Input product name, code, or scan barcode" value="{{ Request::get('query') }}" >
                             </div>
                         </div>
                     </div>
@@ -87,4 +87,23 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var $queryBox = $("#query"),
+                $queryForm = $queryBox.closest("form");
+
+            $queryBox[0].focus();
+
+            $(window).on("paste", function (e) {
+                if (e.target === $queryBox[0]) {
+                    setTimeout(function () {
+                        $queryForm.submit();
+                    }, 100);
+                }
+            });
+        });
+    </script>
 @endsection
