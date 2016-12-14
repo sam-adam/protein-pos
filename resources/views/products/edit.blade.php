@@ -87,7 +87,7 @@
                                 <button type="submit" class="btn btn-success btn-block">Save</button>
                             </div>
                             <div class="col-sm-2">
-                                <a href="{{ URL::previous() }}" class="btn btn-danger btn-block">Cancel</a>
+                                <a href="{{ URL::previous() === route('products.edit', $product->id) ? route('products.index') : URL::previous() }}" class="btn btn-danger btn-block">Cancel</a>
                             </div>
                         </div>
                     </form>

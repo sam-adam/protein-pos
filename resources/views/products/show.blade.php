@@ -30,8 +30,8 @@
                         <div class="col-sm-2">
                             <p class="form-control-static">{{ $product->code }}</p>
                         </div>
-                        <label for="barcode" class="col-sm-1 control-label">Barcode</label>
-                        <div class="col-sm-2">
+                        <label for="barcode" class="col-sm-2 control-label">Barcode</label>
+                        <div class="col-sm-6">
                             <p class="form-control-static">{{ $product->barcode }}</p>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-3">
+                        <div class="col-sm-offset-2 col-sm-5">
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary btn-block">
                                 Edit
                             </a>
