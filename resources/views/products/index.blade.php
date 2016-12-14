@@ -56,7 +56,7 @@
             <div class="row product-list">
                 @foreach($products as $product)
                     <div class="col-md-3">
-                        <div class="btn btn-default btn-lg btn-block product-item">
+                        <div class="btn btn-default btn-lg btn-block product-item" href="{{ route('products.show', $product->id) }}">
                             <div class="product-name">
                                 {{ $product->name }}
                             </div>
@@ -93,7 +93,8 @@
     <script type="text/javascript">
         $(document).ready(function () {
             var $queryBox = $("#query"),
-                $queryForm = $queryBox.closest("form");
+                $queryForm = $queryBox.closest("form"),
+                $productItems = $(".product-item");
 
             $queryBox[0].focus();
 
@@ -103,6 +104,10 @@
                         $queryForm.submit();
                     }, 100);
                 }
+            });
+
+            $productItems.on("click", function () {
+                window.location = $(this).attr("href");
             });
         });
     </script>

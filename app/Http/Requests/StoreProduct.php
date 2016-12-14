@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Route;
 
 class StoreProduct extends FormRequest
 {
@@ -13,7 +15,7 @@ class StoreProduct extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +25,15 @@ class StoreProduct extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $product   = Product::find(Route::input('product'));
+        $productId = $product ? $product->id : 'NULL';
+        $rules     = [
+            'name'        => "bail|required|unique:products,name,{$productId},id,deleted_at,NULL",
+            'price'       => 'numeric',
+            'brand_id'    => 'bail|exists:brands,id',
+            'category_id' => 'bail|exists:product_categories,id'
         ];
+
+        return $rules;
     }
 }

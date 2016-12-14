@@ -75,16 +75,39 @@ class ProductsController extends AuthenticatedController
 
     public function create()
     {
-        return view('products.create', ['products' => Product::roots()->get()]);
+        return view('products.create', [
+            'categories' => ProductCategory::with('parent')->get(),
+            'brands'     => Brand::all()
+        ]);
     }
 
     public function store(StoreProduct $request)
     {
-        $newProduct       = new Product();
-        $newProduct->name = $request->get('name');
+        $brand    = Brand::find($request->get('brand'));
+        $category = ProductCategory::find($request->get('category'));
+
+        $newProduct                      = new Product();
+        $newProduct->name                = $request->get('name');
+        $newProduct->price               = $request->get('price') ?: 0;
+        $newProduct->brand_id            = $brand ? $brand->id : null;
+        $newProduct->product_category_id = $category ? $category->id : null;
         $newProduct->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
+    }
+
+    public function show($productId)
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return redirect()->back()->with('flashes.error', 'Product not found');
+        }
+
+        return view('products.show', [
+            'product'     => $product,
+            'inventories' => Inventory::inBranch(Auth::user()->branch)->where('product_id', '=', $product->id)->get()
+        ]);
     }
 
     public function edit($productId)
@@ -96,8 +119,9 @@ class ProductsController extends AuthenticatedController
         }
 
         return view('products.edit', [
-            'product' => $product,
-            'roots'   => Product::roots()->get()->except($productId)
+            'product'    => $product,
+            'categories' => ProductCategory::with('parent')->get(),
+            'brands'     => Brand::all()
         ]);
     }
 
@@ -109,8 +133,15 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
-        $product->name      = $request->get('name');
-        $product->parent_id = $request->get('parent_id') ?: null;
+        $brand    = Brand::find($request->get('brand'));
+        $category = ProductCategory::find($request->get('category'));
+
+        $product->name                = $request->get('name');
+        $product->price               = $request->get('price') ?: 0;
+        $product->code                = $request->get('code');
+        $product->barcode             = $request->get('barcode');
+        $product->brand_id            = $brand ? $brand->id : $product->brand_id;
+        $product->product_category_id = $category ? $category->id : $product->product_category_id;
         $product->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product edited');
