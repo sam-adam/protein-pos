@@ -7,7 +7,7 @@
 @section('content')
     @parent
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     General - {{ $product->name }}
@@ -75,16 +75,37 @@
                 <div class="panel-body">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active">
-                            <a href="#breakdown" aria-controls="breakdown" role="tab" data-toggle="tab">
-                                Breakdown
+                            <a href="#branch-stock" aria-controls="branch-stock" role="tab" data-toggle="tab">
+                                Branch Stock
                             </a>
                         </li>
                         <li role="presentation">
                             <a href="#movement" aria-controls="movement" role="tab" data-toggle="tab">
-                                Movement
+                                Movements
                             </a>
                         </li>
                     </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="branch-stock">
+                            <table class="table table-bordered table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Branch</th>
+                                        <th>Current Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($branches as $branch)
+                                        <tr>
+                                            <td>{{ $branch->name }}</td>
+                                            <td>{{ number_format($branch->stockRemaining) }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="movement"></div>
+                    </div>
                 </div>
             </div>
         </div>

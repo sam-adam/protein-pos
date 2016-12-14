@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProduct;
+use App\Models\Branch;
 use App\Models\Brand;
 use App\Models\Inventory;
 use App\Models\Product;
@@ -98,15 +99,23 @@ class ProductsController extends AuthenticatedController
 
     public function show($productId)
     {
-        $product = Product::find($productId);
+        $product  = Product::find($productId);
+        $branches = Branch::all();
 
         if (!$product) {
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
+        foreach ($branches as $branch) {
+            $branch->stockRemaining = Inventory::inBranch($branch)
+                ->where('product_id', '=', $productId)
+                ->sum('stock');
+        }
+
         return view('products.show', [
             'product'     => $product,
-            'inventories' => Inventory::inBranch(Auth::user()->branch)->where('product_id', '=', $product->id)->get()
+            'inventories' => Inventory::inBranch(Auth::user()->branch)->where('product_id', '=', $product->id)->get(),
+            'branches'    => Branch::all()
         ]);
     }
 
