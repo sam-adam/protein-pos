@@ -86,8 +86,9 @@
                         </li>
                     </ul>
                     <div class="tab-content">
+                        <br/>
                         <div role="tabpanel" class="tab-pane active" id="branch-stock">
-                            <table class="table table-bordered table-condensed">
+                            <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Branch</th>
@@ -104,7 +105,16 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div role="tabpanel" class="tab-pane" id="movement"></div>
+                        <div role="tabpanel" class="tab-pane" id="movement">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <a href="" class="btn btn-primary">
+                                        <i class="fa fa-plus"></i>
+                                        Add Inventory
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
