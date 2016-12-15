@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    - Create New Product
+    - {{ $product->name }}
 @endsection
 
 @section('content')
@@ -75,8 +75,8 @@
                 <div class="panel-body">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active">
-                            <a href="#branch-stock" aria-controls="branch-stock" role="tab" data-toggle="tab">
-                                Branch Stock
+                            <a href="#breakdown" aria-controls="breakdown" role="tab" data-toggle="tab">
+                                Breakdown
                             </a>
                         </li>
                         <li role="presentation">
@@ -87,28 +87,15 @@
                     </ul>
                     <div class="tab-content">
                         <br/>
-                        <div role="tabpanel" class="tab-pane active" id="branch-stock">
+                        <div role="tabpanel" class="tab-pane active" id="breakdown">
                             <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Branch</th>
-                                        <th>Current Stock</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($branches as $branch)
-                                        <tr>
-                                            <td>{{ $branch->name }}</td>
-                                            <td>{{ number_format($branch->stockRemaining) }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
+
                             </table>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="movement">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <a href="" class="btn btn-primary">
+                                    <a href="#add-inventory-modal" class="btn btn-primary" data-toggle="modal">
                                         <i class="fa fa-plus"></i>
                                         Add Inventory
                                     </a>
@@ -116,6 +103,40 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="add-inventory-modal" tabindex="-1" role="dialog" aria-labelledby="add-inventory-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="add-inventory-modal-label">Add Inventory</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Product</label>
+                                    <div class="col-sm-5">
+                                        <p class="form-control-static">{{ $product->name }}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Date</label>
+                                    <div class="col-sm-5">
+                                        <input type="text" name="movement_effective_at" class="form-control datepicker" value="{{ \Carbon\Carbon::now()->toDateString() }}" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </div>
