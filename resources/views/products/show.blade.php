@@ -120,14 +120,30 @@
                             <form class="form-horizontal">
                                 <div class="form-group">
                                     <label class="control-label col-sm-3">Product</label>
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-9">
                                         <p class="form-control-static">{{ $product->name }}</p>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-3">Date</label>
-                                    <div class="col-sm-5">
-                                        <input type="text" name="movement_effective_at" class="form-control datepicker" value="{{ \Carbon\Carbon::now()->toDateString() }}" />
+                                    <div class="col-sm-3">
+                                        <input type="text" name="movement_effective_at" class="form-control datepicker" value="{{ old('movement_effective_at') ?: \Carbon\Carbon::now()->toDateString() }}" required />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Cost / Item</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="cost" class="form-control" value="{{ old('cost') }}" required />
+                                    </div>
+                                    <label class="control-label col-sm-2">Quantity</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="quantity" class="form-control" value="{{ old('quantity') }}" required />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Expire Date</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="cost" class="form-control datepicker" value="{{ old('expire_date') }}" required />
                                     </div>
                                 </div>
                             </form>

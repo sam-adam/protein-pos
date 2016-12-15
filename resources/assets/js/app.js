@@ -40,6 +40,19 @@ $(function() {
     };
 
     $(window).bind("load resize", resizeHandler);
+    $(document).ready(function () {
+        if (window.location.hash) {
+            var $modal = $(window.location.hash);
+
+            $modal.each(function () {
+                var $this = $(this);
+
+                if ($this.hasClass("modal")) {
+                    $this.modal("show");
+                }
+            });
+        }
+    });
 
     var url = window.location;
     // var element = $('ul.nav a').filter(function() {
