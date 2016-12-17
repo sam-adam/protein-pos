@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class InventoryMovementItem extends Model
 {
+    public $timestamps = false;
+
     public function product()
     {
         return $this->hasOne(Product::class);

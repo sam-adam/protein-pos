@@ -13,3 +13,4 @@ Route::post('/branches/{branchId}/activate', 'BranchesController@activate')->nam
 Route::resource('/brands', 'BrandsController');
 Route::resource('/categories', 'ProductCategoriesController');
 Route::resource('/products', 'ProductsController');
+Route::post('/products/{product}/add-inventory', 'ProductsController@addInventory')->name('products.addInventory');

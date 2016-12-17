@@ -26,13 +26,14 @@ elixir(mix => {
     ], 'public/js/app.js');
 
     mix.less([
-        'sb-admin-2.less'
-    ], 'public/css/theme.css');
+        'sb-admin-2.less',
+        '../../../node_modules/bootstrap-datepicker/build/build_standalone3.less'
+    ], 'public/css/third-party.css');
 
     mix.styles([
         '../../../node_modules/metismenu/dist/metisMenu.min.css',
         '../../../public/css/main.css',
-        '../../../public/css/theme.css'
+        '../../../public/css/third-party.css'
     ], 'public/css/app.css');
 
     mix.copy(['resources/assets/fonts'], 'public/build/fonts');

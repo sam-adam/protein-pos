@@ -167,7 +167,7 @@ return [
          * Package Service Providers...
          */
         Barryvdh\Debugbar\ServiceProvider::class,
-
+        Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         //
 
         /*

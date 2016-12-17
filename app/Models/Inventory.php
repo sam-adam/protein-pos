@@ -11,6 +11,13 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Inventory extends BaseModel
 {
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'expired_at',
+        'expiry_reminder_date'
+    ];
+
     public function scopeInBranch(Builder $query, Branch $branch)
     {
         return $query->where('branch_id', '=', $branch->id);

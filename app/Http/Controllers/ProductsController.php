@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProduct;
+use App\Http\Requests\StoreProductInventory;
 use App\Models\Branch;
 use App\Models\Brand;
 use App\Models\Inventory;
+use App\Models\InventoryMovement;
+use App\Models\InventoryMovementItem;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Services\MovementService;
+use Carbon\Carbon;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ProductsController
@@ -19,6 +25,15 @@ use Illuminate\Support\Facades\Auth;
  */
 class ProductsController extends AuthenticatedController
 {
+    protected $movementService;
+
+    public function __construct(MovementService $movementService)
+    {
+        parent::__construct();
+
+        $this->movementService = $movementService;
+    }
+
     public function index(Request $request)
     {
         $query         = $request->get('query');
@@ -105,9 +120,31 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
+        $inventories = Inventory::inBranch(Auth::user()->branch)
+            ->where('product_id', '=', $product->id)
+            ->orderBy('expired_at', 'desc')
+            ->get();
+        $movements   = InventoryMovement::branch(Auth::user()->branch)
+            ->select('inventory_movements.*')
+            ->join('inventory_movement_items', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
+            ->where('inventory_movement_items.product_id', '=', $productId)
+            ->groupBy('inventory_movements.id')
+            ->get();
+
+        foreach ($movements as $movement) {
+            $movement->direction = $movement->from_branch_id == Auth::user()->branch_id
+                ? 'Out'
+                : 'In';
+        }
+
         return view('products.show', [
-            'product'     => $product,
-            'inventories' => Inventory::inBranch(Auth::user()->branch)->where('product_id', '=', $product->id)->get()
+            'now'                       => Carbon::now(),
+            'product'                   => $product,
+            'inventories'               => $inventories,
+            'movements'                 => $movements,
+            'defaultMovementDate'       => Carbon::now(),
+            'defaultExpiredDate'        => \Carbon\Carbon::now()->addMonth(1),
+            'defaultExpiryReminderDate' => \Carbon\Carbon::now()->addMonth(1)->subWeek(1)
         ]);
     }
 
@@ -146,5 +183,29 @@ class ProductsController extends AuthenticatedController
         $product->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product edited');
+    }
+
+    public function addInventory(StoreProductInventory $request, $productId)
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return redirect()->back()->with('flashes.error', 'Product not found');
+        }
+
+        DB::transaction(function () use ($request, $productId) {
+            $productItems               = $request->all();
+            $productItems['product_id'] = $productId;
+
+            return $this->movementService->createMovement(
+                Auth::user()->branch,
+                [$productItems],
+                null,
+                $request->get('remark'),
+                $request->get('movement_effective_at')
+            );
+        });
+
+        return redirect()->back()->with('flashes.success', 'Movement created');
     }
 }

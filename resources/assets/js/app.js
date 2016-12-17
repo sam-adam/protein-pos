@@ -7,6 +7,8 @@ window.$ = window.jQuery = require("jquery");
  */
 
 require('./bootstrap');
+require('bootstrap-datepicker');
+window.moment = require('moment');
 
 /*!
  * Start Bootstrap - SB Admin 2 v3.3.7+1 (http://startbootstrap.com/template-overviews/sb-admin-2)
@@ -52,6 +54,11 @@ $(function() {
                 }
             });
         }
+    });
+
+    $(".datepicker").datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
     });
 
     var url = window.location;
