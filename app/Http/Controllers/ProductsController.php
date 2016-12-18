@@ -122,7 +122,7 @@ class ProductsController extends AuthenticatedController
 
         $inventories = Inventory::inBranch(Auth::user()->branch)
             ->where('product_id', '=', $product->id)
-            ->orderBy('expired_at', 'desc')
+            ->orderBy('expired_at', 'asc')
             ->get();
         $movements   = InventoryMovement::branch(Auth::user()->branch)
             ->select('inventory_movements.*')
@@ -137,10 +137,15 @@ class ProductsController extends AuthenticatedController
                 : 'In';
         }
 
+        $expiredInventories = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
+        $closestExpired     = $inventories->filter(function (Inventory $inventory) { return !$inventory->isExpired(); })->first();
+
         return view('products.show', [
             'now'                       => Carbon::now(),
             'product'                   => $product,
             'inventories'               => $inventories,
+            'expiredInventories'        => $expiredInventories,
+            'closestExpired'            => $closestExpired,
             'movements'                 => $movements,
             'defaultMovementDate'       => Carbon::now(),
             'defaultExpiredDate'        => \Carbon\Carbon::now()->addMonth(1),

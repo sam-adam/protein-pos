@@ -58,8 +58,30 @@
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-5">
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary btn-block">
+                                <i class="fa fa-pencil fa-fw"></i>
                                 Edit
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Stock
+                </div>
+                <div class="panel-body form-horizontal">
+                    <div class="row">
+                        <label for="stock-in-hand" class="col-sm-3 control-label">Stock In Hand</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{ number_format($inventories->sum('stock')).' ('.number_format($inventories->sum('stock') - $expiredInventories->sum('stock')).' available, '.$expiredInventories->sum('stock').' expired)' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="closest-expiry" class="col-sm-3 control-label">Closest Expiry</label>
+                        <div class="col-sm-9">
+                            <p class="form-control-static">{{ $closestExpired ? $closestExpired->expired_at->toDateString().' ('.$closestExpired->stock.' items)' : '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -97,6 +119,7 @@
                                         <th>Reminder Expired At</th>
                                         <th>Created At</th>
                                         <th>Admin</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -108,6 +131,14 @@
                                             <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toDateString() : '-' }}</td>
                                             <td>{{ $inventory->created_at->toDateString() }}</td>
                                             <td>{{ $inventory->creator->name }}</td>
+                                            <td>
+                                                @if($inventory->stock > 0)
+                                                    <a href="#move-inventory-modal" class="btn btn-primary btn-sm" data-toggle="modal">
+                                                        <i class="fa fa-arrow-right fa-fw"></i>
+                                                        Move To Other Branch
+                                                    </a>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -122,6 +153,7 @@
                                         <th>To</th>
                                         <th>Date</th>
                                         <th>Admin</th>
+                                        <th>Remark</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -132,6 +164,7 @@
                                             <td>{{ $movement->to->name }}</td>
                                             <td>{{ $movement->created_at->toDateTimeString() }}</td>
                                             <td>{{ $movement->creator->name }}</td>
+                                            <td>{{ $movement->remark }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -150,9 +183,15 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="move-inventory-modal" tabindex="-1" role="dialog" aria-labelledby="move-inventory-modal-label">
+        <div class="modal-dialog" role="document">
+            <form class="form-horizontal" method="post" action="{{ route('products.inventory.move', $product->id) }}">
+            </form>
+        </div>
+    </div>
     <div class="modal fade" id="add-inventory-modal" tabindex="-1" role="dialog" aria-labelledby="add-inventory-modal-label">
         <div class="modal-dialog" role="document">
-            <form class="form-horizontal" method="post" action="{{ route('products.addInventory', $product->id) }}">
+            <form class="form-horizontal" method="post" action="{{ route('products.inventory.add', $product->id) }}">
                 {{ csrf_field() }}
                 <div class="modal-content">
                     <div class="modal-header">

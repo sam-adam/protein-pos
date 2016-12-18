@@ -72,24 +72,14 @@ class MovementService
                 $sourceInventory->saveOrFail();
             }
 
-            $sameExpireDateInventory = Inventory::inBranch($toBranch)
-                ->where('product_id', '=', $productId)
-                ->where('expired_at', '=', $movementItem->expired_at)
-                ->first();
-
-            if ($sameExpireDateInventory) {
-                $sameExpireDateInventory->stock += $movementItem->quantity;
-                $sameExpireDateInventory->saveOrFail();
-            } else {
-                $newInventory                       = new Inventory();
-                $newInventory->branch_id            = $toBranch->id;
-                $newInventory->product_id           = $movementItem->product_id;
-                $newInventory->cost                 = $movementItem->cost;
-                $newInventory->stock                = $movementItem->quantity;
-                $newInventory->expired_at           = $movementItem->expired_at;
-                $newInventory->expiry_reminder_date = $movementItem->expiry_reminder_date;
-                $newInventory->saveOrFail();
-            }
+            $newInventory                       = new Inventory();
+            $newInventory->branch_id            = $toBranch->id;
+            $newInventory->product_id           = $movementItem->product_id;
+            $newInventory->cost                 = $movementItem->cost;
+            $newInventory->stock                = $movementItem->quantity;
+            $newInventory->expired_at           = $movementItem->expired_at;
+            $newInventory->expiry_reminder_date = $movementItem->expiry_reminder_date;
+            $newInventory->saveOrFail();
         }
 
         return $movement;
