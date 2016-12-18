@@ -130,6 +130,7 @@ class ProductsController extends AuthenticatedController
             ->join('inventory_movement_items', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
             ->where('inventory_movement_items.product_id', '=', $productId)
             ->groupBy('inventory_movements.id')
+            ->orderBy('inventory_movements.movement_effective_at', 'desc')
             ->get();
 
         foreach ($movements as $movement) {

@@ -210,16 +210,19 @@
                                         <p class="form-control-static">{{ $product->name }}</p>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('quantity') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4" for="quantity">Quantity</label>
                                     <div class="col-sm-2" id="current-stock">
                                         <input type="text" name="quantity" id="quantity" class="form-control" value="{{ old('quantity') ?: 0 }}" required />
+                                        @foreach($errors->get('quantity') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                     <div class="col-sm-6">
                                         <p class="form-control-static text-left" id="stock-left"></p>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('branch_id') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4" for="branch-id">To Branch</label>
                                     <div class="col-sm-8">
                                         <select class="form-control" name="branch_id" id="branch-id" required>
@@ -228,12 +231,18 @@
                                                 <option value="{{ $otherBranch->id }}">{{ $otherBranch->name }}</option>
                                             @endforeach
                                         </select>
+                                        @foreach($errors->get('branch_id') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('remark') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Remark</label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" name="remark">{{ old('remark') }}</textarea>
+                                        @foreach($errors->get('remark') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -271,40 +280,58 @@
                                         <p class="form-control-static">{{ $product->name }}</p>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('movement_effective_at') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Date</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="movement_effective_at" class="form-control datepicker" value="{{ old('movement_effective_at') ?: $defaultMovementDate->toDateString() }}" required/>
+                                        @foreach($errors->get('movement_effective_at') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('cost') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Cost / Item</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="cost" class="form-control" value="{{ old('cost') }}" placeholder="Eg: 10000" required/>
+                                        @foreach($errors->get('cost') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('quantity') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Quantity</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="quantity" class="form-control" value="{{ old('quantity') }}" placeholder="Eg: 12" required/>
+                                        @foreach($errors->get('quantity') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('expire_date') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Expire Date</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="expire_date" class="form-control datepicker" value="{{ old('expire_date') ?: $defaultExpiredDate->toDateString() }}" required/>
+                                        @foreach($errors->get('expire_date') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('expiry_reminder_date') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Expiry Reminder Date</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="expiry_reminder_date" class="form-control datepicker" value="{{ old('expiry_reminder_date') ?: $defaultExpiryReminderDate->toDateString() }}" required/>
+                                        @foreach($errors->get('expiry_reminder_date') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group {{ $errors->has('remark') ? 'has-error' : '' }}">
                                     <label class="control-label col-sm-4">Remark</label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" name="remark">{{ old('remark') }}</textarea>
+                                        @foreach($errors->get('remark') as $error)
+                                            <span class="label label-danger">{{ $error }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -332,9 +359,10 @@
             var $movementEffectiveAt = $("input[name='movement_effective_at']"),
                 $expireDate = $("input[name='expire_date']"),
                 $expiryReminderDate = $("input[name='expiry_reminder_date']"),
+                $moveInventoryModal = $("#move-inventory-modal"),
+                $addInventoryModal = $("#add-inventory-modal"),
                 defaultMovementDate = moment("{{ $defaultMovementDate->toDateString() }}"),
-                defaultExpiredDate = moment("{{ $defaultExpiredDate->toDateString() }}"),
-                defaultExpiryReminderDate = moment("{{ $defaultExpiryReminderDate->toDateString() }}");
+                defaultExpiredDate = moment("{{ $defaultExpiredDate->toDateString() }}");
 
             $movementEffectiveAt.datepicker("setEndDate", defaultMovementDate.toDate());
             $expireDate.datepicker("setStartDate", defaultMovementDate.add(1, "days").toDate());
@@ -350,7 +378,7 @@
                 $expiryReminderDate.datepicker("setEndDate", e.date);
             });
 
-            $("#move-inventory-modal").on("show.bs.modal", function (e) {
+            $moveInventoryModal.on("show.bs.modal", function (e) {
                 var $this = $(this),
                     $button = $(e.relatedTarget),
                     stockLeft = $button.data("current-stock"),
@@ -359,6 +387,12 @@
                 $this.find("#stock-left").text(" / " + stockLeft + " stock left");
                 $this.find("input[name='inventory_id']").val(inventoryId);
             });
+
+            @if(URL::previous() === route('products.inventory.add', $product->id))
+                $addInventoryModal.modal("show");
+            @elseif(URL::previous() === route('products.inventory.move', $product->id))
+                $moveInventoryModal.modal("show");
+            @endif
         });
     </script>
 @endsection
