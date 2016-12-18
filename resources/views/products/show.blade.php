@@ -110,65 +110,73 @@
                     <div class="tab-content">
                         <br/>
                         <div role="tabpanel" class="tab-pane active" id="breakdown">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Stock</th>
-                                        <th>Cost</th>
-                                        <th>Expired At</th>
-                                        <th>Reminder Expired At</th>
-                                        <th>Created At</th>
-                                        <th>Admin</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($inventories as $inventory)
-                                        <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
-                                            <td>{{ number_format($inventory->stock) }}</td>
-                                            <td>{{ number_format($inventory->cost) }}</td>
-                                            <td>{{ $inventory->expired_at->toDateString() }}</td>
-                                            <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toDateString() : '-' }}</td>
-                                            <td>{{ $inventory->created_at->toDateString() }}</td>
-                                            <td>{{ $inventory->creator->name }}</td>
-                                            <td>
-                                                @if($inventory->stock > 0)
-                                                    <a href="#move-inventory-modal" class="btn btn-primary btn-sm" data-toggle="modal">
-                                                        <i class="fa fa-arrow-right fa-fw"></i>
-                                                        Move To Other Branch
-                                                    </a>
-                                                @endif
-                                            </td>
+                            @if($inventories->count() > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Stock</th>
+                                            <th>Cost</th>
+                                            <th>Expired At</th>
+                                            <th>Reminder Expired At</th>
+                                            <th>Created At</th>
+                                            <th>Admin</th>
+                                            <th></th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($inventories as $inventory)
+                                            <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
+                                                <td>{{ number_format($inventory->stock) }}</td>
+                                                <td>{{ number_format($inventory->cost) }}</td>
+                                                <td>{{ $inventory->expired_at->toDateString() }}</td>
+                                                <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toDateString() : '-' }}</td>
+                                                <td>{{ $inventory->created_at->toDateString() }}</td>
+                                                <td>{{ $inventory->creator->name }}</td>
+                                                <td>
+                                                    @if($inventory->stock > 0)
+                                                        <a href="#move-inventory-modal" class="btn btn-primary btn-sm" data-toggle="modal" data-inventory-id="{{ $inventory->id }}" data-current-stock="{{ $inventory->stock }}">
+                                                            <i class="fa fa-arrow-right fa-fw"></i>
+                                                            Move To Other Branch
+                                                        </a>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <p>No inventory yet</p>
+                            @endif
                         </div>
                         <div role="tabpanel" class="tab-pane" id="movement">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Type</th>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Date</th>
-                                        <th>Admin</th>
-                                        <th>Remark</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($movements as $movement)
-                                        <tr class="{{ $movement->direction === 'In' ? 'success' : 'danger' }}">
-                                            <td>{{ $movement->direction }}</td>
-                                            <td>{{ $movement->from ? $movement->from->name : '-' }}</td>
-                                            <td>{{ $movement->to->name }}</td>
-                                            <td>{{ $movement->created_at->toDateTimeString() }}</td>
-                                            <td>{{ $movement->creator->name }}</td>
-                                            <td>{{ $movement->remark }}</td>
+                            @if($movements->count() > 0)
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Date</th>
+                                            <th>Admin</th>
+                                            <th>Remark</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($movements as $movement)
+                                            <tr class="{{ $movement->direction === 'In' ? 'success' : 'danger' }}">
+                                                <td>{{ $movement->direction }}</td>
+                                                <td>{{ $movement->from ? $movement->from->name : '-' }}</td>
+                                                <td>{{ $movement->to->name }}</td>
+                                                <td>{{ $movement->created_at->toDateTimeString() }}</td>
+                                                <td>{{ $movement->creator->name }}</td>
+                                                <td>{{ $movement->remark }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <p>No movement yet</p>
+                            @endif
                             <div class="row">
                                 <div class="col-sm-4">
                                     <a href="#add-inventory-modal" class="btn btn-primary" data-toggle="modal">
@@ -187,6 +195,7 @@
         <div class="modal-dialog" role="document">
             <form class="form-horizontal" method="post" action="{{ route('products.inventory.move', $product->id) }}">
                 {{ csrf_field() }}
+                <input type="hidden" name="inventory_id" value />
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -203,17 +212,17 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-4" for="quantity">Quantity</label>
-                                    <div class="col-sm-3">
-                                        <input type="text" name="quantity" id="quantity" class="form-control" value="{{ old('quantity') }}" />
+                                    <div class="col-sm-2" id="current-stock">
+                                        <input type="text" name="quantity" id="quantity" class="form-control" value="{{ old('quantity') ?: 0 }}" required />
                                     </div>
-                                    <div class="col-sm-2">
-                                        <p class="form-control-static text-left">{{ $product->name }}</p>
+                                    <div class="col-sm-6">
+                                        <p class="form-control-static text-left" id="stock-left"></p>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-4" for="branch-id">To Branch</label>
                                     <div class="col-sm-8">
-                                        <select class="form-control" name="branch_id" id="branch-id">
+                                        <select class="form-control" name="branch_id" id="branch-id" required>
                                             <option value>Select Branch</option>
                                             @foreach($otherBranches as $otherBranch)
                                                 <option value="{{ $otherBranch->id }}">{{ $otherBranch->name }}</option>
@@ -221,8 +230,24 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Remark</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" name="remark">{{ old('remark') }}</textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times fa-fw"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-floppy-o fa-fw"></i>
+                            Save
+                        </button>
                     </div>
                 </div>
             </form>
@@ -323,6 +348,16 @@
 
             $expireDate.on("changeDate", function (e) {
                 $expiryReminderDate.datepicker("setEndDate", e.date);
+            });
+
+            $("#move-inventory-modal").on("show.bs.modal", function (e) {
+                var $this = $(this),
+                    $button = $(e.relatedTarget),
+                    stockLeft = $button.data("current-stock"),
+                    inventoryId = $button.data("inventory-id");
+
+                $this.find("#stock-left").text(" / " + stockLeft + " stock left");
+                $this.find("input[name='inventory_id']").val(inventoryId);
             });
         });
     </script>

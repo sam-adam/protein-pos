@@ -54,6 +54,22 @@ $(function() {
                 }
             });
         }
+
+        $(".modal").on("show.bs.modal", function () {
+            var $this = $(this),
+                id = $this.attr("id");
+
+            if (id && window.location.hash !== id) {
+                window.location.hash = id;
+            }
+        }).on("hide.bs.modal", function () {
+            var $this = $(this),
+                id = $this.attr("id");
+
+            if (id && window.location.hash === ("#" + id)) {
+                window.location.hash = "";
+            }
+        });
     });
 
     $(".datepicker").datepicker({

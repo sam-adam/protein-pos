@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MoveInventoryToOtherBranch;
 use App\Http\Requests\StoreProduct;
-use App\Http\Requests\StoreProductInventory;
+use App\Http\Requests\AddProductMovement;
 use App\Models\Branch;
 use App\Models\Brand;
 use App\Models\Inventory;
@@ -191,7 +192,7 @@ class ProductsController extends AuthenticatedController
         return redirect(route('products.index'))->with('flashes.success', 'Product edited');
     }
 
-    public function addInventory(StoreProductInventory $request, $productId)
+    public function addInventory(AddProductMovement $request, $productId)
     {
         $product = Product::find($productId);
 
@@ -200,12 +201,12 @@ class ProductsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($request, $productId) {
-            $productItems               = $request->all();
-            $productItems['product_id'] = $productId;
+            $movementItem               = $request->all();
+            $movementItem['product_id'] = $productId;
 
             return $this->movementService->createMovement(
                 Auth::user()->branch,
-                [$productItems],
+                [$movementItem],
                 null,
                 $request->get('remark'),
                 $request->get('movement_effective_at')
@@ -213,5 +214,33 @@ class ProductsController extends AuthenticatedController
         });
 
         return redirect()->back()->with('flashes.success', 'Movement created');
+    }
+
+    public function moveInventory(MoveInventoryToOtherBranch $request, $productId)
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return redirect()->back()->with('flashes.error', 'Product not found');
+        }
+
+        DB::transaction(function () use ($request, $productId) {
+            $inventory                            = Inventory::find($request->get('inventory_id'));
+            $movementItem                         = $inventory->getAttributes();
+            $movementItem['product_id']           = $productId;
+            $movementItem['source_inventory_id']  = $inventory->id;
+            $movementItem['expire_date']          = $inventory->expired_at->toDateString();
+            $movementItem['expiry_reminder_date'] = $inventory->expiry_reminder_date->toDateString();
+            $movementItem['quantity']             = $request->get('quantity');
+
+            return $this->movementService->createMovement(
+                Branch::find($request->get('branch_id')),
+                [$movementItem],
+                Auth::user()->branch,
+                $request->get('remark')
+            );
+        });
+
+        return redirect()->back()->with('flashes.success', 'Inventory moved');
     }
 }
