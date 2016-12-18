@@ -147,6 +147,7 @@ class ProductsController extends AuthenticatedController
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,
             'movements'                 => $movements,
+            'otherBranches'             => Branch::licensed()->active()->get()->except(Auth::user()->branch_id),
             'defaultMovementDate'       => Carbon::now(),
             'defaultExpiredDate'        => \Carbon\Carbon::now()->addMonth(1),
             'defaultExpiryReminderDate' => \Carbon\Carbon::now()->addMonth(1)->subWeek(1)

@@ -186,6 +186,45 @@
     <div class="modal fade" id="move-inventory-modal" tabindex="-1" role="dialog" aria-labelledby="move-inventory-modal-label">
         <div class="modal-dialog" role="document">
             <form class="form-horizontal" method="post" action="{{ route('products.inventory.move', $product->id) }}">
+                {{ csrf_field() }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="add-inventory-modal-label">Move Inventory</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4">Product</label>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static">{{ $product->name }}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" for="quantity">Quantity</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" name="quantity" id="quantity" class="form-control" value="{{ old('quantity') }}" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static text-left">{{ $product->name }}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-4" for="branch-id">To Branch</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" name="branch_id" id="branch-id">
+                                            <option value>Select Branch</option>
+                                            @foreach($otherBranches as $otherBranch)
+                                                <option value="{{ $otherBranch->id }}">{{ $otherBranch->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -195,8 +234,7 @@
                 {{ csrf_field() }}
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="add-inventory-modal-label">Add Inventory</h4>
                     </div>
                     <div class="modal-body">
@@ -248,8 +286,14 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times fa-fw"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-floppy-o fa-fw"></i>
+                            Save
+                        </button>
                     </div>
                 </div>
             </form>
