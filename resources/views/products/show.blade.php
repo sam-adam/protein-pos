@@ -134,7 +134,7 @@
                                                 <td>{{ $inventory->creator->name }}</td>
                                                 <td>
                                                     @if($inventory->stock > 0)
-                                                        <a href="#move-inventory-modal" class="btn btn-primary btn-sm" data-toggle="modal" data-inventory-id="{{ $inventory->id }}" data-current-stock="{{ $inventory->stock }}">
+                                                        <a href="#move-inventory-modal" class="btn btn-primary btn-sm btn-move-inventory" data-toggle="modal" data-inventory-id="{{ $inventory->id }}" data-current-stock="{{ $inventory->stock }}">
                                                             <i class="fa fa-arrow-right fa-fw"></i>
                                                             Move To Other Branch
                                                         </a>
@@ -226,9 +226,9 @@
                                     <label class="control-label col-sm-4" for="branch-id">To Branch</label>
                                     <div class="col-sm-8">
                                         <select class="form-control" name="branch_id" id="branch-id" required>
-                                            <option value>Select Branch</option>
+                                            <option value @if(old('branch_id') === null) selected @endif>Select Branch</option>
                                             @foreach($otherBranches as $otherBranch)
-                                                <option value="{{ $otherBranch->id }}">{{ $otherBranch->name }}</option>
+                                                <option value="{{ $otherBranch->id }}" @if(old('branch_id') == $otherBranch->id) selected @endif>{{ $otherBranch->name }}</option>
                                             @endforeach
                                         </select>
                                         @foreach($errors->get('branch_id') as $error)
@@ -388,10 +388,10 @@
                 $this.find("input[name='inventory_id']").val(inventoryId);
             });
 
-            @if(URL::previous() === route('products.inventory.add', $product->id))
+            @if(Session::get('previous_url') === route('products.inventory.add', $product->id))
                 $addInventoryModal.modal("show");
-            @elseif(URL::previous() === route('products.inventory.move', $product->id))
-                $moveInventoryModal.modal("show");
+            @elseif(Session::get('previous_url') === route('products.inventory.move', $product->id) && old('inventory_id'))
+                $(".btn-move-inventory[data-inventory-id='{{ old('inventory_id') }}']").trigger("click");
             @endif
         });
     </script>

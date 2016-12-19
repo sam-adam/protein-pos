@@ -113,7 +113,7 @@ class ProductsController extends AuthenticatedController
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
     }
 
-    public function show($productId)
+    public function show(Request $request, $productId)
     {
         $product = Product::find($productId);
 
