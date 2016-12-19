@@ -113,7 +113,7 @@ class ProductsController extends AuthenticatedController
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
     }
 
-    public function show(Request $request, $productId)
+    public function show($productId)
     {
         $product = Product::find($productId);
 
@@ -125,7 +125,8 @@ class ProductsController extends AuthenticatedController
             ->where('product_id', '=', $product->id)
             ->orderBy('expired_at', 'asc')
             ->get();
-        $movements   = InventoryMovement::branch(Auth::user()->branch)
+        $movements   = InventoryMovement::with('items')
+            ->branch(Auth::user()->branch)
             ->select('inventory_movements.*')
             ->join('inventory_movement_items', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
             ->where('inventory_movement_items.product_id', '=', $productId)
@@ -134,6 +135,9 @@ class ProductsController extends AuthenticatedController
             ->get();
 
         foreach ($movements as $movement) {
+            $movement->quantity  = $movement->items->filter(function (InventoryMovementItem $movementItem) use ($productId) {
+                return $movementItem->product_id == $productId;
+            })->sum('quantity');
             $movement->direction = $movement->from_branch_id == Auth::user()->branch_id
                 ? 'Out'
                 : 'In';

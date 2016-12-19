@@ -156,9 +156,11 @@
                                             <th>Type</th>
                                             <th>From</th>
                                             <th>To</th>
+                                            <th>Quantity</th>
                                             <th>Date</th>
                                             <th>Admin</th>
                                             <th>Remark</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -167,9 +169,16 @@
                                                 <td>{{ $movement->direction }}</td>
                                                 <td>{{ $movement->from ? $movement->from->name : '-' }}</td>
                                                 <td>{{ $movement->to->name }}</td>
+                                                <td>{{ $movement->quantity }}</td>
                                                 <td>{{ $movement->created_at->toDateTimeString() }}</td>
                                                 <td>{{ $movement->creator->name }}</td>
                                                 <td>{{ $movement->remark }}</td>
+                                                <td>
+                                                    <a href="" class="btn btn-primary btn-sm" target="_blank">
+                                                        <i class="fa fa-search-plus"></i>
+                                                        See detail
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
