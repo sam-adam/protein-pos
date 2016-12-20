@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <div class="row">
+    <div id="edit-product" class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -50,10 +50,19 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('brand') ? 'has-error' : '' }}">
+                        <div class="checkbox col-sm-offset-2 {{ $errors->has('is_service') ? 'has-error' : '' }}">
+                            <label>
+                                <input type="checkbox" name="is_service" value="1" v-model="is_service" @if($product->is_service) checked @endif> Is Service
+                                @foreach($errors->get('is_service') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </label>
+                        </div>
+                        <br/>
+                        <div class="form-group {{ $errors->has('brand') ? 'has-error' : '' }}" v-bind:class="{hidden: is_service}">
                             <label for="brand" class="col-sm-2 control-label">Brand</label>
                             <div class="col-sm-5">
-                                <select id="brand" name="brand" class="form-control" required>
+                                <select id="brand" name="brand" class="form-control" v-bind:required="!is_service">
                                     <option value @if($product->brand_id === null) selected @endif>Select Brand</option>
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}" @if((old('brand_id') ?: $product->brand_id) == $brand->id) selected @endif>{{ $brand->name}}</option>
@@ -64,10 +73,10 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('category') ? 'has-error' : '' }}">
+                        <div class="form-group {{ $errors->has('category') ? 'has-error' : '' }}" v-bind:class="{hidden: is_service}">
                             <label for="category" class="col-sm-2 control-label">Category</label>
                             <div class="col-sm-5">
-                                <select id="category" name="category" class="form-control" required>
+                                <select id="category" name="category" class="form-control" v-bind:required="!is_service">
                                     <option value @if($product->product_category_id === null) selected @endif>Select Category</option>
                                     @foreach($categories as $category)
                                         @if(!$category->isRoot())
@@ -82,13 +91,13 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('product_variant_group_id') ? 'has-error' : '' }}">
+                        <div class="form-group {{ $errors->has('product_variant_group_id') ? 'has-error' : '' }}" v-bind:class="{hidden: is_service}">
                             <label for="product_variant_group_id" class="col-sm-2 control-label">Variant</label>
                             <div class="col-sm-5">
                                 <select id="product_variant_group_id" name="product_variant_group_id" class="form-control">
                                     <option value @if($product->product_variant_group_id === null) selected @endif>Select Variant</option>
                                     @foreach($variants as $variant)
-                                        <option value="{{ $variant->id }}" @if((old('product_variant_group_id') ?: $product->product_variant_group_id) == $variant->id) selected @endif>
+                                        <option value="{{ $variant->id }}" @if(((old('product_variant_group_id') ?: $product->product_variant_group_id)) == $variant->id) selected @endif>
                                             {{ $variant->name }}
                                         </option>
                                     @endforeach
@@ -111,4 +120,15 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script type="text/javascript">
+        const app = new Vue({
+            el: '#edit-product',
+            data: {
+                is_service: {{ old('is_service') || $product->is_service ? 'true' : 'false' }}
+            }
+        });
+    </script>
 @endsection

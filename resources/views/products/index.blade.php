@@ -65,10 +65,17 @@
                                 <i class="fa fa-fw fa-money"></i>
                                 {{ number_format($product->price) }}
                             </div>
-                            <div class="product-stock">
-                                <i class="fa fa-fw fa-cubes"></i>
-                                {{ number_format($product->stock) }}
-                            </div>
+                            @if($product->is_service)
+                                <div>
+                                    <i class="fa fa-fw fa-lightbulb-o"></i>
+                                    Service Item
+                                </div>
+                            @else
+                                <div class="product-stock">
+                                    <i class="fa fa-fw fa-cubes"></i>
+                                    {{ number_format($product->stock) }}
+                                </div>
+                            @endif
                         </div>
                         <br/>
                     </div>

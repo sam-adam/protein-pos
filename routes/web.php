@@ -17,3 +17,4 @@ Route::post('/products/{product}/add-inventory', 'ProductsController@addInventor
 Route::post('/products/{product}/move-inventory', 'ProductsController@moveInventory')->name('products.inventory.move');
 //Route::resource('/inventory-movements', 'InventoryMovementsController');
 Route::resource('/product-variants', 'ProductVariantsController');
+Route::resource('/product-sets', 'ProductSetsController');

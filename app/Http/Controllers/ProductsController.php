@@ -110,6 +110,7 @@ class ProductsController extends AuthenticatedController
         $newProduct->brand_id                 = $brand ? $brand->id : null;
         $newProduct->product_category_id      = $category ? $category->id : null;
         $newProduct->product_variant_group_id = $variant ? $variant->id : null;
+        $newProduct->is_service               = $request->get('is_service') ?: false;
         $newProduct->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
@@ -174,7 +175,7 @@ class ProductsController extends AuthenticatedController
             'product'    => $product,
             'categories' => ProductCategory::with('parent')->get(),
             'brands'     => Brand::all(),
-            'variants'   => ProductVariantGroup::availableFor($product)->get()
+            'variants'   => ProductVariantGroup::all()
         ]);
     }
 
@@ -197,6 +198,7 @@ class ProductsController extends AuthenticatedController
         $product->brand_id                 = $brand ? $brand->id : $product->brand_id;
         $product->product_category_id      = $category ? $category->id : $product->product_category_id;
         $product->product_variant_group_id = $variant ? $variant->id : null;
+        $product->is_service               = $request->get('is_service') ?: false;
         $product->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product edited');
