@@ -15,3 +15,5 @@ Route::resource('/categories', 'ProductCategoriesController');
 Route::resource('/products', 'ProductsController');
 Route::post('/products/{product}/add-inventory', 'ProductsController@addInventory')->name('products.inventory.add');
 Route::post('/products/{product}/move-inventory', 'ProductsController@moveInventory')->name('products.inventory.move');
+//Route::resource('/inventory-movements', 'InventoryMovementsController');
+Route::resource('/product-variants', 'ProductVariantsController');

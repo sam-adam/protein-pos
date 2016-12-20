@@ -74,6 +74,12 @@
                                 <li>
                                     <a href="{{ url('brands') }}">Brands</a>
                                 </li>
+                                <li>
+                                    <a href="{{ url('product-variants') }}">Product Variants</a>
+                                </li>
+                                {{--<li>--}}
+                                    {{--<a href="{{ url('inventory-movements') }}">Inventory Movements</a>--}}
+                                {{--</li>--}}
                             </ul>
                         </li>
                     </ul>

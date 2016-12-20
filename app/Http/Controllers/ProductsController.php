@@ -12,6 +12,7 @@ use App\Models\InventoryMovement;
 use App\Models\InventoryMovementItem;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductVariantGroup;
 use App\Services\MovementService;
 use Carbon\Carbon;
 use Illuminate\Database\Query\JoinClause;
@@ -43,11 +44,9 @@ class ProductsController extends AuthenticatedController
         $productsQuery = Product::with('category', 'brand')->select('products.*');
 
         if ($query) {
-            $productByBarcode = Product::where('barcode', '=', $query)->first();
+            $productByBarcode = Product::where('barcode', '=', $query)->paginate();
 
-            if ($productByBarcode) {
-                $products = [$productByBarcode];
-            } else {
+            if ($productByBarcode->count() === 0) {
                 $productsQuery = $productsQuery->where('products.name', 'LIKE', "%{$query}%")
                     ->orWhere('products.code', 'LIKE', "%{$query}%");
             }
@@ -94,7 +93,8 @@ class ProductsController extends AuthenticatedController
     {
         return view('products.create', [
             'categories' => ProductCategory::with('parent')->get(),
-            'brands'     => Brand::all()
+            'brands'     => Brand::all(),
+            'variants'   => ProductVariantGroup::all()
         ]);
     }
 
@@ -102,12 +102,14 @@ class ProductsController extends AuthenticatedController
     {
         $brand    = Brand::find($request->get('brand'));
         $category = ProductCategory::find($request->get('category'));
+        $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
 
-        $newProduct                      = new Product();
-        $newProduct->name                = $request->get('name');
-        $newProduct->price               = $request->get('price') ?: 0;
-        $newProduct->brand_id            = $brand ? $brand->id : null;
-        $newProduct->product_category_id = $category ? $category->id : null;
+        $newProduct                           = new Product();
+        $newProduct->name                     = $request->get('name');
+        $newProduct->price                    = $request->get('price') ?: 0;
+        $newProduct->brand_id                 = $brand ? $brand->id : null;
+        $newProduct->product_category_id      = $category ? $category->id : null;
+        $newProduct->product_variant_group_id = $variant ? $variant->id : null;
         $newProduct->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
@@ -171,7 +173,8 @@ class ProductsController extends AuthenticatedController
         return view('products.edit', [
             'product'    => $product,
             'categories' => ProductCategory::with('parent')->get(),
-            'brands'     => Brand::all()
+            'brands'     => Brand::all(),
+            'variants'   => ProductVariantGroup::availableFor($product)->get()
         ]);
     }
 
@@ -185,13 +188,15 @@ class ProductsController extends AuthenticatedController
 
         $brand    = Brand::find($request->get('brand'));
         $category = ProductCategory::find($request->get('category'));
+        $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
 
-        $product->name                = $request->get('name');
-        $product->price               = $request->get('price') ?: 0;
-        $product->code                = $request->get('code');
-        $product->barcode             = $request->get('barcode');
-        $product->brand_id            = $brand ? $brand->id : $product->brand_id;
-        $product->product_category_id = $category ? $category->id : $product->product_category_id;
+        $product->name                     = $request->get('name');
+        $product->price                    = $request->get('price') ?: 0;
+        $product->code                     = $request->get('code');
+        $product->barcode                  = $request->get('barcode');
+        $product->brand_id                 = $brand ? $brand->id : $product->brand_id;
+        $product->product_category_id      = $category ? $category->id : $product->product_category_id;
+        $product->product_variant_group_id = $variant ? $variant->id : null;
         $product->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product edited');

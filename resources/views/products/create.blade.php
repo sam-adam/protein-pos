@@ -81,6 +81,22 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="form-group {{ $errors->has('product_variant_group_id') ? 'has-error' : '' }}">
+                            <label for="product_variant_group_id" class="col-sm-2 control-label">Variant</label>
+                            <div class="col-sm-5">
+                                <select id="product_variant_group_id" name="product_variant_group_id" class="form-control">
+                                    <option value>Select Variant</option>
+                                    @foreach($variants as $variant)
+                                        <option value="{{ $variant->id }}" @if(old('product_variant_group_id') == $variant->id) selected @endif>
+                                            {{ $variant->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @foreach($errors->get('product_variant_group_id') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-3">
                                 <button type="submit" class="btn btn-success btn-block">Save</button>

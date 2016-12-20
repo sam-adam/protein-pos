@@ -55,6 +55,16 @@
                             @endif
                         </div>
                     </div>
+                    <div class="row">
+                        <label for="brand" class="col-sm-2 control-label">Variant</label>
+                        <div class="col-sm-10">
+                            @if($product->variantGroup)
+                                <p class="form-control-static">{{ $product->variantGroup->name }}</p>
+                            @else
+                                <p class="form-control-static"></p>
+                            @endif
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-5">
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary btn-block">
