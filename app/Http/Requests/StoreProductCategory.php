@@ -31,7 +31,7 @@ class StoreProductCategory extends FormRequest
         $category   = $this->getCategory();
         $categoryId = $category ? $category->id : 'NULL';
         $rules      = [
-            'name' => "bail|required|unique:brands,name,{$categoryId},id,deleted_at,NULL"
+            'name' => "bail|required|unique:product_categories,name,{$categoryId},id,deleted_at,NULL"
         ];
 
         if ($this->isMethod('put')) {
