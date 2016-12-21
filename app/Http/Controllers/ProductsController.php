@@ -54,6 +54,8 @@ class ProductsController extends AuthenticatedController
                     return $subWhere->where('products.name', 'LIKE', "%{$query}%")
                         ->orWhere('products.code', 'LIKE', "%{$query}%");
                 });
+            } else {
+                $products = $productByBarcode;
             }
         }
 
