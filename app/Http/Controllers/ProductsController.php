@@ -47,7 +47,7 @@ class ProductsController extends AuthenticatedController
         $productsQuery = Product::with('category', 'brand')->select('products.*');
 
         if ($query) {
-            $productByBarcode = Product::where('barcode', '=', $query)->paginate();
+            $productByBarcode = Product::where('barcode', 'like', "%{$query}%")->paginate();
 
             if ($productByBarcode->count() === 0) {
                 $productsQuery = $productsQuery->where(function ($subWhere) use($query) {
