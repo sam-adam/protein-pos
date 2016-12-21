@@ -204,7 +204,7 @@ class ProductsController extends AuthenticatedController
         $product->is_service               = $request->get('is_service') ?: false;
         $product->saveOrFail();
 
-        return redirect(route('products.index'))->with('flashes.success', 'Product edited');
+        return redirect(route('products.show', $productId))->with('flashes.success', 'Product edited');
     }
 
     public function addInventory(AddProductMovement $request, $productId)
