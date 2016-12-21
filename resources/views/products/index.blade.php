@@ -27,10 +27,10 @@
                             <div class="col-md-12">
                                 <select class="form-control" name="category">
                                     <option value>All Category</option>
-                                    <option value="uncategorized" @if(Request::get('category') == 'uncategorized') selected @endif>Not Categorized</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" @if(Request::get('category') == $category->id) selected @endif>{{ $category->isRoot() ? 'All '.$category->name  : $category->parent->name.' - '.$category->name}}</option>
                                     @endforeach
+                                    <option value="uncategorized" @if(Request::get('category') == 'uncategorized') selected @endif>Not Categorized</option>
                                 </select>
                             </div>
                         </div>
@@ -40,10 +40,10 @@
                             <div class="col-md-12">
                                 <select class="form-control" name="brand">
                                     <option value>All Brand</option>
-                                    <option value="unbranded" @if(Request::get('brand') == 'unbranded') selected @endif>Not Branded</option>
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}" @if(Request::get('brand') == $brand->id) selected @endif>{{ $brand->name}}</option>
                                     @endforeach
+                                    <option value="unbranded" @if(Request::get('brand') == 'unbranded') selected @endif>Not Branded</option>
                                 </select>
                             </div>
                         </div>
