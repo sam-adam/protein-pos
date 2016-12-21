@@ -19,6 +19,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
 /**
  * Class ProductsController
@@ -83,7 +84,7 @@ class ProductsController extends AuthenticatedController
         }
 
         return view('products.index', [
-            'products'   => $products,
+            'products'   => $products->appends(Input::except('page')),
             'categories' => ProductCategory::with('parent')->get(),
             'brands'     => Brand::all()
         ]);
