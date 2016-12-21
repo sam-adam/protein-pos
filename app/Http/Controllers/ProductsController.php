@@ -20,6 +20,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 
 /**
  * Class ProductsController
@@ -87,6 +89,8 @@ class ProductsController extends AuthenticatedController
                 ->where('product_id', '=', $product->id)
                 ->sum('stock');
         }
+
+        Session::put('last_product_page', $request->fullUrl());
 
         return view('products.index', [
             'products'   => $products->appends(Input::except('page')),
