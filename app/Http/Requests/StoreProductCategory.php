@@ -29,7 +29,7 @@ class StoreProductCategory extends FormRequest
     public function rules()
     {
         $category   = $this->getCategory();
-        $categoryId = $category->id;
+        $categoryId = $category ? $category->id : 'NULL';
         $rules      = [
             'name' => "bail|required|unique:brands,name,{$categoryId},id,deleted_at,NULL"
         ];
