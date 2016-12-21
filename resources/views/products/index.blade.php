@@ -10,11 +10,15 @@
         <div class="col-md-12">
             <div class="row">
                 <form class="form-horizontal" method="get">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group form-group-lg">
-                            <label class="col-md-2 control-label">Search</label>
-                            <div class="col-md-10">
-                                <input type="text" id="query" class="form-control" name="query" placeholder="Input product name, code, or scan barcode" value="{{ Request::get('query') }}" >
+                            <div class="col-md-12">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-fw fa-search"></i>
+                                    </div>
+                                    <input type="text" id="query" class="form-control" name="query" placeholder="Input product name, code, or scan barcode" value="{{ Request::get('query') }}" >
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -44,11 +48,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">
-                            <i class="fa fa-fw fa-search"></i>
-                            Search
-                        </button>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                    <i class="fa fa-fw fa-search"></i>
+                                    Search
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ route('products.index') }}" class="btn btn-default btn-lg btn-block">
+                                    <i class="fa fa-fw fa-times"></i>
+                                    Reset
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
