@@ -48,8 +48,10 @@ class ProductsController extends AuthenticatedController
             $productByBarcode = Product::where('barcode', '=', $query)->paginate();
 
             if ($productByBarcode->count() === 0) {
-                $productsQuery = $productsQuery->where('products.name', 'LIKE', "%{$query}%")
-                    ->orWhere('products.code', 'LIKE', "%{$query}%");
+                $productsQuery = $productsQuery->where(function ($subWhere) use($query) {
+                    return $subWhere->where('products.name', 'LIKE', "%{$query}%")
+                        ->orWhere('products.code', 'LIKE', "%{$query}%");
+                });
             }
         }
 
