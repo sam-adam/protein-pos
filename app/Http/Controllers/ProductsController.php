@@ -59,10 +59,13 @@ class ProductsController extends AuthenticatedController
             if ($categoryId === 'uncategorized') {
                 $productsQuery = $productsQuery->whereNull('products.product_category_id');
             } else {
-                $productsQuery = $productsQuery->orWhere('products.product_category_id', '=', $categoryId);
                 $productsQuery = $productsQuery->leftJoin('product_categories AS child', function (JoinClause $query) use ($categoryId) {
                     return $query->on('child.id', '=', 'products.product_category_id')
                         ->where('child.parent_id', '=', $categoryId);
+                });
+                $productsQuery = $productsQuery->orWhere(function ($subWhere) use ($categoryId) {
+                    return $subWhere->where('products.product_category_id', '=', $categoryId)
+                        ->orWhereNotNull('child.id');
                 });
             }
         }
