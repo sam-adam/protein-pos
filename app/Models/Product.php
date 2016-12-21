@@ -13,6 +13,10 @@ class Product extends BaseModel
 {
     use SoftDeletes;
 
+    protected $casts = [
+        'is_service' => 'boolean'
+    ];
+
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');

@@ -8,6 +8,8 @@ window.$ = window.jQuery = require("jquery");
 
 require('./bootstrap');
 require('bootstrap-datepicker');
+require('devbridge-autocomplete');
+
 window.moment = require('moment');
 
 /*!
