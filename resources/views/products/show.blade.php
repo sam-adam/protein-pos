@@ -74,6 +74,12 @@
                                 Edit
                             </a>
                         </div>
+                        <div class="col-sm-5">
+                            <a href="{{ URL::previous() }}" class="btn btn-default btn-block">
+                                <i class="fa fa-arrow-left fa-fw"></i>
+                                Back
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
