@@ -26,7 +26,7 @@ class ProductCategory extends BaseModel
 
     public function children()
     {
-        return $this->hasMany(self::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id')->orderBy('name', 'asc');
     }
 
     public function products()
