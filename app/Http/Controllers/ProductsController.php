@@ -87,8 +87,8 @@ class ProductsController extends AuthenticatedController
 
         return view('products.index', [
             'products'   => $products->appends(Input::except('page')),
-            'categories' => ProductCategory::with('parent')->get(),
-            'brands'     => Brand::all()
+            'categories' => ProductCategory::with('parent')->orderBy('parent_id', 'asc')->orderBy('name', 'asc')->get(),
+            'brands'     => Brand::orderBy('name', 'asc')->get()
         ]);
     }
 
