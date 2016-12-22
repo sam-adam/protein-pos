@@ -139,8 +139,8 @@
                                                 <th>Cost</th>
                                                 <th>Expired At</th>
                                                 <th>Reminder Expired At</th>
-                                                <th>Created At</th>
-                                                <th>Admin</th>
+                                                <th>Imported Date</th>
+                                                <th>User</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
