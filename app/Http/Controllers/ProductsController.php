@@ -44,6 +44,36 @@ class ProductsController extends AuthenticatedController
         $perPage       = 24;
         $products      = null;
         $productsQuery = Product::with('category', 'brand')->select('products.*');
+        $categoryTree  = [];
+        $categories    = ProductCategory::with('parent')
+            ->orderBy('parent_id', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        foreach ($categories as $category) {
+            if ($category->isRoot()) {
+                $category->displayName = 'All '.$category->name;
+            } else {
+                $category->displayName = $category->parent->name.' - '.$category->name;
+            }
+        }
+
+        foreach ($categories as $category) {
+            if ($category->isRoot()) {
+                $categoryTree[$category->id] = [
+                    'id'       => $category->id,
+                    'name'     => $category->name,
+                    'children' => [
+                        ['id' => $category->id, 'name' => $category->displayName]
+                    ]
+                ];
+            } else {
+                $categoryTree[$category->parent_id]['children'][] = [
+                    'id'   => $category->id,
+                    'name' => $category->displayName
+                ];
+            }
+        }
 
         if ($query) {
             $productByBarcode = Product::where('barcode', 'like', "%{$query}%")->paginate();
@@ -94,9 +124,11 @@ class ProductsController extends AuthenticatedController
         Session::put('last_product_page', $request->fullUrl());
 
         return view('products.index', [
-            'products'   => $products->appends(Input::except('page')),
-            'categories' => ProductCategory::with('parent')->orderBy('parent_id', 'asc')->orderBy('name', 'asc')->get(),
-            'brands'     => Brand::orderBy('name', 'asc')->get()
+            'products'     => $products->appends(Input::except('page')),
+            'categories'   => $categories,
+            'categoryTree' => $categoryTree,
+            'brands'       => Brand::orderBy('name', 'asc')->get(),
+            'showMode'     => count($request->all()) === 0 ? 'category' : 'product'
         ]);
     }
 
