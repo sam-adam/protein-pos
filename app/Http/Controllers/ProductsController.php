@@ -50,7 +50,7 @@ class ProductsController extends AuthenticatedController
             $productByBarcode = Product::where('barcode', 'like', "%{$query}%")->paginate();
 
             if ($productByBarcode->count() === 0) {
-                $productsQuery = $productsQuery->where(function ($subWhere) use($query) {
+                $productsQuery = $productsQuery->where(function ($subWhere) use ($query) {
                     return $subWhere->where('products.name', 'LIKE', "%{$query}%")
                         ->orWhere('products.code', 'LIKE', "%{$query}%");
                 });
@@ -136,6 +136,7 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
+        $branches    = Branch::licensed()->get();
         $inventories = Inventory::inBranch(Auth::user()->branch)
             ->where('product_id', '=', $product->id)
             ->orderBy('expired_at', 'asc')
@@ -158,12 +159,22 @@ class ProductsController extends AuthenticatedController
                 : 'In';
         }
 
+        foreach ($branches as $branch) {
+            $branch->inventories        = Inventory::inBranch($branch)
+                ->where('product_id', '=', $product->id)
+                ->orderBy('expired_at', 'asc')
+                ->get();
+            $branch->expiredInventories = $branch->inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
+            $branch->closestExpired     = $branch->inventories->filter(function (Inventory $inventory) { return !$inventory->isExpired(); })->first();
+        }
+
         $expiredInventories = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
         $closestExpired     = $inventories->filter(function (Inventory $inventory) { return !$inventory->isExpired(); })->first();
 
         return view('products.show', [
             'now'                       => Carbon::now(),
             'product'                   => $product,
+            'branches'                  => $branches,
             'inventories'               => $inventories,
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,

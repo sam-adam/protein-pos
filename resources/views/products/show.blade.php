@@ -127,6 +127,11 @@
                                     Movements
                                 </a>
                             </li>
+                            <li role="presentation">
+                                <a href="#branches" aria-controls="branches" role="tab" data-toggle="tab">
+                                    All Branch
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <br/>
@@ -199,6 +204,42 @@
                                                             <i class="fa fa-search-plus"></i>
                                                             See detail
                                                         </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <p>No movement yet</p>
+                                @endif
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <a href="#add-inventory-modal" class="btn btn-primary" data-toggle="modal">
+                                            <i class="fa fa-plus"></i>
+                                            Add Inventory
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="branches">
+                                @if($movements->count() > 0)
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Branch</th>
+                                                <th>Stock</th>
+                                                <th>Closest Expiry</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($branches as $branch)
+                                                <tr>
+                                                    <td>{{ $branch->name }}</td>
+                                                    <td>
+                                                        {{ number_format($branch->inventories->sum('stock')).' ('.number_format($branch->inventories->sum('stock') - $branch->expiredInventories->sum('stock')).' available, '.$branch->expiredInventories->sum('stock').' expired)' }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $branch->closestExpired ? $branch->closestExpired->expired_at->toDateString().' ('.$branch->closestExpired->stock.' items)' : '-' }}
                                                     </td>
                                                 </tr>
                                             @endforeach
