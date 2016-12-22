@@ -103,6 +103,17 @@
                                 <p class="form-control-static">{{ $closestExpired ? $closestExpired->expired_at->toDateString().' ('.$closestExpired->stock.' items)' : '-' }}</p>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                @if($inventories->sum('stock') > 0)
+                                    <a href="#move-inventory-modal" class="btn btn-primary btn-move-inventory" data-toggle="modal">
+                                        <i class="fa fa-arrow-right fa-fw"></i>
+                                        Move To Other Branch
+                                    </a>
+                                    <br/>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,27 +157,20 @@
                                                 <th>Reminder Expired At</th>
                                                 <th>Imported Date</th>
                                                 <th>User</th>
-                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($inventories as $inventory)
-                                                <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
-                                                    <td>{{ number_format($inventory->stock) }}</td>
-                                                    <td>{{ number_format($inventory->cost) }}</td>
-                                                    <td>{{ $inventory->expired_at->toDateString() }}</td>
-                                                    <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toDateString() : '-' }}</td>
-                                                    <td>{{ $inventory->created_at->toDateString() }}</td>
-                                                    <td>{{ $inventory->creator->name }}</td>
-                                                    <td>
-                                                        @if($inventory->stock > 0)
-                                                            <a href="#move-inventory-modal" class="btn btn-primary btn-sm btn-move-inventory" data-toggle="modal" data-inventory-id="{{ $inventory->id }}" data-current-stock="{{ $inventory->stock }}">
-                                                                <i class="fa fa-arrow-right fa-fw"></i>
-                                                                Move To Other Branch
-                                                            </a>
-                                                        @endif
-                                                    </td>
-                                                </tr>
+                                                @if($inventory->stock > 0)
+                                                    <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
+                                                        <td>{{ number_format($inventory->stock) }}</td>
+                                                        <td>{{ number_format($inventory->cost) }}</td>
+                                                        <td>{{ $inventory->expired_at->toDateString() }}</td>
+                                                        <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toDateString() : '-' }}</td>
+                                                        <td>{{ $inventory->created_at->toDateString() }}</td>
+                                                        <td>{{ $inventory->creator->name }}</td>
+                                                    </tr>
+                                                @endif
                                             @endforeach
                                         </tbody>
                                     </table>
@@ -266,7 +270,6 @@
             <div class="modal-dialog" role="document">
                 <form class="form-horizontal" method="post" action="{{ route('products.inventory.move', $product->id) }}">
                     {{ csrf_field() }}
-                    <input type="hidden" name="inventory_id" value />
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -290,7 +293,7 @@
                                             @endforeach
                                         </div>
                                         <div class="col-sm-6">
-                                            <p class="form-control-static text-left" id="stock-left"></p>
+                                            <p class="form-control-static text-left" id="stock-left">/ {{ number_format($inventories->sum('stock')) }}</p>
                                         </div>
                                     </div>
                                     <div class="form-group {{ $errors->has('branch_id') ? 'has-error' : '' }}">
@@ -452,20 +455,10 @@
                     $expiryReminderDate.datepicker("setEndDate", e.date);
                 });
 
-                $moveInventoryModal.on("show.bs.modal", function (e) {
-                    var $this = $(this),
-                        $button = $(e.relatedTarget),
-                        stockLeft = $button.data("current-stock"),
-                        inventoryId = $button.data("inventory-id");
-
-                    $this.find("#stock-left").text(" / " + stockLeft + " stock left");
-                    $this.find("input[name='inventory_id']").val(inventoryId);
-                });
-
-                @if(Session::get('previous_url') === route('products.inventory.add', $product->id))
+                @if(Session::get('previous_url') === route('products.inventory.add', $product->id) && Session::has('flashes.error'))
                     $addInventoryModal.modal("show");
-                @elseif(Session::get('previous_url') === route('products.inventory.move', $product->id) && old('inventory_id'))
-                    $(".btn-move-inventory[data-inventory-id='{{ old('inventory_id') }}']").trigger("click");
+                @elseif(Session::get('previous_url') === route('products.inventory.move', $product->id) && Session::has('flashes.error'))
+                    $(".btn-move-inventory").trigger("click");
                 @endif
             });
         </script>

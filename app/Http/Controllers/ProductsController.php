@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
 
 /**
  * Class ProductsController
@@ -179,7 +178,7 @@ class ProductsController extends AuthenticatedController
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,
             'movements'                 => $movements,
-            'otherBranches'             => Branch::licensed()->active()->get()->except(Auth::user()->branch_id),
+            'otherBranches'             => $branches->except(Auth::user()->branch_id),
             'defaultMovementDate'       => Carbon::now(),
             'defaultExpiredDate'        => \Carbon\Carbon::now()->addMonth(1),
             'defaultExpiryReminderDate' => \Carbon\Carbon::now()->addMonth(1)->subWeek(1)
@@ -260,17 +259,35 @@ class ProductsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($request, $productId) {
-            $inventory                            = Inventory::find($request->get('inventory_id'));
-            $movementItem                         = $inventory->getAttributes();
-            $movementItem['product_id']           = $productId;
-            $movementItem['source_inventory_id']  = $inventory->id;
-            $movementItem['expire_date']          = $inventory->expired_at->toDateString();
-            $movementItem['expiry_reminder_date'] = $inventory->expiry_reminder_date->toDateString();
-            $movementItem['quantity']             = $request->get('quantity');
+            $movementItems     = [];
+            $currentQuantity   = 0;
+            $requestedQuantity = $request->get('quantity');
+            $inventories       = Inventory::inBranch(Auth::user()->branch)
+                ->where('product_id', '=', $productId)
+                ->orderBy('expired_at', 'asc')
+                ->get();
+
+            foreach ($inventories as $inventory) {
+                $stillRequiredQuantity = $requestedQuantity - $currentQuantity;
+
+                if ($stillRequiredQuantity > 0) {
+                    $movementItem    = [
+                        'product_id'           => $productId,
+                        'source_inventory_id'  => $inventory->id,
+                        'expire_date'          => $inventory->expired_at->toDateString(),
+                        'expiry_reminder_date' => $inventory->expiry_reminder_date->toDateString(),
+                        'cost'                 => $inventory->cost,
+                        'quantity'             => min($inventory->stock, $stillRequiredQuantity)
+                    ];
+                    $movementItems[] = $movementItem;
+
+                    $currentQuantity += $movementItem['quantity'];
+                }
+            }
 
             return $this->movementService->createMovement(
                 Branch::find($request->get('branch_id')),
-                [$movementItem],
+                $movementItems,
                 Auth::user()->branch,
                 $request->get('remark')
             );

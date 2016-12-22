@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use App\Models\Inventory;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class MoveInventoryToOtherBranch extends FormRequest
 {
@@ -24,12 +26,11 @@ class MoveInventoryToOtherBranch extends FormRequest
      */
     public function rules()
     {
-        $inventory = Inventory::find($this->get('inventory_id'));
-
         return [
-            'branch_id'    => 'bail|required|exists:branches,id',
-            'inventory_id' => 'bail|required|exists:inventories,id',
-            'quantity'     => 'bail|required|numeric|min:1|max:'.$inventory->stock
+            'branch_id' => 'bail|required|exists:branches,id',
+            'quantity'  => 'bail|required|numeric|min:1|max:'.Inventory::inBranch(Auth::user()->branch)
+                    ->where('product_id', '=', Route::input('product'))
+                    ->sum('stock')
         ];
     }
 }
