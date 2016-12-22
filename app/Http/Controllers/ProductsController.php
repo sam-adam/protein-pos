@@ -67,7 +67,7 @@ class ProductsController extends AuthenticatedController
                     return $query->on('child.id', '=', 'products.product_category_id')
                         ->where('child.parent_id', '=', $categoryId);
                 });
-                $productsQuery = $productsQuery->orWhere(function ($subWhere) use ($categoryId) {
+                $productsQuery = $productsQuery->where(function ($subWhere) use ($categoryId) {
                     return $subWhere->where('products.product_category_id', '=', $categoryId)
                         ->orWhereNotNull('child.id');
                 });
