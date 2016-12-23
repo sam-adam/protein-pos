@@ -190,20 +190,16 @@ class ProductsController extends AuthenticatedController
             ->orderBy('inventory_removals.created_at', 'desc')
             ->get();
 
-        $currentPriority = 1;
-
-        foreach ($inventories as $inventory) {
-            if ($inventory->stock > 0) {
-                $inventory->priority = $currentPriority;
-
-                $currentPriority++;
-            }
-        }
-
         foreach ($inventoryMovements as $movement) {
+            if ($movement->from_branch_id) {
+                $movementLabel = 'Inventory transfer '.($movement->from_branch_id == Auth::user()->branch_id ? 'to ' : 'from ').$movement->to->name;
+            } else {
+                $movementLabel = 'Inventory import at '.$movement->to->name;
+            }
+
             $movements[] = [
                 'id'         => $movement->id,
-                'label'      => 'Inventory transfer '.($movement->from_branch_id == Auth::user()->branch_id ? 'to ' : 'from ').$movement->to->name,
+                'label'      => $movementLabel,
                 'quantity'   => $movement->items->filter(function (InventoryMovementItem $movementItem) use ($productId) {
                     return $movementItem->product_id == $productId;
                 })->sum('quantity'),
