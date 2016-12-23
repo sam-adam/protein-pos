@@ -50,6 +50,12 @@ class MovementService
                 throw new InsufficientStockException($sourceInventory);
             }
 
+            if ($sourceInventory) {
+                $priority = $sourceInventory->priority;
+            } else {
+                $priority = Inventory::inBranch($toBranch)->where('product_id', '=', $productId)->max('priority') + 1;
+            }
+
             $movementItem                            = new InventoryMovementItem();
             $movementItem->product_id                = $productId;
             $movementItem->expired_at                = Carbon::createFromFormat('Y-m-d', data_get($item, 'expire_date'));
@@ -74,6 +80,7 @@ class MovementService
             $newInventory                       = new Inventory();
             $newInventory->branch_id            = $toBranch->id;
             $newInventory->product_id           = $movementItem->product_id;
+            $newInventory->priority             = $priority;
             $newInventory->cost                 = $movementItem->cost;
             $newInventory->stock                = $movementItem->quantity;
             $newInventory->expired_at           = $movementItem->expired_at;

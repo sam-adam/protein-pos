@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class InventoryMovement extends BaseModel
 {
+    protected $dates = ['movement_effective_at'];
+
     public function from()
     {
         return $this->belongsTo(Branch::class, 'from_branch_id');

@@ -75,7 +75,7 @@
                             </a>
                         </div>
                         <div class="col-sm-5">
-                            <a href="{{ Session::get('last_product_page') ?: route('product.index') }}" class="btn btn-default btn-block">
+                            <a href="{{ Session::get('last_product_page') ?: route('products.index') }}" class="btn btn-default btn-block">
                                 <i class="fa fa-arrow-left fa-fw"></i>
                                 Back
                             </a>
@@ -105,13 +105,24 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-9">
-                                @if($inventories->sum('stock') > 0)
-                                    <a href="#move-inventory-modal" class="btn btn-primary btn-move-inventory" data-toggle="modal">
-                                        <i class="fa fa-arrow-right fa-fw"></i>
-                                        Move To Other Branch
-                                    </a>
-                                    <br/>
-                                @endif
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        @if($inventories->sum('stock') > 0)
+                                            <a href="#move-inventory-modal" class="btn btn-primary btn-block" data-toggle="modal">
+                                                <i class="fa fa-arrow-right fa-fw"></i>
+                                                Move To Other Branch
+                                            </a>
+                                        @endif
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @if($inventories->sum('stock') > 0)
+                                            <a href="#remove-inventory-modal" class="btn btn-danger btn-block" data-toggle="modal">
+                                                <i class="fa fa-trash fa-fw"></i>
+                                                Remove
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -151,6 +162,7 @@
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
+                                                <th>Priority</th>
                                                 <th>Stock</th>
                                                 <th>Cost</th>
                                                 <th>Expired At</th>
@@ -163,6 +175,7 @@
                                             @foreach($inventories as $inventory)
                                                 @if($inventory->stock > 0)
                                                     <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
+                                                        <td>{{ number_format($inventory->priority) }}</td>
                                                         <td>{{ number_format($inventory->stock) }}</td>
                                                         <td>{{ number_format($inventory->cost) }}</td>
                                                         <td>{{ $inventory->expired_at->toDateString() }}</td>
@@ -179,36 +192,32 @@
                                 @endif
                             </div>
                             <div role="tabpanel" class="tab-pane" id="movement">
-                                @if($movements->count() > 0)
+                                @if(count($movements) > 0)
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Type</th>
-                                                <th>From</th>
-                                                <th>To</th>
+                                                <th>Movement</th>
                                                 <th>Quantity</th>
                                                 <th>Date</th>
                                                 <th>Admin</th>
                                                 <th>Remark</th>
-                                                <th></th>
+                                                {{--<th></th>--}}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($movements as $movement)
-                                                <tr class="{{ $movement->direction === 'In' ? 'success' : 'danger' }}">
-                                                    <td>{{ $movement->direction }}</td>
-                                                    <td>{{ $movement->from ? $movement->from->name : '-' }}</td>
-                                                    <td>{{ $movement->to->name }}</td>
-                                                    <td>{{ $movement->quantity }}</td>
-                                                    <td>{{ $movement->created_at->toDateTimeString() }}</td>
-                                                    <td>{{ $movement->creator->name }}</td>
-                                                    <td>{{ $movement->remark }}</td>
-                                                    <td>
-                                                        <a href="" class="btn btn-primary btn-sm" target="_blank">
-                                                            <i class="fa fa-search-plus"></i>
-                                                            See detail
-                                                        </a>
-                                                    </td>
+                                                <tr>
+                                                    <td>{{ $movement['label'] }}</td>
+                                                    <td>{{ $movement['quantity'] }}</td>
+                                                    <td>{{ $movement['dateString'] }}</td>
+                                                    <td>{{ $movement['actor'] }}</td>
+                                                    <td>{{ $movement['remark'] }}</td>
+                                                    {{--<td>--}}
+                                                        {{--<a href="" class="btn btn-primary btn-sm" target="_blank">--}}
+                                                            {{--<i class="fa fa-search-plus"></i>--}}
+                                                            {{--See detail--}}
+                                                        {{--</a>--}}
+                                                    {{--</td>--}}
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -226,7 +235,7 @@
                                 </div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="branches">
-                                @if($movements->count() > 0)
+                                @if($branches->count() > 0)
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
@@ -266,6 +275,75 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="remove-inventory-modal" tabindex="-1" role="dialog" aria-labelledby="remove-inventory-modal-label">
+            <div class="modal-dialog" role="document">
+                <form class="form-horizontal" method="post" action="{{ route('products.inventory.remove', $product->id) }}">
+                    {{ csrf_field() }}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="remove-inventory-modal-label">Remove Inventory</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Product</label>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static">{{ $product->name }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group {{ $errors->has('inventory_id') ? 'has-error' : '' }}">
+                                        <label class="control-label col-sm-4" for="inventory_id">Priority</label>
+                                        <div class="col-sm-6" id="current-stock">
+                                            <select class="form-control" name="inventory_id">
+                                                <option value>Select Priority</option>
+                                                @foreach($inventories as $inventory)
+                                                    @if($inventory->stock > 0)
+                                                        <option value="{{ $inventory->id }}" @if($inventory->id == old('inventory_id')) selected @endif)>Priority {{ $inventory->priority }}</option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                            @foreach($errors->get('inventory_id') as $error)
+                                                <span class="label label-danger">{{ $error }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="form-group {{ $errors->has('quantity') ? 'has-error' : '' }}">
+                                        <label class="control-label col-sm-4" for="quantity">Quantity</label>
+                                        <div class="col-sm-2" id="current-stock">
+                                            <input type="text" name="quantity" id="quantity" class="form-control" value="{{ old('quantity') ?: 0 }}" required />
+                                            @foreach($errors->get('quantity') as $error)
+                                                <span class="label label-danger">{{ $error }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="form-group {{ $errors->has('remark') ? 'has-error' : '' }}">
+                                        <label class="control-label col-sm-4">Remark</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" name="remark">{{ old('remark') }}</textarea>
+                                            @foreach($errors->get('remark') as $error)
+                                                <span class="label label-danger">{{ $error }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                <i class="fa fa-times fa-fw"></i>
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fa fa-trash fa-fw"></i>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="modal fade" id="move-inventory-modal" tabindex="-1" role="dialog" aria-labelledby="move-inventory-modal-label">
             <div class="modal-dialog" role="document">
                 <form class="form-horizontal" method="post" action="{{ route('products.inventory.move', $product->id) }}">
@@ -273,7 +351,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="add-inventory-modal-label">Move Inventory</h4>
+                            <h4 class="modal-title" id="move-inventory-modal-label">Move Inventory</h4>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -437,6 +515,7 @@
                     $expireDate = $("input[name='expire_date']"),
                     $expiryReminderDate = $("input[name='expiry_reminder_date']"),
                     $moveInventoryModal = $("#move-inventory-modal"),
+                    $removeInventoryModal = $("#remove-inventory-modal"),
                     $addInventoryModal = $("#add-inventory-modal"),
                     defaultMovementDate = moment("{{ $defaultMovementDate->toDateString() }}"),
                     defaultExpiredDate = moment("{{ $defaultExpiredDate->toDateString() }}");
@@ -455,10 +534,12 @@
                     $expiryReminderDate.datepicker("setEndDate", e.date);
                 });
 
-                @if(Session::get('previous_url') === route('products.inventory.add', $product->id) && Session::has('flashes.error'))
+                @if(Session::get('previous_url') === route('products.inventory.add', $product->id) && Session::has('errors'))
                     $addInventoryModal.modal("show");
-                @elseif(Session::get('previous_url') === route('products.inventory.move', $product->id) && Session::has('flashes.error'))
-                    $(".btn-move-inventory").trigger("click");
+                @elseif(Session::get('previous_url') === route('products.inventory.move', $product->id) && Session::has('errors'))
+                    $moveInventoryModal.modal("show");
+                @elseif(Session::get('previous_url') === route('products.inventory.remove', $product->id) && Session::has('errors'))
+                    $removeInventoryModal.modal("show");
                 @endif
             });
         </script>

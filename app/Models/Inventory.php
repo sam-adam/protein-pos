@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\InsufficientStockException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -18,6 +19,18 @@ class Inventory extends BaseModel
         'expired_at',
         'expiry_reminder_date'
     ];
+
+    /** {@inheritDoc} */
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::saving(function (Inventory $inventory) {
+            if ($inventory->stock < 0) {
+                throw new InsufficientStockException($inventory);
+            }
+        });
+    }
 
     public function scopeInBranch(Builder $query, Branch $branch)
     {
