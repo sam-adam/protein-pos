@@ -143,7 +143,7 @@ class ProductsController extends AuthenticatedController
                 ->orderBy('parent.name', 'asc')
                 ->orderBy('product_categories.name', 'asc')
                 ->get(),
-            'brands'     => Brand::all(),
+            'brands'     => Brand::orderBy('name', 'asc')->get(),
             'variants'   => ProductVariantGroup::all()
         ]);
     }
@@ -274,7 +274,7 @@ class ProductsController extends AuthenticatedController
                 ->orderBy('parent.name', 'asc')
                 ->orderBy('product_categories.name', 'asc')
                 ->get(),
-            'brands'     => Brand::all(),
+            'brands'     => Brand::orderBy('name', 'asc')->get(),
             'variants'   => ProductVariantGroup::all()
         ]);
     }
