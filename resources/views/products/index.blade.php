@@ -141,27 +141,27 @@
 
 @section('scripts')
     <script type="text/javascript">
-        @if($showMode === 'product')
-            $(document).ready(function () {
-                var $queryBox = $("#query"),
-                    $queryForm = $queryBox.closest("form"),
-                    $productItems = $(".product-item");
+        $(document).ready(function () {
+            var $queryBox = $("#query"),
+                $queryForm = $queryBox.closest("form"),
+                $productItems = $(".product-item");
 
-                $queryBox[0].focus();
+            $queryBox[0].focus();
 
-                $(window).on("paste", function (e) {
-                    if (e.target === $queryBox[0]) {
-                        setTimeout(function () {
-                            $queryForm.submit();
-                        }, 100);
-                    }
-                });
+            $(window).on("paste", function (e) {
+                if (e.target === $queryBox[0]) {
+                    setTimeout(function () {
+                        $queryForm.submit();
+                    }, 100);
+                }
+            });
 
+            @if($showMode === 'product')
                 $productItems.on("click", function () {
                     window.location = $(this).attr("href");
                 });
-            });
-        @endif
+            @endif
+        });
 
         var app = new Vue({
             el: "#app",
