@@ -19,3 +19,5 @@ Route::post('/products/{product}/remove-inventory', 'ProductsController@removeIn
 //Route::resource('/inventory-movements', 'InventoryMovementsController');
 Route::resource('/product-variants', 'ProductVariantsController');
 Route::resource('/packages', 'PackagesController');
+Route::resource('/customer-groups', 'CustomerGroupsController');
+Route::resource('/customers', 'CustomersController');

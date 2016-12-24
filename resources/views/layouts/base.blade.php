@@ -48,7 +48,7 @@
                         </li>
                         <li>
                             <a href="{{ url('users') }}">
-                                <i class="fa fa-fw fa-users"></i>
+                                <i class="fa fa-fw fa-user-circle"></i>
                                 Users
                             </a>
                         </li>
@@ -84,6 +84,18 @@
                                     {{--<a href="{{ url('inventory-movements') }}">Inventory Movements</a>--}}
                                 {{--</li>--}}
                             </ul>
+                        </li>
+                        <li>
+                            <a href="{{ url('customers') }}">
+                                <i class="fa fa-fw fa-users"></i>
+                                Customers
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('customer-groups') }}">
+                                <i class="fa fa-fw fa-object-group"></i>
+                                Customer Groups
+                            </a>
                         </li>
                     </ul>
                 </div>
