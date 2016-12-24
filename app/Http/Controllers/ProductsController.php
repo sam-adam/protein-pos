@@ -137,7 +137,12 @@ class ProductsController extends AuthenticatedController
     public function create()
     {
         return view('products.create', [
-            'categories' => ProductCategory::with('parent')->get(),
+            'categories' => ProductCategory::with('parent')
+                ->select('product_categories.*')
+                ->join('product_categories as parent', 'parent.id', 'product_categories.parent_id')
+                ->orderBy('parent.name', 'asc')
+                ->orderBy('product_categories.name', 'asc')
+                ->get(),
             'brands'     => Brand::all(),
             'variants'   => ProductVariantGroup::all()
         ]);
@@ -263,7 +268,12 @@ class ProductsController extends AuthenticatedController
 
         return view('products.edit', [
             'product'    => $product,
-            'categories' => ProductCategory::with('parent')->get(),
+            'categories' => ProductCategory::with('parent')
+                ->select('product_categories.*')
+                ->join('product_categories as parent', 'parent.id', 'product_categories.parent_id')
+                ->orderBy('parent.name', 'asc')
+                ->orderBy('product_categories.name', 'asc')
+                ->get(),
             'brands'     => Brand::all(),
             'variants'   => ProductVariantGroup::all()
         ]);
