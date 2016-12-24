@@ -57,7 +57,7 @@
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                <a href="{{ route('products.index') }}" class="btn btn-default btn-lg btn-block">
+                                <a href="{{ route('products.index') }}" class="btn btn-danger btn-lg btn-block">
                                     <i class="fa fa-fw fa-times"></i>
                                     Reset
                                 </a>
