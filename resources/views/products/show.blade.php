@@ -141,7 +141,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active">
                                 <a href="#breakdown" aria-controls="breakdown" role="tab" data-toggle="tab">
-                                    Breakdown
+                                    Breakdown - {{ Auth::user()->branch->name }}
                                 </a>
                             </li>
                             <li role="presentation">
@@ -172,7 +172,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($inventories as $inventory)
+                                            @foreach($branchInventories as $inventory)
                                                 @if($inventory->stock > 0)
                                                     <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
                                                         <td>{{ number_format($inventory->priority) }}</td>

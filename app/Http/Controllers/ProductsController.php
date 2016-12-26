@@ -118,7 +118,8 @@ class ProductsController extends AuthenticatedController
         }
 
         foreach ($products as $product) {
-            $product->stock = Inventory::inBranch(Auth::user()->branch)
+            $product->stock       = Inventory::where('product_id', '=', $product->id)->sum('stock');
+            $product->branchStock = Inventory::inBranch(Auth::user()->branch)
                 ->where('product_id', '=', $product->id)
                 ->sum('stock');
         }
@@ -176,8 +177,7 @@ class ProductsController extends AuthenticatedController
 
         $movements          = [];
         $branches           = Branch::licensed()->get();
-        $inventories        = Inventory::inBranch(Auth::user()->branch)
-            ->where('product_id', '=', $product->id)
+        $inventories        = Inventory::where('product_id', '=', $product->id)
             ->orderBy('expired_at', 'asc')
             ->get();
         $inventoryMovements = InventoryMovement::with('items')
@@ -248,6 +248,7 @@ class ProductsController extends AuthenticatedController
             'product'                   => $product,
             'branches'                  => $branches,
             'inventories'               => $inventories,
+            'branchInventories'         => $inventories->filter(function (Inventory $inventory) { return $inventory->branch_id == Auth::user()->branch_id; }),
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,
             'movements'                 => $movements,
