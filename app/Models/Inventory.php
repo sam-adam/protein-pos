@@ -30,6 +30,12 @@ class Inventory extends BaseModel
                 throw new InsufficientStockException($inventory);
             }
         });
+
+        self::saved(function (Inventory $inventory) {
+            if ($inventory->isDirty('stock')) {
+                //$availableInventories = Inventory::where('product_id', '=', $inventory->product_id)->orderBy()->get();
+            }
+        });
     }
 
     public function scopeInBranch(Builder $query, Branch $branch)
