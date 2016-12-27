@@ -25,12 +25,6 @@ class Inventory extends BaseModel
     {
         parent::boot();
 
-        self::saving(function (Inventory $inventory) {
-            if ($inventory->stock < 0) {
-                throw new InsufficientStockException($inventory);
-            }
-        });
-
         self::saved(function (Inventory $inventory) {
             if ($inventory->isDirty('stock')) {
                 //$availableInventories = Inventory::where('product_id', '=', $inventory->product_id)->orderBy()->get();
@@ -38,14 +32,14 @@ class Inventory extends BaseModel
         });
     }
 
-    public function scopeInBranch(Builder $query, Branch $branch)
-    {
-        return $query->where('branch_id', '=', $branch->id);
-    }
-
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function branchItems()
+    {
+        return $this->hasMany(BranchInventory::class);
     }
 
     public function isExpired()

@@ -22,6 +22,11 @@ class Branch extends Model
         return $this->hasMany(User::class);
     }
 
+    public function inventories()
+    {
+        return $this->hasMany(BranchInventory::class);
+    }
+
     public function loginSessions()
     {
         return $this->hasMany(LoginSession::class);

@@ -7,6 +7,7 @@ use App\Http\Requests\RemoveInventory;
 use App\Http\Requests\StoreProduct;
 use App\Http\Requests\AddProductMovement;
 use App\Models\Branch;
+use App\Models\BranchInventory;
 use App\Models\Brand;
 use App\Models\Inventory;
 use App\Models\InventoryMovement;
@@ -17,6 +18,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductVariantGroup;
 use App\Services\MovementService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,9 +120,9 @@ class ProductsController extends AuthenticatedController
         }
 
         foreach ($products as $product) {
-            $product->stock       = Inventory::where('product_id', '=', $product->id)->sum('stock');
-            $product->branchStock = Inventory::inBranch(Auth::user()->branch)
-                ->where('product_id', '=', $product->id)
+            $product->stock       = BranchInventory::product($product)->sum('stock');
+            $product->branchStock = BranchInventory::inBranch(Auth::user()->branch)
+                ->product($product)
                 ->sum('stock');
         }
 
@@ -138,14 +140,14 @@ class ProductsController extends AuthenticatedController
     public function create()
     {
         return view('products.create', [
+            'brands'     => Brand::orderBy('name', 'asc')->get(),
+            'variants'   => ProductVariantGroup::all(),
             'categories' => ProductCategory::with('parent')
                 ->select('product_categories.*')
                 ->join('product_categories as parent', 'parent.id', 'product_categories.parent_id')
                 ->orderBy('parent.name', 'asc')
                 ->orderBy('product_categories.name', 'asc')
-                ->get(),
-            'brands'     => Brand::orderBy('name', 'asc')->get(),
-            'variants'   => ProductVariantGroup::all()
+                ->get()
         ]);
     }
 
@@ -172,14 +174,20 @@ class ProductsController extends AuthenticatedController
         $product = Product::find($productId);
 
         if (!$product) {
-            return redirect()->back()->with('flashes.error', 'Product not found');
+            return redirect(route('products.index'))->with('flashes.error', 'Product not found');
         }
 
         $movements          = [];
-        $branches           = Branch::licensed()->get();
-        $inventories        = Inventory::where('product_id', '=', $product->id)
+        $branches           = Branch::licensed()->get()->keyBy('id');
+        $inventories        = Inventory::with('branchItems')
+            ->where('product_id', '=', $product->id)
             ->orderBy('expired_at', 'asc')
-            ->get();
+            ->get()
+            ->map(function (Inventory $inventory) {
+                $inventory->stock = $inventory->branchItems->sum('stock');
+
+                return $inventory;
+            });
         $inventoryMovements = InventoryMovement::with('items')
             ->branch(Auth::user()->branch)
             ->select('inventory_movements.*')
@@ -189,8 +197,9 @@ class ProductsController extends AuthenticatedController
             ->orderBy('inventory_movements.movement_effective_at', 'desc')
             ->get();
         $inventoryRemovals  = InventoryRemoval::select('inventory_removals.*')
-            ->join('inventories', 'inventory_removals.inventory_id', '=', 'inventories.id')
-            ->where('inventories.branch_id', '=', Auth::user()->branch_id)
+            ->join('branch_inventories', 'branch_inventories.id', '=', 'inventory_removals.branch_inventory_id')
+            ->join('inventories', 'branch_inventories.inventory_id', '=', 'inventories.id')
+            ->where('branch_inventories.branch_id', '=', Auth::user()->branch_id)
             ->where('inventories.product_id', '=', $productId)
             ->orderBy('inventory_removals.created_at', 'desc')
             ->get();
@@ -232,23 +241,28 @@ class ProductsController extends AuthenticatedController
         });
 
         foreach ($branches as $branch) {
-            $branch->inventories        = Inventory::inBranch($branch)
-                ->where('product_id', '=', $product->id)
-                ->orderBy('expired_at', 'asc')
-                ->get();
-            $branch->expiredInventories = $branch->inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
-            $branch->closestExpired     = $branch->inventories->filter(function (Inventory $inventory) { return !$inventory->isExpired(); })->first();
+            $branch->branchInventories        = $inventories->map(function (Inventory $inventory) use ($branch) {
+                $inventory              = clone $inventory;
+                $inventory->branchItems = $inventory->branchItems->filter(function (BranchInventory $branchInventory) use ($branch) {
+                    return $branchInventory->branch_id == $branch->id;
+                });
+                $inventory->stock       = $inventory->branchItems->sum('stock');
+
+                return $inventory;
+            });
+            $branch->expiredBranchInventories = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
+            $branch->closestExpiredInventory  = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false; })->first();
         }
 
         $expiredInventories = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
-        $closestExpired     = $inventories->filter(function (Inventory $inventory) { return !$inventory->isExpired(); })->first();
+        $closestExpired     = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false; })->first();
 
         return view('products.show', [
             'now'                       => Carbon::now(),
             'product'                   => $product,
             'branches'                  => $branches,
             'inventories'               => $inventories,
-            'branchInventories'         => $inventories->filter(function (Inventory $inventory) { return $inventory->branch_id == Auth::user()->branch_id; }),
+            'allowedMovementQuantity'   => $branches[Auth::user()->branch_id]->branchInventories->sum('stock'),
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,
             'movements'                 => $movements,
@@ -264,7 +278,7 @@ class ProductsController extends AuthenticatedController
         $product = Product::find($productId);
 
         if (!$product) {
-            return redirect()->back()->with('flashes.error', 'Product not found');
+            return redirect(route('products.show', $productId))->with('flashes.error', 'Product not found');
         }
 
         return view('products.edit', [
@@ -337,26 +351,24 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
-        DB::transaction(function () use ($request, $productId) {
+        DB::transaction(function () use ($request, $product) {
             $movementItems     = [];
             $currentQuantity   = 0;
             $requestedQuantity = $request->get('quantity');
-            $inventories       = Inventory::inBranch(Auth::user()->branch)
-                ->where('product_id', '=', $productId)
-                ->orderBy('expired_at', 'asc')
+            $sourceInventories = BranchInventory::inBranch(Auth::user()->branch)
+                ->product($product)
+                ->orderBy('priority', 'asc')
                 ->get();
 
-            foreach ($inventories as $inventory) {
+            /** @var BranchInventory $inventory */
+            foreach ($sourceInventories as $inventory) {
                 $stillRequiredQuantity = $requestedQuantity - $currentQuantity;
 
                 if ($stillRequiredQuantity > 0) {
                     $movementItem    = [
-                        'product_id'           => $productId,
-                        'source_inventory_id'  => $inventory->id,
-                        'expire_date'          => $inventory->expired_at->toDateString(),
-                        'expiry_reminder_date' => $inventory->expiry_reminder_date->toDateString(),
-                        'cost'                 => $inventory->cost,
-                        'quantity'             => min($inventory->stock, $stillRequiredQuantity)
+                        'product_id'          => $product->id,
+                        'source_inventory_id' => $inventory->id,
+                        'quantity'            => min($inventory->stock, $stillRequiredQuantity)
                     ];
                     $movementItems[] = $movementItem;
 
@@ -389,16 +401,24 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Inventory not found');
         }
 
-        DB::transaction(function () use ($request, $inventory, $productId) {
-            $newRemoval                     = new InventoryRemoval();
-            $newRemoval->inventory_id       = $request->get('inventory_id');
-            $newRemoval->quantity           = $request->get('quantity');
-            $newRemoval->pre_adjusted_stock = $inventory->stock;
-            $newRemoval->remark             = $request->get('remark');
+        DB::transaction(function () use ($request, $inventory, $product) {
+            $branchInventory = $inventory->branchItems->first(function (BranchInventory $branchInventory) {
+                return $branchInventory->branch_id == Auth::user()->branch_id;
+            });
+
+            if (!$branchInventory) {
+                throw new ModelNotFoundException(BranchInventory::class);
+            }
+
+            $newRemoval                      = new InventoryRemoval();
+            $newRemoval->branch_inventory_id = $branchInventory->id;
+            $newRemoval->quantity            = $request->get('quantity');
+            $newRemoval->pre_adjusted_stock  = $branchInventory->stock;
+            $newRemoval->remark              = $request->get('remark');
             $newRemoval->saveOrFail();
 
-            $inventory->stock -= $newRemoval->quantity;
-            $inventory->saveOrFail();
+            $branchInventory->stock -= $newRemoval->quantity;
+            $branchInventory->saveOrFail();
         });
 
         return redirect()->back()->with('flashes.success', 'Inventory removed');

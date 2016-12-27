@@ -100,7 +100,7 @@
                         <div class="row">
                             <label for="closest-expiry" class="col-sm-3 control-label">Closest Expiry</label>
                             <div class="col-sm-9">
-                                <p class="form-control-static">{{ $closestExpired ? $closestExpired->expired_at->toDateString().' ('.$closestExpired->stock.' items)' : '-' }}</p>
+                                <p class="form-control-static">{{ $closestExpired ? $closestExpired->expired_at->toFormattedDateString().' ('.$closestExpired->stock.' items)' : '-' }}</p>
                             </div>
                         </div>
                         <div class="form-group">
@@ -172,15 +172,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($branchInventories as $inventory)
+                                            @foreach($inventories as $inventory)
                                                 @if($inventory->stock > 0)
                                                     <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
                                                         <td>{{ number_format($inventory->priority) }}</td>
                                                         <td>{{ number_format($inventory->stock) }}</td>
                                                         <td>{{ number_format($inventory->cost) }}</td>
-                                                        <td>{{ $inventory->expired_at->toDateString() }}</td>
-                                                        <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toDateString() : '-' }}</td>
-                                                        <td>{{ $inventory->created_at->toDateString() }}</td>
+                                                        <td>{{ $inventory->expired_at->toFormattedDateString() }}</td>
+                                                        <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toFormattedDateString() : '-' }}</td>
+                                                        <td>{{ $inventory->created_at->toDayDateTimeString() }}</td>
                                                         <td>{{ $inventory->creator->name }}</td>
                                                     </tr>
                                                 @endif
@@ -249,10 +249,10 @@
                                                 <tr>
                                                     <td>{{ $branch->name }}</td>
                                                     <td>
-                                                        {{ number_format($branch->inventories->sum('stock')).' ('.number_format($branch->inventories->sum('stock') - $branch->expiredInventories->sum('stock')).' available, '.$branch->expiredInventories->sum('stock').' expired)' }}
+                                                        {{ number_format($branch->branchInventories->sum('stock')).' ('.number_format($branch->branchInventories->sum('stock') - $branch->expiredBranchInventories->sum('stock')).' available, '.$branch->expiredBranchInventories->sum('stock').' expired)' }}
                                                     </td>
                                                     <td>
-                                                        {{ $branch->closestExpired ? $branch->closestExpired->expired_at->toDateString().' ('.$branch->closestExpired->stock.' items)' : '-' }}
+                                                        {{ $branch->closestExpiredInventory ? $branch->closestExpiredInventory->expired_at->toFormattedDateString().' ('.$branch->closestExpiredInventory->stock.' items)' : '-' }}
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -371,7 +371,7 @@
                                             @endforeach
                                         </div>
                                         <div class="col-sm-6">
-                                            <p class="form-control-static text-left" id="stock-left">/ {{ number_format($inventories->sum('stock')) }}</p>
+                                            <p class="form-control-static text-left" id="stock-left">/ {{ number_format($allowedMovementQuantity) }}</p>
                                         </div>
                                     </div>
                                     <div class="form-group {{ $errors->has('branch_id') ? 'has-error' : '' }}">
