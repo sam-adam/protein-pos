@@ -98,9 +98,37 @@ class CustomersController extends AuthenticatedController
         return redirect(route('customers.index'))->with('flashes.success', 'Customer added');
     }
 
-    public function edit() { }
+    public function edit($customerId)
+    {
+        $customer = Customer::find($customerId);
 
-    public function update() { }
+        if (!$customer) {
+            return redirect()->back()->with('flashes.error', 'Customer not found');
+        }
+
+        return view('customers.edit', [
+            'customer' => $customer,
+            'groups'   => CustomerGroup::all()
+        ]);
+    }
+
+    public function update(StoreCustomer $request, $customerId)
+    {
+        $customer = Customer::find($customerId);
+
+        if (!$customer) {
+            return redirect()->back()->with('flashes.error', 'Customer not found');
+        }
+
+        $customer->name                 = $request->get('name') ?: $customer->name;
+        $customer->phone                = $request->get('phone');
+        $customer->email                = $request->get('email');
+        $customer->address              = $request->get('address');
+        $customer->customer_group_id    = $request->get('customer_group_id') ?: null;
+        $customer->saveOrFail();
+
+        return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customer edited');
+    }
 
     public function destroy() { }
 }
