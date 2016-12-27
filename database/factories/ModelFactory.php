@@ -30,3 +30,17 @@ $factory->define(App\Models\Branch::class, function (Faker\Generator $faker) {
         'contact_person_phone' => $faker->phoneNumber,
     ];
 });
+
+$factory->define(App\Models\Customer::class, function (Faker\Generator $faker) {
+    $branch  = \App\Models\Branch::orderBy(\Illuminate\Support\Facades\DB::raw('RAND()'))->first();
+    $creator = \App\Models\User::orderBy(\Illuminate\Support\Facades\DB::raw('RAND()'))->first();
+
+    return [
+        'name'                 => $faker->name,
+        'phone'                => $faker->phoneNumber,
+        'email'                => $faker->email,
+        'registered_branch_id' => $branch->id,
+        'address'              => $faker->address,
+        'created_by'           => $creator->id
+    ];
+});
