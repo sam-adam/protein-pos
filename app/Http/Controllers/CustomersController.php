@@ -76,7 +76,18 @@ class CustomersController extends AuthenticatedController
         ]);
     }
 
-    public function show() { }
+    public function show($customerId)
+    {
+        $customer = Customer::find($customerId);
+
+        if (!$customer) {
+            return redirect()->back()->with('flashes.error', 'Customer not found');
+        }
+
+        return view('customers.show', [
+            'customer' => $customer
+        ]);
+    }
 
     public function create()
     {
