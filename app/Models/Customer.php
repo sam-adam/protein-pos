@@ -11,6 +11,6 @@ class Customer extends BaseModel
 {
     public function group()
     {
-        return $this->belongsTo(CustomerGroup::class);
+        return $this->belongsTo(CustomerGroup::class, 'customer_group_id');
     }
 }

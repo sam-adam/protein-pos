@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCustomer;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
 
 /**
  * Class CustomersController
@@ -22,7 +25,7 @@ class CustomersController extends AuthenticatedController
         $customerQuery = Customer::with('group');
 
         if ($query = $request->get('query')) {
-            $customerQuery =  $customerQuery->where(function ($whereSubQuery) use ($query) {
+            $customerQuery = $customerQuery->where(function ($whereSubQuery) use ($query) {
                 $whereSubQuery->where('customers.name', 'like', "%{$query}%")
                     ->orWhere('customers.phone', 'like', "%{$query}%")
                     ->orWhere('customers.address', 'like', "%{$query}%");
@@ -43,6 +46,8 @@ class CustomersController extends AuthenticatedController
         } else {
             $customers = $customerQuery->orderBy('customers.'.$orderBy, $orderDir)->paginate($perPage);
         }
+
+        Session::put('last_customer_page', $request->fullUrl());
 
         return view('customers.index', [
             'customers' => $customers->appends(Input::except('page')),
@@ -73,9 +78,25 @@ class CustomersController extends AuthenticatedController
 
     public function show() { }
 
-    public function create() { }
+    public function create()
+    {
+        return view('customers.create', ['groups' => CustomerGroup::all()]);
+    }
 
-    public function store() { }
+    public function store(StoreCustomer $request)
+    {
+        $newCustomer                       = new Customer();
+        $newCustomer->name                 = $request->get('name');
+        $newCustomer->phone                = $request->get('phone');
+        $newCustomer->email                = $request->get('email');
+        $newCustomer->address              = $request->get('address');
+        $newCustomer->registered_branch_id = Auth::user()->branch_id;
+        $newCustomer->customer_group_id    = $request->get('customer_group_id') ?: null;
+        $newCustomer->points               = 0;
+        $newCustomer->saveOrFail();
+
+        return redirect(route('customers.index'))->with('flashes.success', 'Customer added');
+    }
 
     public function edit() { }
 
