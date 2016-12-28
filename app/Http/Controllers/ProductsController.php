@@ -47,7 +47,7 @@ class ProductsController extends AuthenticatedController
         $query         = $request->get('query');
         $perPage       = 24;
         $products      = null;
-        $productsQuery = Product::with('category', 'brand')->select('products.*');
+        $productsQuery = Product::with('category', 'brand', 'item')->select('products.*');
         $categoryTree  = [];
         $categories    = ProductCategory::with('parent')
             ->orderBy('parent_id', 'asc')
@@ -142,6 +142,7 @@ class ProductsController extends AuthenticatedController
         return view('products.create', [
             'brands'     => Brand::orderBy('name', 'asc')->get(),
             'variants'   => ProductVariantGroup::all(),
+            'products'   => Product::nonContainer()->orderBy('name', 'asc')->get(),
             'categories' => ProductCategory::with('parent')
                 ->select('product_categories.*')
                 ->join('product_categories as parent', 'parent.id', 'product_categories.parent_id')
@@ -153,17 +154,34 @@ class ProductsController extends AuthenticatedController
 
     public function store(StoreProduct $request)
     {
-        $brand    = Brand::find($request->get('brand'));
-        $category = ProductCategory::find($request->get('category'));
-        $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
-
         $newProduct                           = new Product();
+        $newProduct->is_service               = $request->get('is_service') ?: false;
+        $newProduct->product_item_id          = $request->get('product_item_id') ?: null;
+        $newProduct->product_item_quantity    = $newProduct->isBulkContainer() ? $request->get('product_item_quantity') : 1;
         $newProduct->name                     = $request->get('name');
         $newProduct->price                    = $request->get('price') ?: 0;
+        $newProduct->code                     = $request->get('code');
+        $newProduct->barcode                  = $request->get('barcode');
+
+        if ($newProduct->isBulkContainer()) {
+            $productItem = Product::find($request->get('product_item_id'));
+
+            if (!$productItem) {
+                return redirect()->back()->with('flashes.error', 'Product item not found');
+            }
+
+            $brand    = $productItem->brand;
+            $category = $productItem->category;
+            $variant  = null;
+        } else {
+            $brand    = Brand::find($request->get('brand'));
+            $category = ProductCategory::find($request->get('category'));
+            $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
+        }
+
         $newProduct->brand_id                 = $brand ? $brand->id : null;
         $newProduct->product_category_id      = $category ? $category->id : null;
         $newProduct->product_variant_group_id = $variant ? $variant->id : null;
-        $newProduct->is_service               = $request->get('is_service') ?: false;
         $newProduct->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
@@ -283,6 +301,7 @@ class ProductsController extends AuthenticatedController
 
         return view('products.edit', [
             'product'    => $product,
+            'products'   => Product::nonContainer()->orderBy('name', 'asc')->get(),
             'categories' => ProductCategory::with('parent')
                 ->select('product_categories.*')
                 ->join('product_categories as parent', 'parent.id', 'product_categories.parent_id')
@@ -302,19 +321,37 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
-        $brand    = Brand::find($request->get('brand'));
-        $category = ProductCategory::find($request->get('category'));
-        $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
+        DB::transaction(function () use ($product, $request) {
+            $product->is_service               = $request->get('is_service') ?: false;
+            $product->product_item_id          = $request->get('product_item_id') ?: null;
+            $product->product_item_quantity    = $product->isBulkContainer() ? $request->get('product_item_quantity') : 1;
+            $product->name                     = $request->get('name');
+            $product->price                    = $request->get('price') ?: 0;
+            $product->code                     = $request->get('code');
+            $product->barcode                  = $request->get('barcode');
 
-        $product->name                     = $request->get('name');
-        $product->price                    = $request->get('price') ?: 0;
-        $product->code                     = $request->get('code');
-        $product->barcode                  = $request->get('barcode');
-        $product->brand_id                 = $brand ? $brand->id : $product->brand_id;
-        $product->product_category_id      = $category ? $category->id : $product->product_category_id;
-        $product->product_variant_group_id = $variant ? $variant->id : null;
-        $product->is_service               = $request->get('is_service') ?: false;
-        $product->saveOrFail();
+            if ($product->isBulkContainer()) {
+                $productItem = Product::find($request->get('product_item_id'));
+
+                if (!$productItem) {
+                    return redirect()->back()->with('flashes.error', 'Product item not found');
+                }
+
+                $brand    = $productItem->brand;
+                $category = $productItem->category;
+                $variant  = null;
+            } else {
+                $brand    = Brand::find($request->get('brand'));
+                $category = ProductCategory::find($request->get('category'));
+                $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
+            }
+
+            $product->brand_id                 = $brand ? $brand->id : null;
+            $product->product_category_id      = $category ? $category->id : null;
+            $product->product_variant_group_id = $variant ? $variant->id : null;
+            $product->is_service               = $request->get('is_service') ?: false;
+            $product->saveOrFail();
+        });
 
         return redirect(route('products.show', $productId))->with('flashes.success', 'Product edited');
     }

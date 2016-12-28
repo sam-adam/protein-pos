@@ -71,9 +71,9 @@
                 @if($showMode === 'product')
                     @foreach($products as $product)
                         <div class="col-md-3">
-                            <div class="btn btn-default btn-lg btn-block product-item" href="{{ route('products.show', $product->id) }}">
+                            <div class="btn btn-default btn-lg btn-block product-item {{ $product->isBulkContainer() ? 'btn-success' : ''}}" href="{{ route('products.show', $product->id) }}">
                                 <div class="product-name">
-                                    {{ $product->name }}
+                                    {{ ($product->isBulkContainer() ? '(Bulk) ' : '').$product->name }}
                                 </div>
                                 <br/>
                                 <div class="product-price">
@@ -84,6 +84,11 @@
                                     <div>
                                         <i class="fa fa-fw fa-lightbulb-o"></i>
                                         Service Item
+                                    </div>
+                                @elseif($product->isBulkContainer())
+                                    <div class="product-stock">
+                                        <i class="fa fa-fw fa-clone"></i>
+                                        {{ number_format($product->product_item_quantity).' x '.$product->item->name }}
                                     </div>
                                 @else
                                     <div class="product-stock">

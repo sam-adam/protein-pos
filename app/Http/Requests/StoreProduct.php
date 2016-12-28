@@ -28,10 +28,12 @@ class StoreProduct extends FormRequest
         $product   = Product::find(Route::input('product'));
         $productId = $product ? $product->id : 'NULL';
         $rules     = [
-            'name'        => "bail|required|unique:products,name,{$productId},id,deleted_at,NULL",
-            'price'       => 'numeric',
-            'brand_id'    => 'bail|exists:brands,id',
-            'category_id' => 'bail|exists:product_categories,id'
+            'name'                  => "bail|required|unique:products,name,{$productId},id,deleted_at,NULL",
+            'price'                 => 'numeric',
+            'brand_id'              => 'bail|exists:brands,id',
+            'category_id'           => 'bail|exists:product_categories,id',
+            'product_item_id'       => 'bail|exists:products,id',
+            'product_item_quantity' => 'bail|required_with:product_item_id|numeric|min:1'
         ];
 
         return $rules;
