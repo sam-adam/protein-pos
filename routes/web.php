@@ -28,3 +28,5 @@ Route::get('/shifts/out', 'ShiftsController@viewClockOut')->name('shifts.viewOut
 Route::post('/shifts/{shift}/out', 'ShiftsController@clockOut')->name('shifts.out');
 Route::resource('/shifts', 'ShiftsController');
 Route::resource('/sales', 'SalesController');
+Route::get('/settings', 'SettingsController@index')->name('settings.index');
+Route::post('/settings', 'SettingsController@update')->name('settings.update');

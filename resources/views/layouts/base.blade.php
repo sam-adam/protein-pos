@@ -116,6 +116,12 @@
                                 Sales
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ url('settings') }}">
+                                <i class="fa fa-fw fa-gear"></i>
+                                Settings
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
