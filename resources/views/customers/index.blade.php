@@ -201,7 +201,7 @@
 
             $selectors.on("change", customerSelectedToggleHandler);
             $massSelector.on("change", function () {
-                $selectors.attr("checked", $(this).is(":checked"));
+                $selectors.prop("checked", $(this).is(":checked"));
 
                 customerSelectedToggleHandler();
             });
