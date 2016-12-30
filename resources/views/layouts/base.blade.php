@@ -86,16 +86,23 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="{{ url('customers') }}">
+                            <a href="#">
                                 <i class="fa fa-fw fa-users"></i>
                                 Customers
+                                <span class="fa arrow"></span>
                             </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('customer-groups') }}">
-                                <i class="fa fa-fw fa-object-group"></i>
-                                Customer Groups
-                            </a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="{{ url('customers') }}">
+                                        List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('customer-groups') }}">
+                                        Groups
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li>
                             <a href="{{ url('shifts') }}">
