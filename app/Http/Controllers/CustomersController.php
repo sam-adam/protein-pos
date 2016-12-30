@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\CustomerGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
@@ -152,5 +153,25 @@ class CustomersController extends AuthenticatedController
         $customer->delete();
 
         return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customer deleted');
+    }
+
+    public function bulkChangeGroup(Request $request)
+    {
+        if ($request->get('customer_group_id ')) {
+            $group = CustomerGroup::find($request->get('customer_group_id'));
+
+            if (!$group) {
+                return redirect()->back()->with('flashes.error', 'Customer group not found');
+            }
+        }
+
+        foreach ($request->get('customer_ids') as $customerId) {
+            if ($customer = Customer::find($customerId)) {
+                $customer->customer_group_id = isset($group) ? $group->id : null;
+                $customer->saveOrFail();
+            }
+        }
+
+        return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customers group udpated');
     }
 }

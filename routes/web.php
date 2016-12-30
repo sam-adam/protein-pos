@@ -21,3 +21,4 @@ Route::resource('/product-variants', 'ProductVariantsController');
 Route::resource('/packages', 'PackagesController');
 Route::resource('/customer-groups', 'CustomerGroupsController');
 Route::resource('/customers', 'CustomersController');
+Route::post('/customers/bulk-change-group', 'CustomersController@bulkChangeGroup')->name('customers.bulk_change_group');
