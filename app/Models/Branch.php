@@ -37,6 +37,11 @@ class Branch extends Model
         return $this->loginSessions()->whereNull('logged_out_at');
     }
 
+    public function shifts()
+    {
+        return $this->hasMany(Shift::class);
+    }
+
     public function scopeLicensed(Builder $query)
     {
         return $query->whereNotNull('licensed_at');

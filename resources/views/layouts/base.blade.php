@@ -97,6 +97,18 @@
                                 Customer Groups
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ url('shifts') }}">
+                                <i class="fa fa-fw fa-clock-o"></i>
+                                Shifts
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('sales') }}">
+                                <i class="fa fa-fw fa-shopping-cart"></i>
+                                Sales
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
