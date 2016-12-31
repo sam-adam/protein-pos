@@ -157,7 +157,7 @@ class CustomersController extends AuthenticatedController
 
     public function bulkChangeGroup(Request $request)
     {
-        if ($request->get('customer_group_id ')) {
+        if ($request->get('customer_group_id')) {
             $group = CustomerGroup::find($request->get('customer_group_id'));
 
             if (!$group) {
@@ -172,6 +172,17 @@ class CustomersController extends AuthenticatedController
             }
         }
 
-        return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customers group udpated');
+        return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customers group updated');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        foreach ($request->get('customer_ids') as $customerId) {
+            if ($customer = Customer::find($customerId)) {
+                $customer->delete();
+            }
+        }
+
+        return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customers deleted');
     }
 }

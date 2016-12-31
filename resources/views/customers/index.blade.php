@@ -61,6 +61,12 @@
                                     Bulk set group
                                 </a>
                             </div>
+                            <div class="col-md-3">
+                                <a href="#bulk-delete-modal" class="btn btn-danger btn-lg btn-block" data-toggle="modal">
+                                    <i class="fa fa-trash"></i>
+                                    Bulk delete
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <br/>
@@ -175,6 +181,36 @@
             </form>
         </div>
     </div>
+    <div class="modal fade" id="bulk-delete-modal" tabindex="-1" role="dialog" aria-labelledby="bulk-delete-modal-label">
+        <div class="modal-dialog" role="document">
+            <form class="form-horizontal bulk-customer-action-form" method="post" action="{{ route('customers.bulk_delete') }}">
+                {{ csrf_field() }}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="bulk-delete-modal-label">Bulk Delete Customer</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <p>Deleting multiple customers! Are you sure?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times fa-fw"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa fa-trash fa-fw"></i>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
@@ -208,13 +244,16 @@
             $bulkCustomerForms.on("submit", function () {
                 var $form = $(this);
 
+                $form.find(".customer-input-list").remove();
+
                 $selectors.each(function () {
                     var $customer = $(this);
 
                     if ($customer.is(":checked")) {
                         $form.append($("<input />", {
                             "name": "customer_ids[]",
-                            "type": "hidden"
+                            "type": "hidden",
+                            "class": "customer-input-list"
                         }).val($customer.val()));
                     }
                 });
