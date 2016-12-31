@@ -67,3 +67,13 @@ ul.tree {
 .autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }
 .autocomplete-group { padding: 2px 5px; }
 .autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
+
+.sidebar {
+  .nav-second-level {
+    li {
+      a {
+        padding-left: 60px;
+      }
+    }
+  }
+}

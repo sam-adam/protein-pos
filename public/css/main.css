@@ -10807,4 +10807,8 @@ ul.tree li:last-child {
   border-bottom: 1px solid #000;
 }
 
+.sidebar .nav-second-level li a {
+  padding-left: 60px;
+}
+
 /*# sourceMappingURL=main.css.map */
