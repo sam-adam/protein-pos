@@ -167,6 +167,7 @@ return [
          * Package Service Providers...
          */
         Barryvdh\Debugbar\ServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
         //Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         //
 

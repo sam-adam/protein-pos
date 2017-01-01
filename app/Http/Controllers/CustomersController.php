@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomer;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
+use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Writers\LaravelExcelWriter;
 
 /**
  * Class CustomersController
@@ -18,18 +22,19 @@ use Illuminate\Support\Facades\Session;
  */
 class CustomersController extends AuthenticatedController
 {
-    public function index(Request $request)
+    protected function getCustomersQuery(Request $request)
     {
+        $perPage       = $request->get('per-page') ?: 25;
         $orderBy       = $request->get('order-by') ?: 'name';
         $orderDir      = $request->get('order-dir') ?: 'asc';
-        $perPage       = $request->get('per-page') ?: 25;
         $customerQuery = Customer::with('group');
 
         if ($query = $request->get('query')) {
             $customerQuery = $customerQuery->where(function ($whereSubQuery) use ($query) {
                 $whereSubQuery->where('customers.name', 'like', "%{$query}%")
                     ->orWhere('customers.phone', 'like', "%{$query}%")
-                    ->orWhere('customers.address', 'like', "%{$query}%");
+                    ->orWhere('customers.address', 'like', "%{$query}%")
+                    ->orWhere('customers.email', 'like', "%{$query}%");
             });
         }
 
@@ -40,15 +45,30 @@ class CustomersController extends AuthenticatedController
         }
 
         if ($orderBy === 'group') {
-            $customers = $customerQuery->select('customers.*')
+            $customerQuery = $customerQuery->select('customers.*')
                 ->leftJoin('customer_groups', 'customers.customer_group_id', '=', 'customer_groups.id')
-                ->orderBy('customer_groups.name', $orderDir)
-                ->paginate($perPage);
+                ->orderBy('customer_groups.name', $orderDir);
         } else {
-            $customers = $customerQuery->orderBy('customers.'.$orderBy, $orderDir)->paginate($perPage);
+            $customerQuery = $customerQuery->orderBy('customers.'.$orderBy, $orderDir);
         }
 
+        return [
+            'query'    => $customerQuery,
+            'perPage'  => $perPage,
+            'orderBy'  => $orderBy,
+            'orderDir' => $orderDir
+        ];
+    }
+
+    public function index(Request $request)
+    {
         Session::put('last_customer_page', $request->fullUrl());
+
+        $customerQuery = $this->getCustomersQuery($request);
+        $customers     = $customerQuery['query']->paginate();
+        $perPage       = $customerQuery['perPage'];
+        $orderBy       = $customerQuery['orderBy'];
+        $orderDir      = $customerQuery['orderDir'];
 
         return view('customers.index', [
             'customers' => $customers->appends(Input::except('page')),
@@ -61,6 +81,10 @@ class CustomersController extends AuthenticatedController
                     'label' => 'Name',
                     'url'   => $request->fullUrlWithQuery(['order-by' => 'name', 'order-dir' => $orderBy !== 'name' || $orderDir === 'desc' ? 'asc' : 'desc'])
                 ],
+                'email'   => [
+                    'label' => 'E-Mail',
+                    'url'   => $request->fullUrlWithQuery(['order-by' => 'email', 'order-dir' => $orderBy !== 'email' || $orderDir === 'desc' ? 'asc' : 'desc'])
+                ],
                 'phone'   => [
                     'label' => 'Number',
                     'url'   => $request->fullUrlWithQuery(['order-by' => 'phone', 'order-dir' => $orderBy !== 'phone' || $orderDir === 'desc' ? 'asc' : 'desc'])
@@ -70,7 +94,7 @@ class CustomersController extends AuthenticatedController
                     'url'   => $request->fullUrlWithQuery(['order-by' => 'address', 'order-dir' => $orderBy !== 'address' || $orderDir === 'desc' ? 'asc' : 'desc'])
                 ],
                 'group'   => [
-                    'label' => 'Group (% Discount)',
+                    'label' => 'Group (% Disc)',
                     'url'   => $request->fullUrlWithQuery(['order-by' => 'group', 'order-dir' => $orderBy !== 'group' || $orderDir === 'desc' ? 'asc' : 'desc'])
                 ]
             ]
@@ -184,5 +208,25 @@ class CustomersController extends AuthenticatedController
         }
 
         return redirect(Session::get('last_customer_page') ?: route('customers.index'))->with('flashes.success', 'Customers deleted');
+    }
+
+    public function exportAsCsv(Request $request)
+    {
+        Excel::create('customers-'.Carbon::now()->format('YmdHis'), function (LaravelExcelWriter $excel) use ($request) {
+            $excel->sheet('list', function (LaravelExcelWorksheet $sheet) use ($request) {
+                $customers = $request->has('all') ? Customer::all() : $this->getCustomersQuery($request)['query']->get();
+
+                $sheet->fromArray($customers->map(function (Customer $customer) {
+                    return [
+                        'Name'    => $customer->name,
+                        'E-Mail'  => $customer->email,
+                        'Phone'   => $customer->phone,
+                        'Address' => $customer->address,
+                        'Group'   => $customer->group ? $customer->group->name.' ('.$customer->group->discount.'%)' : ''
+                    ];
+                })->toArray());
+                $sheet->setColumnFormat(['A:Z' => '@']);
+            });
+        })->download('csv');
     }
 }

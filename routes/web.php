@@ -20,9 +20,10 @@ Route::post('/products/{product}/remove-inventory', 'ProductsController@removeIn
 Route::resource('/product-variants', 'ProductVariantsController');
 Route::resource('/packages', 'PackagesController');
 Route::resource('/customer-groups', 'CustomerGroupsController');
-Route::resource('/customers', 'CustomersController');
+Route::get('/customers/export-csv', 'CustomersController@exportAsCsv')->name('customers.export');
 Route::post('/customers/bulk-change-group', 'CustomersController@bulkChangeGroup')->name('customers.bulk_change_group');
 Route::post('/customers/bulk-delete', 'CustomersController@bulkDelete')->name('customers.bulk_delete');
+Route::resource('/customers', 'CustomersController');
 Route::get('/shifts/in', 'ShiftsController@viewClockIn')->name('shifts.viewIn');
 Route::post('/shifts/in', 'ShiftsController@clockIn')->name('shifts.in');
 Route::get('/shifts/out', 'ShiftsController@viewClockOut')->name('shifts.viewOut');

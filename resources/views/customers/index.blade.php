@@ -22,10 +22,10 @@
                                             <div class="input-group-addon">
                                                 <i class="fa fa-fw fa-search"></i>
                                             </div>
-                                            <input type="text" id="query" class="form-control" name="query" placeholder="Input customer name, phone, or address" value="{{ Request::get('query') }}" >
+                                            <input type="text" id="query" class="form-control" name="query" placeholder="Input customer name, phone, email, or address" value="{{ Request::get('query') }}" >
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <select class="form-control" name="group">
                                             <option value>Select Group</option>
                                             @foreach($groups as $group)
@@ -33,20 +33,27 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <button type="submit" class="btn btn-primary btn-lg btn-block">
-                                                    <i class="fa fa-fw fa-search"></i>
-                                                    Search
-                                                </button>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <a href="{{ route('customers.index') }}" class="btn btn-danger btn-lg btn-block">
-                                                    <i class="fa fa-fw fa-times"></i>
-                                                    Reset
-                                                </a>
-                                            </div>
+                                    <div class="col-md-5">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-fw fa-search"></i>
+                                            Search
+                                        </button>
+                                        <a href="{{ route('customers.index') }}" class="btn btn-danger btn-lg">
+                                            <i class="fa fa-fw fa-times"></i>
+                                            Reset
+                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('customers.export', Request::query()) }}" class="btn btn-primary btn-lg">
+                                                <i class="fa fa-fw fa-download"></i>
+                                                Download Result
+                                            </a>
+                                            <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="caret"></span>
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="{{ route('customers.export', Request::query() + ['all' => true]) }}">Download All</a></li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -96,23 +103,22 @@
                                     <td>
                                         <input type="checkbox" value="{{ $customer->id }}" class="customer-checkbox" />
                                     </td>
-                                    <td>{{ $customer->name }}</td>
+                                    <td>
+                                        <a href="{{ route('customers.show', $customer->id) }}">{{ $customer->name }}</a>
+                                    </td>
+                                    <td>{{ $customer->email }}</td>
                                     <td>{{ $customer->phone }}</td>
                                     <td>{{ $customer->address }}</td>
                                     <td>{{ $customer->group ? $customer->group->name.' ('.$customer->group->discount.'%)' : '' }}</td>
                                     <td>
-                                        <a href="{{ route('customers.show', $customer->id) }}" class="btn btn-default btn-sm">
-                                            <i class="fa fa-eye"></i>
-                                            Show
-                                        </a>
-                                        <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-primary btn-sm">
+                                        <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-primary btn-sm btn-block">
                                             <i class="fa fa-pencil"></i>
                                             Edit
                                         </a>
                                         <form method="post" action="{{ route('customers.destroy', $customer->id) }}" style="display: inline;" onsubmit="return confirm('Deleting group! Are you sure?');">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}
-                                            <button type="submit" class="btn btn-danger btn-sm">
+                                            <button type="submit" class="btn btn-danger btn-sm btn-block">
                                                 <i class="fa fa-trash"></i>
                                                 Delete
                                             </button>
@@ -140,7 +146,7 @@
     </div>
     <div class="modal fade" id="bulk-change-group-modal" tabindex="-1" role="dialog" aria-labelledby="bulk-change-group-modal-label">
         <div class="modal-dialog" role="document">
-            <form class="form-horizontal bulk-customer-action-form" method="post" action="{{ route('customers.bulk_change_group') }}">
+            <form class="form-horizontal bulk-customer-action-form" method="post" action="{{ route('customers.bulk_change_group') }}" onsubmit="return confirm('Updating multiple customers! Are you sure?')">
                 {{ csrf_field() }}
                 <div class="modal-content">
                     <div class="modal-header">
