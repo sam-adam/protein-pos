@@ -89,6 +89,7 @@ class MovementService
         /** @var InventoryMovementItem $movementItem */
         foreach ($movement->items as $movementItem) {
             $sourceInventory = BranchInventory::findOrFail($movementItem->source_branch_inventory_id);
+
             $sourceInventory->stock -= $movementItem->quantity;
             $sourceInventory->saveOrFail();
 
@@ -96,6 +97,32 @@ class MovementService
                 'branch_id'    => $movement->to_branch_id,
                 'inventory_id' => $sourceInventory->inventory_id
             ]);
+
+            // if it exists, simply adjust the stock, if it doesn't, have it compared with the global priority
+            if (!$destinationBranchInventory->exists) {
+                $incomingGlobalPriority    = $sourceInventory->inventory->priority;
+                $sortedSameProductInBranch = BranchInventory::with('inventory')
+                    ->inBranch($movement->to)
+                    ->product($movementItem->product)
+                    ->orderBy('inventories.priority', 'asc')
+                    ->orderBy('branch_inventories.priority', 'asc')
+                    ->get();
+                $lowerPriorityInBranch    = $sortedSameProductInBranch->filter(function (BranchInventory $branchInventory) use ($incomingGlobalPriority) {
+                    return $branchInventory->inventory->priority > $incomingGlobalPriority;
+                });
+
+                if ($lowerPriorityInBranch->count() > 0) {
+                    $destinationBranchInventory->priority = $lowerPriorityInBranch->first()->priority;
+
+                    foreach ($lowerPriorityInBranch as $branchInventory) {
+                        $branchInventory->priority -= 1;
+                        $branchInventory->saveOrFail();
+                    }
+                } else {
+                    $destinationBranchInventory->priority = ($sortedSameProductInBranch->max('priority') ?: 0) + 1;
+                }
+            }
+
             $destinationBranchInventory->stock += $movementItem->quantity;
             $destinationBranchInventory->saveOrFail();
         }
@@ -105,12 +132,14 @@ class MovementService
     {
         /** @var InventoryMovementItem $movementItem */
         foreach ($movement->items as $movementItem) {
-            $currentPriority = Inventory::where('product_id', '=', $movementItem->product_id)->max('priority');
-            $priority        = $currentPriority ? $currentPriority + 1 : 1;
+            $generalPriority = Inventory::where('product_id', '=', $movementItem->product_id)->max('priority');
+            $generalPriority = $generalPriority ? $generalPriority + 1 : 1;
+            $branchPriority  = BranchInventory::inBranch($movement->to)->product($movementItem->product)->max('branch_inventories.priority');
+            $branchPriority  = $branchPriority ? $branchPriority + 1 : 1;
 
             $newInventory                       = new Inventory();
             $newInventory->product_id           = $movementItem->product_id;
-            $newInventory->priority             = $priority;
+            $newInventory->priority             = $generalPriority;
             $newInventory->cost                 = $movementItem->cost;
             $newInventory->expired_at           = $movementItem->expired_at;
             $newInventory->expiry_reminder_date = $movementItem->expiry_reminder_date;
@@ -120,6 +149,7 @@ class MovementService
             $newBranchInventory               = new BranchInventory();
             $newBranchInventory->branch_id    = $movement->to_branch_id;
             $newBranchInventory->inventory_id = $newInventory->id;
+            $newBranchInventory->priority     = $branchPriority;
             $newBranchInventory->stock        = $movementItem->quantity;
             $newBranchInventory->saveOrFail();
         }

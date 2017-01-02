@@ -125,6 +125,32 @@
                                 </div>
                             </div>
                         </div>
+                        @if($branches->count() > 0)
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Branch</th>
+                                    <th>Stock</th>
+                                    <th>Closest Expiry</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($branches as $branch)
+                                    <tr>
+                                        <td>{{ $branch->name }}</td>
+                                        <td>
+                                            {{ number_format($branch->branchInventories->sum('stock')).' ('.number_format($branch->branchInventories->sum('stock') - $branch->expiredBranchInventories->sum('stock')).' available, '.$branch->expiredBranchInventories->sum('stock').' expired)' }}
+                                        </td>
+                                        <td>
+                                            {{ $branch->closestExpiredInventory ? $branch->closestExpiredInventory->expired_at->toFormattedDateString().' ('.$branch->closestExpiredInventory->stock.' items)' : '-' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <p>No movement yet</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -141,7 +167,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active">
                                 <a href="#breakdown" aria-controls="breakdown" role="tab" data-toggle="tab">
-                                    Breakdown - {{ Auth::user()->branch->name }}
+                                    Breakdown - Current Branch
                                 </a>
                             </li>
                             <li role="presentation">
@@ -149,47 +175,18 @@
                                     Movements
                                 </a>
                             </li>
-                            <li role="presentation">
-                                <a href="#branches" aria-controls="branches" role="tab" data-toggle="tab">
-                                    All Branch
-                                </a>
-                            </li>
+                            @foreach($otherBranches as $branch)
+                                <li role="presentation">
+                                    <a href="#breakdown-{{ $branch->id }}" aria-controls="breakdown" role="tab" data-toggle="tab">
+                                        Breakdown - {{ $branch->name }}
+                                    </a>
+                                </li>
+                            @endforeach
                         </ul>
                         <div class="tab-content">
                             <br/>
                             <div role="tabpanel" class="tab-pane active" id="breakdown">
-                                @if($inventories->count() > 0)
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Priority</th>
-                                                <th>Stock</th>
-                                                <th>Cost</th>
-                                                <th>Expired At</th>
-                                                <th>Reminder Expired At</th>
-                                                <th>Imported Date</th>
-                                                <th>User</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($inventories as $inventory)
-                                                @if($inventory->stock > 0)
-                                                    <tr class="{{ $inventory->expired_at->lte($now) ? 'danger' : ($inventory->expiry_reminder_date && $inventory->expiry_reminder_date->lte($now) ? 'warning' : 'default') }}">
-                                                        <td>{{ number_format($inventory->priority) }}</td>
-                                                        <td>{{ number_format($inventory->stock) }}</td>
-                                                        <td>{{ number_format($inventory->cost) }}</td>
-                                                        <td>{{ $inventory->expired_at->toFormattedDateString() }}</td>
-                                                        <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toFormattedDateString() : '-' }}</td>
-                                                        <td>{{ $inventory->created_at->toDayDateTimeString() }}</td>
-                                                        <td>{{ $inventory->creator->name }}</td>
-                                                    </tr>
-                                                @endif
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @else
-                                    <p>No inventory yet</p>
-                                @endif
+                                @include('products.components.branch-inventory-table', ['inventories' => $branches[Auth::user()->branch_id]->branchInventories])
                             </div>
                             <div role="tabpanel" class="tab-pane" id="movement">
                                 @if(count($movements) > 0)
@@ -234,42 +231,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="branches">
-                                @if($branches->count() > 0)
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Branch</th>
-                                                <th>Stock</th>
-                                                <th>Closest Expiry</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($branches as $branch)
-                                                <tr>
-                                                    <td>{{ $branch->name }}</td>
-                                                    <td>
-                                                        {{ number_format($branch->branchInventories->sum('stock')).' ('.number_format($branch->branchInventories->sum('stock') - $branch->expiredBranchInventories->sum('stock')).' available, '.$branch->expiredBranchInventories->sum('stock').' expired)' }}
-                                                    </td>
-                                                    <td>
-                                                        {{ $branch->closestExpiredInventory ? $branch->closestExpiredInventory->expired_at->toFormattedDateString().' ('.$branch->closestExpiredInventory->stock.' items)' : '-' }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                @else
-                                    <p>No movement yet</p>
-                                @endif
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <a href="#add-inventory-modal" class="btn btn-primary" data-toggle="modal">
-                                            <i class="fa fa-plus"></i>
-                                            Add Inventory
-                                        </a>
-                                    </div>
+                            @foreach($otherBranches as $branch)
+                                <div role="tabpanel" class="tab-pane" id="breakdown-{{ $branch->id }}">
+                                    @include('products.components.branch-inventory-table', ['inventories' => $branch->branchInventories])
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -296,11 +262,11 @@
                                     <div class="form-group {{ $errors->has('inventory_id') ? 'has-error' : '' }}">
                                         <label class="control-label col-sm-4" for="inventory_id">Priority</label>
                                         <div class="col-sm-6" id="current-stock">
-                                            <select class="form-control" name="inventory_id">
+                                            <select class="form-control" name="inventory_id" required>
                                                 <option value>Select Priority</option>
-                                                @foreach($inventories as $inventory)
+                                                @foreach($currentBranch->branchInventories as $inventory)
                                                     @if($inventory->stock > 0)
-                                                        <option value="{{ $inventory->id }}" @if($inventory->id == old('inventory_id')) selected @endif)>Priority {{ $inventory->priority }}</option>
+                                                        <option value="{{ $inventory->id }}" @if($inventory->id == old('inventory_id')) selected @endif)>Priority {{ $inventory->priority }} ({{ number_format($inventory->stock) }} items)</option>
                                                     @endif
                                                 @endforeach
                                             </select>
@@ -370,9 +336,6 @@
                                                 <span class="label label-danger">{{ $error }}</span>
                                             @endforeach
                                         </div>
-                                        <div class="col-sm-6">
-                                            <p class="form-control-static text-left" id="stock-left">/ {{ number_format($allowedMovementQuantity) }}</p>
-                                        </div>
                                     </div>
                                     <div class="form-group {{ $errors->has('branch_id') ? 'has-error' : '' }}">
                                         <label class="control-label col-sm-4" for="branch-id">To Branch</label>
@@ -384,6 +347,22 @@
                                                 @endforeach
                                             </select>
                                             @foreach($errors->get('branch_id') as $error)
+                                                <span class="label label-danger">{{ $error }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="form-group {{ $errors->has('inventory_id') ? 'has-error' : '' }}">
+                                        <label class="control-label col-sm-4" for="inventory_id">Priority</label>
+                                        <div class="col-sm-6" id="current-stock">
+                                            <select class="form-control" name="inventory_id" required>
+                                                <option value>Select Priority</option>
+                                                @foreach($currentBranch->branchInventories as $inventory)
+                                                    @if($inventory->stock > 0)
+                                                        <option value="{{ $inventory->id }}" @if($inventory->id == old('inventory_id')) selected @endif)>Priority {{ $inventory->priority }} ({{ number_format($inventory->stock) }} items)</option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                            @foreach($errors->get('inventory_id') as $error)
                                                 <span class="label label-danger">{{ $error }}</span>
                                             @endforeach
                                         </div>

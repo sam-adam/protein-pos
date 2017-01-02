@@ -154,14 +154,14 @@ class ProductsController extends AuthenticatedController
 
     public function store(StoreProduct $request)
     {
-        $newProduct                           = new Product();
-        $newProduct->is_service               = $request->get('is_service') ?: false;
-        $newProduct->product_item_id          = $request->get('product_item_id') ?: null;
-        $newProduct->product_item_quantity    = $newProduct->isBulkContainer() ? $request->get('product_item_quantity') : 1;
-        $newProduct->name                     = $request->get('name');
-        $newProduct->price                    = $request->get('price') ?: 0;
-        $newProduct->code                     = $request->get('code');
-        $newProduct->barcode                  = $request->get('barcode');
+        $newProduct                        = new Product();
+        $newProduct->is_service            = $request->get('is_service') ?: false;
+        $newProduct->product_item_id       = $request->get('product_item_id') ?: null;
+        $newProduct->product_item_quantity = $newProduct->isBulkContainer() ? $request->get('product_item_quantity') : 1;
+        $newProduct->name                  = $request->get('name');
+        $newProduct->price                 = $request->get('price') ?: 0;
+        $newProduct->code                  = $request->get('code');
+        $newProduct->barcode               = $request->get('barcode');
 
         if ($newProduct->isBulkContainer()) {
             $productItem = Product::find($request->get('product_item_id'));
@@ -195,18 +195,19 @@ class ProductsController extends AuthenticatedController
             return redirect(route('products.index'))->with('flashes.error', 'Product not found');
         }
 
-        $movements          = [];
-        $branches           = Branch::licensed()->get()->keyBy('id');
-        $inventories        = Inventory::with('branchItems')
+        $movementLabels = [];
+
+        $branches    = Branch::licensed()->get()->keyBy('id');
+        $inventories = Inventory::with('branchItems')
             ->where('product_id', '=', $product->id)
-            ->orderBy('expired_at', 'asc')
+            ->orderBy('priority', 'asc')
             ->get()
             ->map(function (Inventory $inventory) {
                 $inventory->stock = $inventory->branchItems->sum('stock');
 
                 return $inventory;
             });
-        $inventoryMovements = InventoryMovement::with('items')
+        $movements   = InventoryMovement::with('items')
             ->branch(Auth::user()->branch)
             ->select('inventory_movements.*')
             ->join('inventory_movement_items', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
@@ -214,7 +215,7 @@ class ProductsController extends AuthenticatedController
             ->groupBy('inventory_movements.id')
             ->orderBy('inventory_movements.movement_effective_at', 'desc')
             ->get();
-        $inventoryRemovals  = InventoryRemoval::select('inventory_removals.*')
+        $removals    = InventoryRemoval::select('inventory_removals.*')
             ->join('branch_inventories', 'branch_inventories.id', '=', 'inventory_removals.branch_inventory_id')
             ->join('inventories', 'branch_inventories.inventory_id', '=', 'inventories.id')
             ->where('branch_inventories.branch_id', '=', Auth::user()->branch_id)
@@ -222,14 +223,14 @@ class ProductsController extends AuthenticatedController
             ->orderBy('inventory_removals.created_at', 'desc')
             ->get();
 
-        foreach ($inventoryMovements as $movement) {
+        foreach ($movements as $movement) {
             if ($movement->from_branch_id) {
                 $movementLabel = 'Inventory transfer '.($movement->from_branch_id == Auth::user()->branch_id ? 'to ' : 'from ').$movement->to->name;
             } else {
                 $movementLabel = 'Inventory import at '.$movement->to->name;
             }
 
-            $movements[] = [
+            $movementLabels[] = [
                 'id'         => $movement->id,
                 'label'      => $movementLabel,
                 'quantity'   => $movement->items->filter(function (InventoryMovementItem $movementItem) use ($productId) {
@@ -242,8 +243,8 @@ class ProductsController extends AuthenticatedController
             ];
         }
 
-        foreach ($inventoryRemovals as $inventoryRemoval) {
-            $movements[] = [
+        foreach ($removals as $inventoryRemoval) {
+            $movementLabels[] = [
                 'id'         => $inventoryRemoval->id,
                 'label'      => 'Removed',
                 'quantity'   => $inventoryRemoval->quantity,
@@ -254,7 +255,7 @@ class ProductsController extends AuthenticatedController
             ];
         }
 
-        uasort($movements, function ($first, $second) {
+        uasort($movementLabels, function ($first, $second) {
             return $first['date']->lt($second['date']);
         });
 
@@ -283,7 +284,8 @@ class ProductsController extends AuthenticatedController
             'allowedMovementQuantity'   => $branches[Auth::user()->branch_id]->branchInventories->sum('stock'),
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,
-            'movements'                 => $movements,
+            'movements'                 => $movementLabels,
+            'currentBranch'             => $branches[Auth::user()->branch_id],
             'otherBranches'             => $branches->except(Auth::user()->branch_id),
             'defaultMovementDate'       => Carbon::now(),
             'defaultExpiredDate'        => \Carbon\Carbon::now()->addMonth(1),
@@ -322,13 +324,13 @@ class ProductsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($product, $request) {
-            $product->is_service               = $request->get('is_service') ?: false;
-            $product->product_item_id          = $request->get('product_item_id') ?: null;
-            $product->product_item_quantity    = $product->isBulkContainer() ? $request->get('product_item_quantity') : 1;
-            $product->name                     = $request->get('name');
-            $product->price                    = $request->get('price') ?: 0;
-            $product->code                     = $request->get('code');
-            $product->barcode                  = $request->get('barcode');
+            $product->is_service            = $request->get('is_service') ?: false;
+            $product->product_item_id       = $request->get('product_item_id') ?: null;
+            $product->product_item_quantity = $product->isBulkContainer() ? $request->get('product_item_quantity') : 1;
+            $product->name                  = $request->get('name');
+            $product->price                 = $request->get('price') ?: 0;
+            $product->code                  = $request->get('code');
+            $product->barcode               = $request->get('barcode');
 
             if ($product->isBulkContainer()) {
                 $productItem = Product::find($request->get('product_item_id'));
@@ -389,33 +391,13 @@ class ProductsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($request, $product) {
-            $movementItems     = [];
-            $currentQuantity   = 0;
-            $requestedQuantity = $request->get('quantity');
-            $sourceInventories = BranchInventory::inBranch(Auth::user()->branch)
-                ->product($product)
-                ->orderBy('priority', 'asc')
-                ->get();
-
-            /** @var BranchInventory $inventory */
-            foreach ($sourceInventories as $inventory) {
-                $stillRequiredQuantity = $requestedQuantity - $currentQuantity;
-
-                if ($stillRequiredQuantity > 0) {
-                    $movementItem    = [
-                        'product_id'          => $product->id,
-                        'source_inventory_id' => $inventory->id,
-                        'quantity'            => min($inventory->stock, $stillRequiredQuantity)
-                    ];
-                    $movementItems[] = $movementItem;
-
-                    $currentQuantity += $movementItem['quantity'];
-                }
-            }
-
             return $this->movementService->createMovement(
                 Branch::find($request->get('branch_id')),
-                $movementItems,
+                [[
+                    'product_id'          => $product->id,
+                    'source_inventory_id' => $request->get('inventory_id'),
+                    'quantity'            => $request->get('quantity')
+                ]],
                 Auth::user()->branch,
                 $request->get('remark')
             );
@@ -432,16 +414,8 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
-        $inventory = Inventory::find($request->get('inventory_id'));
-
-        if (!$inventory) {
-            return redirect()->back()->with('flashes.error', 'Inventory not found');
-        }
-
-        DB::transaction(function () use ($request, $inventory, $product) {
-            $branchInventory = $inventory->branchItems->first(function (BranchInventory $branchInventory) {
-                return $branchInventory->branch_id == Auth::user()->branch_id;
-            });
+        DB::transaction(function () use ($request, $product) {
+            $branchInventory = BranchInventory::find($request->get('inventory_id'));
 
             if (!$branchInventory) {
                 throw new ModelNotFoundException(BranchInventory::class);
