@@ -12,10 +12,11 @@ Route::post('/branches/{branchId}/license', 'BranchesController@license')->name(
 Route::post('/branches/{branchId}/activate', 'BranchesController@activate')->name('branches.activate');
 Route::resource('/brands', 'BrandsController');
 Route::resource('/categories', 'ProductCategoriesController');
-Route::resource('/products', 'ProductsController');
 Route::post('/products/{product}/add-inventory', 'ProductsController@addInventory')->name('products.inventory.add');
 Route::post('/products/{product}/move-inventory', 'ProductsController@moveInventory')->name('products.inventory.move');
 Route::post('/products/{product}/remove-inventory', 'ProductsController@removeInventory')->name('products.inventory.remove');
+Route::get('/products/xhr-search', 'ProductsController@xhrSearch');
+Route::resource('/products', 'ProductsController');
 //Route::resource('/inventory-movements', 'InventoryMovementsController');
 Route::resource('/product-variants', 'ProductVariantsController');
 Route::resource('/packages', 'PackagesController');

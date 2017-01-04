@@ -23,5 +23,7 @@ class SalesController
         if (!$shift) {
             return redirect()->route('shifts.viewIn', ['redirect' => $request->fullUrl()])->with('flashes.error', 'Please clock in before making sales');
         }
+
+        return view('sales.create');
     }
 }

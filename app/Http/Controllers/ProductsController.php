@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\ProductWithStock;
 use App\Http\Requests\MoveInventoryToOtherBranch;
 use App\Http\Requests\RemoveInventory;
 use App\Http\Requests\StoreProduct;
@@ -433,5 +434,20 @@ class ProductsController extends AuthenticatedController
         });
 
         return redirect()->back()->with('flashes.success', 'Inventory removed');
+    }
+
+    public function xhrSearch(Request $request)
+    {
+        $product = Product::whereBarcode($request->get('query'))->first();
+
+        if ($product) {
+            $stock = BranchInventory::inBranch(Auth::user()->branch)
+                ->product($product)
+                ->sum('stock');
+
+            return response()->json(new ProductWithStock($product, $stock));
+        }
+
+        return response()->json([]);
     }
 }
