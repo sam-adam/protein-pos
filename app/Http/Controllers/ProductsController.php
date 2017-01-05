@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Collection;
 use App\DTO\ProductWithStock;
 use App\Http\Requests\MoveInventoryToOtherBranch;
 use App\Http\Requests\RemoveInventory;
@@ -438,14 +439,26 @@ class ProductsController extends AuthenticatedController
 
     public function xhrSearch(Request $request)
     {
-        $product = Product::whereBarcode($request->get('query'))->first();
-
-        if ($product) {
+        $withStockTransformer = function (Product $product) {
             $stock = BranchInventory::inBranch(Auth::user()->branch)
                 ->product($product)
                 ->sum('stock');
 
-            return response()->json(new ProductWithStock($product, $stock));
+            return new ProductWithStock($product, $stock);
+        };
+
+        if ($request->get('method') === 'barcode') {
+            if ($product = Product::whereBarcode($request->get('query'))->first()) {
+                return response()->json(new Collection([$product], $withStockTransformer));
+            }
+        } else {
+            $products = Product::with('category', 'brand', 'item')->select('products.*')
+                ->where('products.name', 'LIKE', "%{$request->get('query')}%")
+                ->orWhere('products.code', 'LIKE', "%{$request->get('query')}%")
+                ->limit(5)
+                ->get();
+
+            return response()->json(new Collection($products, $withStockTransformer));
         }
 
         return response()->json([]);

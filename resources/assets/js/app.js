@@ -98,6 +98,7 @@ $(function() {
     resizeHandler();
 });
 
+Vue.component('SearchProduct', require('./components/SearchProduct.vue'));
 
 // const app = new Vue({
 //     el: '#app'

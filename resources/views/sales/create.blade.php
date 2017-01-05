@@ -10,12 +10,7 @@
         <div class="col-md-7">
             <div class="panel panel-default">
                 <div class="panel-body" id="search-panel">
-                    <div class="form-group form-group-lg">
-                        <div class="input-group">
-                            <div class="input-group-addon"><i class="fa fa-fw fa-search"></i></div>
-                            <input type="text" id="query" placeholder="Input product name, code, or scan barcode" class="form-control" v-model="query" />
-                        </div>
-                    </div>
+                    <search-product src="{{ route('products.xhr.search') }}" v-on:product-selected="addProduct($event.product, 1)"></search-product>
                 </div>
             </div>
             <div class="panel panel-default">
@@ -53,10 +48,6 @@
 @section('scripts')
     @parent
     <script type="text/javascript">
-        var $queryBox = $("#query");
-
-        $queryBox[0].focus();
-
         const app = new Vue({
             el: "#app",
             data: {

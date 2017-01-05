@@ -132,6 +132,9 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        window.Laravel = {!! json_encode(['csrfToken' => csrf_token()]) !!};
+    </script>
     <script type="text/javascript" src="{{ elixir('js/app.js') }}"></script>
     @yield('scripts')
 </body>

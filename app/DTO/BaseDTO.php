@@ -39,41 +39,58 @@ abstract class BaseDTO implements \JsonSerializable, Arrayable
     protected function extractValue($value)
     {
         if ($value instanceof Model) {
-            $members = $value->attributesToArray();
-
-            foreach ($this->eagerLoaded as $relationProperty => $data) {
-                $value->load($relationProperty);
-
-                $members = array_merge($members, (new $data['dto']($value->{$relationProperty}))->toArray());
-
-                unset($members[$data['property']]);
-            }
-
-            if ($value->timestamps) {
-                unset($members[$value->getCreatedAtColumn()]);
-                unset($members[$value->getUpdatedAtColumn()]);
-            }
-
-            if (isset(class_uses_recursive($value)[SoftDeletes::class])) {
-                unset($members[$value->getDeletedAtColumn()]);
-            }
-
-            return $this->extractValue($members);
+            return $this->modelHandler($value);
         } elseif (is_array($value)) {
-            $parsed = [];
-
-            foreach ($value as $key => $subValue) {
-                if (!in_array($key, $this->guarded)) {
-                    $parsed[Str::camel($key)] = $this->extractValue($subValue);
-                }
-            }
-
-            return $parsed;
+            return $this->arrayHandler($value);
         } elseif (is_callable($value)) {
-            return $this->extractValue(call_user_func($value));
+            return $this->callbackHandler($value);
         } else {
             return $value;
         }
+    }
+
+    protected function modelHandler($value)
+    {
+        $members = $value->attributesToArray();
+
+        foreach ($this->eagerLoaded as $relationProperty => $data) {
+            $value->load($relationProperty);
+
+            if ($value->{$relationProperty}) {
+                $members = array_merge($members, (new $data['dto']($value->{$relationProperty}))->toArray());
+            }
+
+            unset($members[$data['property']]);
+        }
+
+        if ($value->timestamps) {
+            unset($members[$value->getCreatedAtColumn()]);
+            unset($members[$value->getUpdatedAtColumn()]);
+        }
+
+        if (isset(class_uses_recursive($value)[SoftDeletes::class])) {
+            unset($members[$value->getDeletedAtColumn()]);
+        }
+
+        return $this->extractValue($members);
+    }
+
+    protected function arrayHandler($value)
+    {
+        $parsed = [];
+
+        foreach ($value as $key => $subValue) {
+            if (!in_array($key, $this->guarded)) {
+                $parsed[Str::camel($key)] = $this->extractValue($subValue);
+            }
+        }
+
+        return $parsed;
+    }
+
+    protected function callbackHandler($value)
+    {
+        return $this->extractValue(call_user_func($value));
     }
 }
 

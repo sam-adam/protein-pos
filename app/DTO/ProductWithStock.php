@@ -3,7 +3,6 @@
 namespace App\DTO;
 
 use App\Models\Product;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class ProductWithStock

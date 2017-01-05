@@ -15,7 +15,7 @@ Route::resource('/categories', 'ProductCategoriesController');
 Route::post('/products/{product}/add-inventory', 'ProductsController@addInventory')->name('products.inventory.add');
 Route::post('/products/{product}/move-inventory', 'ProductsController@moveInventory')->name('products.inventory.move');
 Route::post('/products/{product}/remove-inventory', 'ProductsController@removeInventory')->name('products.inventory.remove');
-Route::get('/products/xhr-search', 'ProductsController@xhrSearch');
+Route::get('/products/xhr-search', 'ProductsController@xhrSearch')->name('products.xhr.search');
 Route::resource('/products', 'ProductsController');
 //Route::resource('/inventory-movements', 'InventoryMovementsController');
 Route::resource('/product-variants', 'ProductVariantsController');
