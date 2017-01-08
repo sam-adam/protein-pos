@@ -358,7 +358,9 @@
                                                 <option value>Select Priority</option>
                                                 @foreach($currentBranch->branchInventories as $inventory)
                                                     @if($inventory->stock > 0)
-                                                        <option value="{{ $inventory->id }}" @if($inventory->id == old('inventory_id')) selected @endif)>Priority {{ $inventory->priority }} ({{ number_format($inventory->stock) }} items)</option>
+                                                        @foreach($inventory->branchItems as $branchItem)
+                                                            <option value="{{ $branchItem->id }}" @if($branchItem->id == old('inventory_id')) selected @endif>Priority {{ $branchItem->priority }} ({{ number_format($branchItem->stock) }} items)</option>
+                                                        @endforeach
                                                     @endif
                                                 @endforeach
                                             </select>

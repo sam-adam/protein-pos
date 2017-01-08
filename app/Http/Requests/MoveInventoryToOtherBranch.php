@@ -26,7 +26,7 @@ class MoveInventoryToOtherBranch extends FormRequest
     {
         return [
             'branch_id'    => 'bail|required|exists:branches,id',
-            'inventory_id' => 'bail|required|exists:inventories,id',
+            'inventory_id' => 'bail|required|exists:branch_inventories,id',
             'quantity'     => 'bail|required|numeric|min:1|max:'.BranchInventory::findOrFail($this->get('inventory_id'))->stock
         ];
     }

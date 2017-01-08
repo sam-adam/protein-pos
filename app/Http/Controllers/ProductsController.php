@@ -18,6 +18,7 @@ use App\Models\InventoryRemoval;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductVariantGroup;
+use App\Repository\InventoryRepository;
 use App\Services\MovementService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -36,12 +37,14 @@ use Illuminate\Support\Facades\Session;
 class ProductsController extends AuthenticatedController
 {
     protected $movementService;
+    protected $inventoryRepo;
 
-    public function __construct(MovementService $movementService)
+    public function __construct(MovementService $movementService, InventoryRepository $inventoryRepo)
     {
         parent::__construct();
 
         $this->movementService = $movementService;
+        $this->inventoryRepo   = $inventoryRepo;
     }
 
     public function index(Request $request)
@@ -440,16 +443,14 @@ class ProductsController extends AuthenticatedController
     public function xhrSearch(Request $request)
     {
         $withStockTransformer = function (Product $product) {
-            $stock = BranchInventory::inBranch(Auth::user()->branch)
-                ->product($product)
-                ->sum('stock');
-
-            return new ProductWithStock($product, $stock);
+            return new ProductWithStock($product, $product->stock);
         };
+
+        $branch = Auth::user()->branch;
 
         if ($request->get('method') === 'barcode') {
             if ($product = Product::whereBarcode($request->get('query'))->first()) {
-                return response()->json(new Collection([$product], $withStockTransformer));
+                return response()->json(new Collection($this->inventoryRepo->countAvailableStock([$product], $branch), $withStockTransformer));
             }
         } else {
             $products = Product::with('category', 'brand', 'item')->select('products.*')
@@ -458,7 +459,7 @@ class ProductsController extends AuthenticatedController
                 ->limit(5)
                 ->get();
 
-            return response()->json(new Collection($products, $withStockTransformer));
+            return response()->json(new Collection($this->inventoryRepo->countAvailableStock($products, $branch), $withStockTransformer));
         }
 
         return response()->json([]);

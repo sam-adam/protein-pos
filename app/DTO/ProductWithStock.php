@@ -16,18 +16,26 @@ class ProductWithStock extends BaseDTO
             'property' => 'product_category_id',
             'dto'      => NonHierarchyCategory::class
         ],
-        'brand' => [
+        'brand'    => [
             'property' => 'brand_id',
             'dto'      => Brand::class
         ]
     ];
 
     public $product;
+    public $actualProduct;
     public $availableStock;
+    public $quantity;
+    public $canBeSold;
+    public $isPackage;
 
     public function __construct(Product $product, $availableStock)
     {
+        $this->quantity       = $product->isBulkContainer() ? $product->product_item_quantity : 1;
         $this->product        = $product;
+        $this->actualProduct  = $product->isBulkContainer() ? $product->item : $product;
         $this->availableStock = $availableStock;
+        $this->canBeSold      = $this->availableStock > 0;
+        $this->isPackage      = $product->isBulkContainer();
     }
 }
