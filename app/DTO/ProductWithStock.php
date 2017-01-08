@@ -27,6 +27,7 @@ class ProductWithStock extends BaseDTO
     public $availableStock;
     public $quantity;
     public $canBeSold;
+    public $remark;
     public $isPackage;
 
     public function __construct(Product $product, $availableStock)
@@ -37,5 +38,9 @@ class ProductWithStock extends BaseDTO
         $this->availableStock = $availableStock;
         $this->canBeSold      = $this->availableStock > 0;
         $this->isPackage      = $product->isBulkContainer();
+
+        if ($this->availableStock === 0) {
+            $this->remark = 'Out of stock';
+        }
     }
 }

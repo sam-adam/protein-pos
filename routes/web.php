@@ -24,6 +24,7 @@ Route::resource('/customer-groups', 'CustomerGroupsController');
 Route::get('/customers/export-csv', 'CustomersController@exportAsCsv')->name('customers.export');
 Route::post('/customers/bulk-change-group', 'CustomersController@bulkChangeGroup')->name('customers.bulk_change_group');
 Route::post('/customers/bulk-delete', 'CustomersController@bulkDelete')->name('customers.bulk_delete');
+Route::get('/customers/xhr-search', 'CustomersController@xhrSearch')->name('customers.xhr.search');
 Route::resource('/customers', 'CustomersController');
 Route::get('/shifts/in', 'ShiftsController@viewClockIn')->name('shifts.viewIn');
 Route::post('/shifts/in', 'ShiftsController@clockIn')->name('shifts.in');

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Collection;
+use App\DTO\Customer as CustomerDTO;
 use App\Http\Requests\StoreCustomer;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
@@ -228,5 +229,16 @@ class CustomersController extends AuthenticatedController
                 $sheet->setColumnFormat(['A:Z' => '@']);
             });
         })->download('csv');
+    }
+
+    public function xhrSearch(Request $request)
+    {
+        $query     = $request->query('query');
+        $customers = Customer::where('name', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
+            ->limit(5)
+            ->get();
+
+        return response()->json(new Collection($customers, function (Customer $customer) { return new CustomerDTO($customer); }));
     }
 }

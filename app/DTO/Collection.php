@@ -9,6 +9,8 @@ namespace App\DTO;
  */
 class Collection extends BaseDTO
 {
+    /** @var int */
+    public $count;
     /** @var array */
     public $items;
     /** @var callable */
@@ -23,6 +25,7 @@ class Collection extends BaseDTO
     public function __construct($items = [], callable $transformer = null)
     {
         $this->items       = $items;
+        $this->count       = count($items);
         $this->transformer = $transformer;
     }
 

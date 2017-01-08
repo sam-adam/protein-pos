@@ -99,6 +99,7 @@ $(function() {
 });
 
 Vue.component('SearchProduct', require('./components/SearchProduct.vue'));
+Vue.component('SearchCustomer', require('./components/SearchCustomer.vue'));
 
 // const app = new Vue({
 //     el: '#app'

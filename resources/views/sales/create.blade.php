@@ -15,7 +15,10 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-body" id="products-panel">
-                    <table class="table table-hover">
+                    <div v-show="isCartEmpty">
+                        <span class="label label-primary">No items on cart</span>
+                    </div>
+                    <table class="table table-hover" v-show="!isCartEmpty">
                         <thead>
                             <tr class="register-items-header">
                                 <th></th>
@@ -31,9 +34,13 @@
                                 <td></td>
                                 <td>@{{ cartItem.product.name }}</td>
                                 <td>@{{ cartItem.product.price }}</td>
-                                <td>@{{ cartItem.quantity }}</td>
-                                <td>@{{ 0 }}</td>
-                                <td>@{{ cartItem.product.price * cartItem.quantity }}</td>
+                                <td style="width: 70px;">
+                                    <input type="text" class="form-control" v-model="cartItem.quantity" />
+                                </td>
+                                <td style="width: 70px;">
+                                    <input type="text" class="form-control" v-model="cartItem.discount" />
+                                </td>
+                                <td>@{{ (cartItem.product.price * cartItem.quantity) * (100 - cartItem.discount) / 100 }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -41,6 +48,11 @@
             </div>
         </div>
         <div class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-body" id="search-panel">
+                    <search-customer src="{{ route('customers.xhr.search') }}" v-on:product-selected="setCustomer($event.customer)"></search-customer>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -52,9 +64,18 @@
             el: "#app",
             data: {
                 query: "",
-                cart: []
+                cart: [],
+                customer: {}
+            },
+            computed: {
+                isCartEmpty: function () {
+                    return this.cart.length === 0;
+                }
             },
             methods: {
+                setCustomer: function (customer) {
+                    this.customer = customer;
+                },
                 addProduct: function (product, quantity) {
                     var sameProduct = false;
 
@@ -68,7 +89,8 @@
                     if (!sameProduct) {
                         this.cart.push({
                             product: product,
-                            quantity: quantity
+                            quantity: quantity,
+                            discount: 0
                         })
                     }
                 },

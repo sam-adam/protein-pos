@@ -13,6 +13,7 @@
                         id="query"
                         placeholder="Input product name, code, or scan barcode"
                         class="form-control"
+                        autofocus
                         v-model="query"
                         autocomplete="off"
                         @keydown.down="down"
@@ -25,8 +26,27 @@
         </div>
         <ul v-show="hasItems">
             <li v-for="(inventory, index) in items" :class="activeClass(index)" @mousedown="hit" @mousemove="setActive(index)">
-                <span class="name" v-text="inventory.product.name"></span>
-                <span class="screen-name" v-text="inventory.product.name"></span>
+                <div class="row">
+                    <div class="col-xs-10">
+                        <div class="name">
+                            {{ inventory.actualProduct.name }}
+                            <span v-show="!inventory.canBeSold" class="label label-danger">
+                                <i class="fa fa-fw fa-exclamation-circle"></i>
+                                {{ inventory.remark }}
+                            </span>
+                        </div>
+                        <div class="screen-name">{{ inventory.actualProduct.brand ? inventory.actualProduct.brand.name : 'Not branded' }}</div>
+                        <div class="screen-name">
+                            Price: {{ inventory.actualProduct.price }}, Category: {{ inventory.actualProduct.category ? inventory.actualProduct.category.name : 'Uncategorized' }}
+                        </div>
+                    </div>
+                    <div class="col-xs-2">
+                        <div class="stock text-center">
+                            {{ inventory.availableStock }}
+                        </div>
+                        <div class="stock-message text-center">item(s) avail.</div>
+                    </div>
+                </div>
             </li>
         </ul>
     </div>
@@ -47,8 +67,10 @@
             }
         },
         methods: {
-            onHit (item) {
-                this.$emit('product-selected', item);
+            onHit (inventory) {
+                if (inventory.canBeSold) {
+                    this.$emit('product-selected', inventory);
+                }
             },
             prepareResponseData (response) {
                 if (response.hasOwnProperty('items')) {
@@ -78,6 +100,7 @@
     }
 
     li {
+        color: #333333;
         padding: 10px 16px;
         border-bottom: 1px solid #ccc;
         cursor: pointer;
@@ -94,16 +117,11 @@
         border-bottom: 0;
     }
 
-    span {
-        display: block;
-        color: #2c3e50;
-    }
-
     .active {
         background-color: #3aa373;
     }
 
-    .active span {
+    .active div {
         color: white;
     }
 
@@ -113,6 +131,14 @@
     }
 
     .screen-name {
+        font-style: italic;
+    }
+
+    .stock {
+        font-size: 30px;
+    }
+
+    .stock-message {
         font-style: italic;
     }
 </style>
