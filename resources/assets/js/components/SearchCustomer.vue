@@ -59,7 +59,7 @@
         },
         methods: {
             onHit (customer) {
-                this.$emit('customer-selected', inventory);
+                this.$emit('customer-selected', customer);
             },
             prepareResponseData (response) {
                 if (response.hasOwnProperty('items')) {
