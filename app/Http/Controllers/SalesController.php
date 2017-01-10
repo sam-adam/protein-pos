@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
  *
  * @package App\Http\Controllers
  */
-class SalesController
+class SalesController extends AuthenticatedController
 {
     public function index(Request $request)
     {

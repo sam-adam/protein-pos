@@ -10737,6 +10737,10 @@ button.close {
   margin: 0;
 }
 
+[v-cloak] {
+  display: none;
+}
+
 ul.tree {
   list-style-type: none;
 }

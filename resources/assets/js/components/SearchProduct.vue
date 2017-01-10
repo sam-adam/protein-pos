@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-xs-2">
                         <div class="stock text-center">
-                            {{ inventory.availableStock }}
+                            {{ calculateAvailable(inventory) }}
                         </div>
                         <div class="stock-message text-center">item(s) avail.</div>
                     </div>
@@ -57,7 +57,7 @@
 
     export default {
         extends: VueTypeahead,
-        props: ['src'],
+        props: ['src', 'existingItems'],
         data () {
             return {
                 queryParamName: 'query',
@@ -67,10 +67,25 @@
             }
         },
         methods: {
+            calculateAvailable (inventory) {
+                var inCartQuantity = 0;
+
+                if (Array.isArray(this.existingItems)) {
+                    this.existingItems.forEach(function (item) {
+                        if (item.product.id === inventory.product.id) {
+                            inCartQuantity = item.quantity;
+                        }
+                    });
+                }
+
+                return inventory.availableStock - inCartQuantity;
+            },
             onHit (inventory) {
                 if (inventory.canBeSold) {
                     this.$emit('product-selected', inventory);
                 }
+
+                this.reset();
             },
             prepareResponseData (response) {
                 if (response.hasOwnProperty('items')) {

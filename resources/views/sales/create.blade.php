@@ -6,11 +6,11 @@
 
 @section('content')
     @parent
-    <div class="row" id="app">
+    <div class="row" id="app" v-cloak>
         <div class="col-md-7">
             <div class="panel panel-default">
                 <div class="panel-body" id="search-product-panel">
-                    <search-product src="{{ route('products.xhr.search') }}" v-on:product-selected="addProduct($event.product, 1)"></search-product>
+                    <search-product src="{{ route('products.xhr.search') }}" :existing-items="cart" v-on:product-selected="addToCart($event.product, 1)"></search-product>
                 </div>
             </div>
             <div class="panel panel-default">
@@ -21,26 +21,30 @@
                     <table class="table table-hover" v-show="!isCartEmpty">
                         <thead>
                             <tr class="register-items-header">
-                                <th></th>
-                                <th>Item Name</th>
-                                <th>Price</th>
-                                <th>Qty.</th>
-                                <th>Disc %</th>
-                                <th>Total</th>
+                                <th class="text-center"></th>
+                                <th class="text-center">Item Name</th>
+                                <th class="text-center">Price</th>
+                                <th class="text-center">Qty. / Max</th>
+                                <th class="text-center">Disc %</th>
+                                <th class="text-center">Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="cartItem in cart">
-                                <td></td>
+                            <tr v-for="(cartItem, index) in cart">
+                                <td>
+                                    <a class="btn btn-xs text-danger" v-on:click="removeFromCart(index)">
+                                        <i class="fa fa-times-circle"></i>
+                                    </a>
+                                </td>
                                 <td>@{{ cartItem.product.name }}</td>
                                 <td>@{{ cartItem.product.price }}</td>
-                                <td style="width: 70px;">
-                                    <input type="text" class="form-control" v-model="cartItem.quantity" />
+                                <td style="width: 100px;">
+                                    <input type="text" class="form-control" v-model="cartItem.quantity" /> / @{{ cartItem.product.availableQuantity }}
                                 </td>
                                 <td style="width: 70px;">
                                     <input type="text" class="form-control" v-model="cartItem.discount" />
                                 </td>
-                                <td>@{{ (cartItem.product.price * cartItem.quantity) * (100 - cartItem.discount) / 100 }}</td>
+                                <td>@{{ calculateItemPrice(cartItem) }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -69,13 +73,13 @@
                         <br/>
                         <div class="row">
                             <div class="col-xs-6">
-                                <button class="btn btn-primary btn-block btn-lg">
+                                <button class="btn btn-primary btn-block">
                                     <i class="fa fa-search-plus"></i>
                                     Show details
                                 </button>
                             </div>
                             <div class="col-xs-6">
-                                <button class="btn btn-default btn-block btn-lg" v-on:click="setCustomer({})">
+                                <button class="btn btn-default btn-block" v-on:click="setCustomer({})">
                                     <i class="fa fa-times"></i>
                                     Change customer
                                 </button>
@@ -86,7 +90,33 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-body" id="sales-summary-panel">
-
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-xs-4 text-left">Customer Discount</label>
+                            <div class="col-xs-6">
+                                <p class="form-control-static text-primary">
+                                    <strong>@{{ customer.group ? customer.group.discount + "%" : "-" }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-4 text-left">Sales Discount</label>
+                            <div class="col-xs-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" v-model="salesDiscount" />
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-4 text-left">Subtotal</label>
+                            <div class="col-xs-3">
+                                <p class="form-control-static text-primary">
+                                    <strong>@{{ subTotal }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,18 +130,35 @@
             el: "#app",
             data: {
                 query: "",
+                salesDiscount: 0,
                 cart: [],
                 customer: {}
             },
             computed: {
                 isCartEmpty: function () { return this.cart.length === 0; },
-                isCustomerSelected: function () { return this.customer.hasOwnProperty('id'); }
+                isCustomerSelected: function () { return this.customer.hasOwnProperty('id'); },
+                subTotal: function () {
+                    var itemsTotal = 0,
+                        $this = this;
+
+                    this.cart.forEach(function (cartItem) {
+                        itemsTotal += $this.calculateItemPrice(cartItem);
+                    });
+
+                    if ($this.customer.group) {
+                        itemsTotal = $this.applyDiscount(itemsTotal, this.customer.group.discount);
+                    }
+
+                    itemsTotal = $this.applyDiscount(itemsTotal, this.salesDiscount);
+
+                    return itemsTotal;
+                }
             },
             methods: {
-                setCustomer: function (customer) {
-                    this.customer = customer;
-                },
-                addProduct: function (product, quantity) {
+                applyDiscount: function(original, discount) { return original * (100 - discount) / 100; },
+                calculateItemPrice: function (item) { return this.applyDiscount(item.product.price * item.quantity, item.discount); },
+                setCustomer: function (customer) { this.customer = customer; },
+                addToCart: function (product, quantity) {
                     var sameProduct = false;
 
                     this.cart.forEach(function (cartItem) {
@@ -129,13 +176,16 @@
                         })
                     }
                 },
+                removeFromCart: function (index) {
+                    this.cart.splice(index, 1);
+                },
                 findByBarcode: function(query) {
                     var $this = this;
 
                     $.get("{{ url('/products/xhr-search') }}", {
                         query: query
                     }, function (response) {
-                        $this.addProduct(response.product, 1);
+                        $this.addToCart(response.product, 1);
                         $this.query = "";
                     });
                 }
