@@ -104,6 +104,10 @@
             }
         }
     }
+
+    window.addEventListener("paste", function () {
+
+    }, false);
 </script>
 <style scoped>
     .typeahead {

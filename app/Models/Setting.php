@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Setting extends BaseModel
 {
+    const KEY_CREDIT_CARD_TAX = 'credit_card_tax';
+
     public function scopeKey(Builder $query, $key)
     {
         return $query->where('key', '=', $key);

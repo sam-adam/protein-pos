@@ -208,7 +208,8 @@
                     method: 'cash',
                     amount: 0,
                     cardNumber: ''
-                }
+                },
+                taxes: {!!  json_encode($taxes)  !!}
             },
             watch: {
                 cart: {
@@ -301,16 +302,6 @@
                     }
                 },
                 removeFromCart: function (index) { this.cart.splice(index, 1); },
-                findByBarcode: function(query) {
-                    var $this = this;
-
-                    $.get("{{ url('/products/xhr-search') }}", {
-                        query: query
-                    }, function (response) {
-                        $this.addToCart(response.product, 1);
-                        $this.query = "";
-                    });
-                },
                 notify: function (type, message) {
                     var fn = window.toastr[type];
 

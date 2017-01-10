@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,10 @@ class SalesController extends AuthenticatedController
             return redirect()->route('shifts.viewIn', ['redirect' => $request->fullUrl()])->with('flashes.error', 'Please clock in before making sales');
         }
 
-        return view('sales.create');
+        return view('sales.create', [
+            'taxes' => [
+                Setting::KEY_CREDIT_CARD_TAX => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0)
+            ]
+        ]);
     }
 }
