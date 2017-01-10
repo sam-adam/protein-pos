@@ -10,7 +10,12 @@
         <div class="col-md-7">
             <div class="panel panel-default">
                 <div class="panel-body" id="search-product-panel">
-                    <search-product src="{{ route('products.xhr.search') }}" :existing-items="cart" v-on:product-selected="addToCart($event.product, 1)"></search-product>
+                    <search-product
+                            src="{{ route('products.xhr.search') }}"
+                            :existing-items="cart"
+                            v-on:product-selected="addToCart($event.product, 1)"
+                            v-on:insufficient-stock="notify('error', $event.remark)"
+                    ></search-product>
                 </div>
             </div>
             <div class="panel panel-default">
@@ -22,29 +27,29 @@
                         <thead>
                             <tr class="register-items-header">
                                 <th class="text-center"></th>
-                                <th class="text-center">Item Name</th>
+                                <th>Item Name</th>
                                 <th class="text-center">Price</th>
-                                <th class="text-center">Qty. / Max</th>
+                                <th class="text-center">Qty.</th>
                                 <th class="text-center">Disc %</th>
                                 <th class="text-center">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(cartItem, index) in cart">
-                                <td>
+                                <td style="vertical-align: middle;" class="text-center">
                                     <a class="btn btn-xs text-danger" v-on:click="removeFromCart(index)">
                                         <i class="fa fa-times-circle"></i>
                                     </a>
                                 </td>
-                                <td>@{{ cartItem.product.name }}</td>
-                                <td>@{{ cartItem.product.price }}</td>
-                                <td style="width: 100px;">
-                                    <input type="text" class="form-control" v-model="cartItem.quantity" /> / @{{ cartItem.product.availableQuantity }}
+                                <td style="vertical-align: middle;">@{{ cartItem.product.name }}</td>
+                                <td style="vertical-align: middle;" class="text-center">@{{ cartItem.product.price }}</td>
+                                <td class="text-center" style="width: 70px; vertical-align: middle;">
+                                    <input type="number" class="form-control" v-model="cartItem.quantity" min="0" v-bind:max="cartItem.availableQuantity" />
                                 </td>
-                                <td style="width: 70px;">
-                                    <input type="text" class="form-control" v-model="cartItem.discount" />
+                                <td class="text-center" style="width: 70px; vertical-align: middle;">
+                                    <input type="number" class="form-control" v-model="cartItem.discount" min="0" />
                                 </td>
-                                <td>@{{ calculateItemPrice(cartItem) }}</td>
+                                <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(cartItem) }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -90,33 +95,31 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-body" id="sales-summary-panel">
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-xs-4 text-left">Customer Discount</label>
-                            <div class="col-xs-6">
-                                <p class="form-control-static text-primary">
-                                    <strong>@{{ customer.group ? customer.group.discount + "%" : "-" }}</strong>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-xs-4 text-left">Sales Discount</label>
-                            <div class="col-xs-3">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" v-model="salesDiscount" />
-                                    <span class="input-group-addon">%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-xs-4 text-left">Subtotal</label>
-                            <div class="col-xs-3">
-                                <p class="form-control-static text-primary">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="width: 80%">Customer Discount:</td>
+                                <td class="text-right" style="vertical-align: middle">
+                                    @{{ customer.group ? customer.group.discount + "%" : "-" }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: middle">Sales Discount:</td>
+                                <td class="text-right" style="vertical-align: middle">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" v-model="salesDiscount" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="success">
+                                <td>Subtotal:</td>
+                                <td class="text-right">
                                     <strong>@{{ subTotal }}</strong>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -188,6 +191,11 @@
                         $this.addToCart(response.product, 1);
                         $this.query = "";
                     });
+                },
+                notify: function (type, message) {
+                    var fn = window.toastr[type];
+
+                    fn(message);
                 }
             }
         });

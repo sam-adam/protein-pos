@@ -32,6 +32,7 @@ elixir(mix => {
 
     mix.styles([
         '../../../node_modules/metismenu/dist/metisMenu.min.css',
+        '../../../node_modules/toastr/build/toastr.min.css',
         '../../../public/css/third-party.css',
         '../../../public/css/main.css'
     ], 'public/css/app.css');

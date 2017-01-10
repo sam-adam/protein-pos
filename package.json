@@ -13,9 +13,11 @@
     "laravel-elixir-webpack-official": "^1.0.2",
     "lodash": "^4.16.2",
     "vue": "^2.0.1",
+    "vue-numeric": "^1.1.2",
     "vue-resource": "^1.0.3"
   },
   "dependencies": {
+    "toastr": "^2.1.2",
     "vue-typeahead": "^2.3.0"
   }
 }

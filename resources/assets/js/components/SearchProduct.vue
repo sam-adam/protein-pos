@@ -83,6 +83,11 @@
             onHit (inventory) {
                 if (inventory.canBeSold) {
                     this.$emit('product-selected', inventory);
+                } else if (inventory.remark) {
+                    this.$emit('insufficient-stock', {
+                        inventory: inventory,
+                        remark: inventory.remark
+                    })
                 }
 
                 this.reset();
