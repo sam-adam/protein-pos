@@ -1,6 +1,6 @@
 <template>
     <div class="typeahead">
-        <div class="form-group form-group-lg">
+        <div class="form-group">
             <div class="input-group">
                 <div class="input-group-addon">
                     <i class="fa fa-fw fa-spinner fa-spin" v-if="loading"></i>
