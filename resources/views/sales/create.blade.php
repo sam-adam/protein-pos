@@ -210,6 +210,20 @@
                     cardNumber: ''
                 }
             },
+            watch: {
+                cart: {
+                    deep: true,
+                    handler: function (oldItems, newItems) {
+                        var $this = this;
+
+                        newItems.forEach(function (item, index) {
+                            if (item.quantity === 0) {
+                                $this.removeFromCart(index);
+                            }
+                        });
+                    }
+                }
+            },
             computed: {
                 isCartEmpty: function () { return this.cart.length === 0; },
                 isCustomerSelected: function () { return this.customer.hasOwnProperty('id'); },
