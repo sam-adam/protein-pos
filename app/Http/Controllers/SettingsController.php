@@ -21,7 +21,9 @@ class SettingsController extends AuthenticatedController
 
     public function update(UpdateSettings $request)
     {
-        Setting::key('credit_card_tax')->update(['value' => $request->get('credit_card_tax')]);
+        $creditCardTax = Setting::firstOrCreate(['key' => Setting::KEY_CREDIT_CARD_TAX]);
+        $creditCardTax->value = $request->get('credit_card_tax');
+        $creditCardTax->saveOrFail();
 
         return redirect()->route('settings.index')->with('flashes.success', 'Settings updated');
     }

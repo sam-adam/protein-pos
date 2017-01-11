@@ -44,10 +44,10 @@
                                     </td>
                                     <td style="vertical-align: middle;">@{{ cartItem.product.name }}</td>
                                     <td style="vertical-align: middle;" class="text-center">@{{ cartItem.product.price }}</td>
-                                    <td class="text-center" style="width: 70px; vertical-align: middle;">
+                                    <td class="text-center" style="width: 80px; vertical-align: middle;">
                                         <input type="number" class="form-control" v-model="cartItem.quantity" min="0" v-bind:max="cartItem.availableQuantity" />
                                     </td>
-                                    <td class="text-center" style="width: 70px; vertical-align: middle;">
+                                    <td class="text-center" style="width: 80px; vertical-align: middle;">
                                         <input type="number" class="form-control" v-model="cartItem.discount" min="0" />
                                     </td>
                                     <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(cartItem) }}</td>
@@ -57,16 +57,16 @@
                                     <td colspan="5">
                                         <table class="table table-condensed">
                                             <tr>
-                                                <td><strong>Barcode</strong></td>
-                                                <td>@{{ cartItem.product.barcode || "-" }}</td>
-                                                <td><strong>Category</strong></td>
-                                                <td>@{{ cartItem.product.category ? cartItem.product.category.name : "-" }}</td>
+                                                <td style="width: 25%;"><strong>Barcode</strong></td>
+                                                <td style="width: 25%;">@{{ cartItem.product.barcode || "-" }}</td>
+                                                <td style="width: 25%;"><strong>Category</strong></td>
+                                                <td style="width: 25%;">@{{ cartItem.product.category ? cartItem.product.category.name : "-" }}</td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Brand</strong></td>
-                                                <td>@{{ cartItem.product.brand ? cartItem.product.brand.name : "-" }}</td>
                                                 <td><strong>Available Stock</strong></td>
                                                 <td>@{{ cartItem.product.availableQuantity }}</td>
+                                                <td><strong>Brand</strong></td>
+                                                <td>@{{ cartItem.product.brand ? cartItem.product.brand.name : "-" }}</td>
                                             </tr>
                                         </table>
                                     </td>
@@ -86,13 +86,25 @@
                             <div class="col-xs-12">
                                 <h4 class="name">
                                     @{{ customer.name }}
+                                </h4>
+                                <div>
                                     <span class="label label-success" v-show="customer.group">
                                         <i class="fa fa-star"></i>
                                         @{{ customer.groupLabel }}
                                     </span>
-                                </h4>
-                                <div class="screen-name">
-                                    <i class="fa fa-phone"></i> @{{ customer.phone || "-" }} &nbsp; <i class="fa fa-envelope"></i> @{{ customer.email }}
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-xs-2">Phone:</div>
+                                    <div class="col-xs-6">@{{ customer.phone || "-" }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2">E-Mail:</div>
+                                    <div class="col-xs-6">@{{ customer.email || "-" }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-2">Point:</div>
+                                    <div class="col-xs-6">@{{ customer.points }}</div>
                                 </div>
                             </div>
                         </div>
@@ -137,6 +149,12 @@
                                 <td>Subtotal:</td>
                                 <td>
                                     <strong>@{{ subTotal }}</strong>
+                                </td>
+                            </tr>
+                            <tr v-show="this.payment.method === 'credit_card'">
+                                <td>Credit Card Tax:</td>
+                                <td>
+                                    @{{ creditCardTax }}%
                                 </td>
                             </tr>
                             <tr class="separator"><td colspan="2">&nbsp;</td></tr>
@@ -209,7 +227,7 @@
                     amount: 0,
                     cardNumber: ''
                 },
-                taxes: {!!  json_encode($taxes)  !!}
+                creditCardTax: {{ $creditCardTax }}
             },
             watch: {
                 cart: {
@@ -257,14 +275,19 @@
                     return itemsTotal;
                 },
                 grandTotal: function () {
-                    return this.subTotal;
+                    var total = this.subTotal;
+
+                    if (this.payment.method === 'credit_card') {
+                        total = this.applyTax(this.subTotal, this.creditCardTax)
+                    }
+
+                    return total;
                 },
-                change: function () {
-                    return Math.max(this.payment.amount - this.grandTotal, 0);
-                }
+                change: function () { return Math.max(this.payment.amount - this.grandTotal, 0); }
             },
             methods: {
                 applyDiscount: function (original, discount) { return original * (100 - discount) / 100; },
+                applyTax: function (original, tax) { return original * (100 + tax) / 100 },
                 calculateItemPrice: function (item) { return this.applyDiscount(item.product.price * item.quantity, item.discount); },
                 setCustomer: function (customer) { this.customer = customer; },
                 setPaymentMethod: function (paymentMethod) {

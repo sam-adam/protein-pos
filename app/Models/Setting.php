@@ -13,6 +13,8 @@ class Setting extends BaseModel
 {
     const KEY_CREDIT_CARD_TAX = 'credit_card_tax';
 
+    protected $fillable = ['key'];
+
     public function scopeKey(Builder $query, $key)
     {
         return $query->where('key', '=', $key);

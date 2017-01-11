@@ -26,9 +26,7 @@ class SalesController extends AuthenticatedController
         }
 
         return view('sales.create', [
-            'taxes' => [
-                Setting::KEY_CREDIT_CARD_TAX => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0)
-            ]
+            'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0)
         ]);
     }
 }
