@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Setting extends BaseModel
 {
-    const KEY_CREDIT_CARD_TAX = 'credit_card_tax';
+    const KEY_CREDIT_CARD_TAX      = 'credit_card_tax';
+    const KEY_SALES_POINT_BASELINE = 'sales_point_baseline';
 
     protected $fillable = ['key'];
 

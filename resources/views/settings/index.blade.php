@@ -13,10 +13,19 @@
                     <form class="form-horizontal" method="post" action="{{ route('settings.update') }}">
                         {{ csrf_field() }}
                         <div class="form-group {{ $errors->has('credit_card_tax') ? 'has-error' : '' }}">
-                            <label class="control-label col-sm-2" for="credit-card-tax">Credit Card Tax (%)</label>
+                            <label class="control-label col-sm-3" for="credit-card-tax">Credit Card Tax (%)</label>
                             <div class="col-sm-1">
                                 <input type="text" class="form-control" name="credit_card_tax" value="{{ old('credit_card_tax') ?: $creditCardTax }}" placeholder="In percent" />
                                 @foreach($errors->get('credit_card_tax') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="form-group {{ $errors->has('sales_point_baseline') ? 'has-error' : '' }}">
+                            <label class="control-label col-sm-3" for="sales-point-baselin">Sales Point Earning Baseline</label>
+                            <div class="col-sm-1">
+                                <input type="text" class="form-control" name="sales_point_baseline" value="{{ old('sales_point_baseline') ?: $salesPointBaseline }}" placeholder="How much a customer need to purchase for a point" />
+                                @foreach($errors->get('sales_point_baseline') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
                             </div>

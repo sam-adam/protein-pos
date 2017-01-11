@@ -15,15 +15,20 @@ class SettingsController extends AuthenticatedController
     public function index()
     {
         return view('settings.index', [
-            'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 2)
+            'creditCardTax'      => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 2),
+            'salesPointBaseline' => Setting::getValueByKey(Setting::KEY_SALES_POINT_BASELINE, 0)
         ]);
     }
 
     public function update(UpdateSettings $request)
     {
-        $creditCardTax = Setting::firstOrCreate(['key' => Setting::KEY_CREDIT_CARD_TAX]);
+        $creditCardTax        = Setting::firstOrCreate(['key' => Setting::KEY_CREDIT_CARD_TAX]);
         $creditCardTax->value = $request->get('credit_card_tax');
         $creditCardTax->saveOrFail();
+
+        $salesPointBaseline        = Setting::firstOrCreate(['key' => Setting::KEY_SALES_POINT_BASELINE]);
+        $salesPointBaseline->value = $request->get('sales_point_baseline');
+        $salesPointBaseline->saveOrFail();
 
         return redirect()->route('settings.index')->with('flashes.success', 'Settings updated');
     }
