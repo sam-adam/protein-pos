@@ -23,7 +23,7 @@ class InventoryRepository
      *
      * @return Product[] $products
      */
-    public function countAvailableStock(\ArrayAccess $products, Branch $inBranch = null)
+    public function populateProductStock(\ArrayAccess $products, Branch $inBranch = null)
     {
         $productIds = [];
 
@@ -66,6 +66,6 @@ class InventoryRepository
      */
     public function checkIfStockSufficient(Product $product, $quantity, Branch $inBranch = null)
     {
-        return $quantity <= $this->countAvailableStock(new Collection([$product]), $inBranch);
+        return $quantity <= $this->populateProductStock(new Collection([$product]), $inBranch);
     }
 }

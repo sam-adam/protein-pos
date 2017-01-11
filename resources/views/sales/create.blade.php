@@ -249,7 +249,7 @@
                 query: "",
                 salesDiscount: 0,
                 cart: [],
-                customer: {},
+                customer: {!! json_encode($customerData) !!},
                 payment: {
                     method: 'cash',
                     amount: 0,

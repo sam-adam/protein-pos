@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Product;
+use App\Models\SalePayment;
 use App\Repository\InventoryRepository;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,6 +40,10 @@ class StoreSale extends FormRequest
             'customer_id'         => 'bail|required|exists:customers,id',
             'sales_discount'      => 'bail|required|numeric|min:0|max:100'
         ];
+
+        if ($this->get('payment_method') === SalePayment::PAYMENT_METHOD_CREDIT_CARD) {
+            $rules['credit_card_number'] = 'bail|required';
+        }
 
         return $rules;
     }

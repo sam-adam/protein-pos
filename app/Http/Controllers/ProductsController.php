@@ -450,7 +450,7 @@ class ProductsController extends AuthenticatedController
 
         if ($request->get('method') === 'barcode') {
             if ($product = Product::whereBarcode($request->get('query'))->first()) {
-                return response()->json(new Collection($this->inventoryRepo->countAvailableStock([$product], $branch), $withStockTransformer));
+                return response()->json(new Collection($this->inventoryRepo->populateProductStock([$product], $branch), $withStockTransformer));
             }
         } else {
             $products = Product::with('category', 'brand', 'item')->select('products.*')
@@ -459,7 +459,7 @@ class ProductsController extends AuthenticatedController
                 ->limit(5)
                 ->get();
 
-            return response()->json(new Collection($this->inventoryRepo->countAvailableStock($products, $branch), $withStockTransformer));
+            return response()->json(new Collection($this->inventoryRepo->populateProductStock($products, $branch), $withStockTransformer));
         }
 
         return response()->json([]);

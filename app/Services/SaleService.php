@@ -77,6 +77,7 @@ class SaleService
                 // save sale item
                 $newSaleItem                      = new SaleItem();
                 $newSaleItem->sale_id             = $newSale->id;
+                $newSaleItem->product_id          = $product->id;
                 $newSaleItem->branch_inventory_id = $branchInventory->id;
                 $newSaleItem->quantity            = $availableQuantity;
                 $newSaleItem->price               = data_get($item, 'price', $product->price);

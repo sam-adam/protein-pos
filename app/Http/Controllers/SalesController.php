@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Customer as CustomerDTO;
+use App\DTO\ProductWithStock;
 use App\Http\Requests\StoreSale;
 use App\Models\Customer;
+use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\Shift;
+use App\Repository\InventoryRepository;
 use App\Services\SaleService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,18 +25,23 @@ class SalesController extends AuthenticatedController
 {
     /** @var SaleService */
     private $saleService;
+    /** @var InventoryRepository */
+    private $inventoryRepo;
 
-    public function __construct(SaleService $saleService)
+    public function __construct(SaleService $saleService, InventoryRepository $inventoryRepo)
     {
         parent::__construct();
 
-        $this->saleService = $saleService;
+        $this->saleService   = $saleService;
+        $this->inventoryRepo = $inventoryRepo;
     }
 
-    public function index(Request $request)
+    public function index(Request $request, $salesId = null)
     {
-        $user  = Auth::user();
-        $shift = Shift::inBranch($user->branch)->open()
+        $oldData = [];
+        $sales   = Sale::find($salesId);
+        $user    = Auth::user();
+        $shift   = Shift::inBranch($user->branch)->open()
             ->where('opened_by_user_id', $user->id)
             ->first();
 
@@ -39,9 +49,27 @@ class SalesController extends AuthenticatedController
             return redirect()->route('shifts.viewIn', ['redirect' => $request->fullUrl()])->with('flashes.error', 'Please clock in before making sales');
         }
 
-        return view('sales.create', [
+        if ($sales) {
+            $oldData = [
+                'customerData' => data_get((new CustomerDTO($sales->customer))->toArray(), 'customer'),
+                'cartData'     => []
+            ];
+
+            foreach ($sales->items as $item) {
+                $oldData['cartData'][] = new ProductWithStock(
+                    $item->product,
+                    $this->inventoryRepo->populateProductStock(
+                        new Collection([$item->product]),
+                        Auth::user()->branch
+                    )
+                );
+            }
+        }
+
+        return view('sales.create', array_merge([
+            'customerData'  => [],
             'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0)
-        ]);
+        ], $oldData));
     }
 
     public function store(StoreSale $request)
