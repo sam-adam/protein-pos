@@ -6,10 +6,10 @@ use App\Exceptions\InsufficientStockException;
 use App\Exceptions\PersistenceException;
 use App\Models\Branch;
 use App\Models\BranchInventory;
+use App\Models\Product;
 use App\Models\Inventory;
 use App\Models\InventoryMovement;
 use App\Models\InventoryMovementItem;
-use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -55,7 +55,7 @@ class MovementService
             }
 
             if ($sourceInventory && $sourceInventory->stock < data_get($item, 'quantity')) {
-                throw new InsufficientStockException($sourceInventory);
+                throw new InsufficientStockException($sourceInventory->inventory->product, data_get($item, 'quantity'));
             }
 
             $movementItem                             = new InventoryMovementItem();

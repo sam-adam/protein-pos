@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\BranchInventory;
+use App\Models\Product;
 use App\Models\Inventory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +30,7 @@ class RemoveInventory extends FormRequest
 
         $rules = [
             'inventory_id' => 'bail|required|exists:inventories,id',
-            'quantity'     => 'bail|required|numeric|min:1|max:'.BranchInventory::inBranch(Auth::user()->branch)
+            'quantity'     => 'bail|required|numeric|min:1|max:'.Product::inBranch(Auth::user()->branch)
                     ->product($inventory->product)
                     ->sum('stock')
         ];

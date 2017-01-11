@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Models\Branch;
 use App\Models\BranchInventory;
 use App\Models\Product;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -52,5 +53,19 @@ class InventoryRepository
         }
 
         return $products;
+    }
+
+    /**
+     * Check if there are a sufficient stock for a product
+     *
+     * @param Product     $product
+     * @param int         $quantity
+     * @param Branch|null $inBranch
+     *
+     * @return bool
+     */
+    public function checkIfStockSufficient(Product $product, $quantity, Branch $inBranch = null)
+    {
+        return $quantity <= $this->countAvailableStock(new Collection([$product]), $inBranch);
     }
 }

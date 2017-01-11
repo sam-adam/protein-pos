@@ -267,7 +267,7 @@ class ProductsController extends AuthenticatedController
         foreach ($branches as $branch) {
             $branch->branchInventories        = $inventories->map(function (Inventory $inventory) use ($branch) {
                 $inventory              = clone $inventory;
-                $inventory->branchItems = $inventory->branchItems->filter(function (BranchInventory $branchInventory) use ($branch) {
+                $inventory->branchItems = $inventory->branchItems->filter(function (Product $branchInventory) use ($branch) {
                     return $branchInventory->branch_id == $branch->id;
                 });
                 $inventory->stock       = $inventory->branchItems->sum('stock');

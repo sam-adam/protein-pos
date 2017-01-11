@@ -24,7 +24,7 @@ class Branch extends Model
 
     public function inventories()
     {
-        return $this->hasMany(BranchInventory::class);
+        return $this->hasMany(Product::class);
     }
 
     public function loginSessions()

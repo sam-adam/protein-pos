@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-use App\Models\BranchInventory;
+use App\Models\Product;
 
 /**
  * Class InsufficientStockException
@@ -11,15 +11,24 @@ use App\Models\BranchInventory;
  */
 class InsufficientStockException extends \LogicException
 {
-    protected $inventory;
+    /** @var Product */
+    protected $product;
+    /** @var int */
+    protected $requestedQuantity;
 
-    public function __construct(BranchInventory $inventory)
+    public function __construct(Product $product, $requestedQuantity)
     {
-        $this->inventory = $inventory;
+        $this->product           = $product;
+        $this->requestedQuantity = $requestedQuantity;
     }
 
-    public function getInventory()
+    public function getProduct()
     {
-        return $this->inventory;
+        return $this->product;
+    }
+
+    public function getRequestedQuantity()
+    {
+        return $this->requestedQuantity;
     }
 }

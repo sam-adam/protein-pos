@@ -44,7 +44,7 @@ class StorePackage extends FormRequest
     {
         $factory->extend('not_service_product', function ($attribute, $value, $parameters) {
             return Product::findOrfail($value)->is_service === false;
-        }, 'Cannot user service as package');
+        }, 'Cannot use service as package');
 
         return $factory->make(
             $this->validationData(), $this->container->call([$this, 'rules']),

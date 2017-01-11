@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Exceptions\InsufficientStockException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
@@ -21,9 +20,7 @@ class BranchInventory extends Model
         parent::boot();
 
         self::saving(function (BranchInventory $branchInventory) {
-            if ($branchInventory->stock < 0) {
-                throw new InsufficientStockException($branchInventory);
-            }
+            return $branchInventory->stock >= 0;
         });
     }
 
@@ -39,6 +36,11 @@ class BranchInventory extends Model
                 return $query->on('branch_inventories.inventory_id', '=' ,'inventories.id')
                     ->where('inventories.product_id', '=', $product->id);
             });
+    }
+
+    public function scopeNotEmpty(Builder $query)
+    {
+        return $query->where('stock', '>', 0);
     }
 
     public function branch()

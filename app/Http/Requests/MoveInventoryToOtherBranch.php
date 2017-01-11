@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\BranchInventory;
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MoveInventoryToOtherBranch extends FormRequest
@@ -27,7 +27,7 @@ class MoveInventoryToOtherBranch extends FormRequest
         return [
             'branch_id'    => 'bail|required|exists:branches,id',
             'inventory_id' => 'bail|required|exists:branch_inventories,id',
-            'quantity'     => 'bail|required|numeric|min:1|max:'.BranchInventory::findOrFail($this->get('inventory_id'))->stock
+            'quantity'     => 'bail|required|numeric|min:1|max:'.Product::findOrFail($this->get('inventory_id'))->stock
         ];
     }
 }

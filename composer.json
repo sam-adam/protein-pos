@@ -9,7 +9,8 @@
         "laravel/framework": "5.3.*",
         "barryvdh/laravel-debugbar": "^2.3",
         "recca0120/laravel-tracy": "^1.7",
-        "maatwebsite/excel": "^2.1"
+        "maatwebsite/excel": "^2.1",
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
