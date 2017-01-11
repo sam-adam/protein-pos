@@ -133,8 +133,9 @@ class SaleService
         if ($newPayment->payment_method === SalePayment::PAYMENT_METHOD_CREDIT_CARD) {
             $newPayment->card_number = data_get($paymentData, 'card_number');
             $newPayment->card_tax    = Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0);
-            $newPayment->saveOrFail();
         }
+
+        $newPayment->saveOrFail();
 
         $sale->paid_at           = Carbon::now();
         $sale->closed_at         = Carbon::now();
