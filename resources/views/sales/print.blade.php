@@ -137,7 +137,7 @@
                                     <td class="no-line"></td>
                                     <td class="no-line"></td>
                                     <td class="text-right">
-                                        <strong>Credit Card Tax ({{ number_format($payment->credit_card_tax).'%' }})</strong>
+                                        <strong>Credit Card Tax ({{ number_format($payment->card_tax).'%' }})</strong>
                                     </td>
                                     <td class="text-right">{{ number_format($payment->calculateTotal()) }}</td>
                                 </tr>
