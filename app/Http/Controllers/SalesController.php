@@ -91,13 +91,26 @@ class SalesController extends AuthenticatedController
                 ]);
             });
 
-            return redirect(route('sales.print', $sale->id))->with('flashes.success', 'Transaction completed');
+            return redirect(route('sales.print', $sale->id))->with([
+                'flashes.success' => 'Transaction completed',
+                'doPrint'         => true
+            ]);
         } catch (\Exception $ex) {
             return redirect()->back()->with('flashes.error', $ex->getMessage());
         }
     }
 
-    public function viewPrint()
+    public function viewPrint($aleId)
     {
+        $sale = Sale::find($aleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        return view('sales.print', [
+            'sale'    => $sale,
+            'payment' => $sale->payments->first()
+        ]);
     }
 }

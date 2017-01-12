@@ -16,4 +16,9 @@ class SalePayment extends BaseModel
     {
         return $this->belongsTo(Sale::class);
     }
+
+    public function calculateTotal()
+    {
+        return $this->sale->calculateTotal() * (100 + $this->credit_card_tax) / 100;
+    }
 }

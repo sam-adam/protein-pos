@@ -33,20 +33,38 @@ class Sale extends BaseModel
         return $this->closed_at !== null;
     }
 
-    public function calculateTotal()
+    public function calculateSubTotal()
     {
-        $total = 0;
+        $subTotal = 0;
 
         foreach ($this->items as $item) {
-            $total += $item->calculateSubTotal();
+            $subTotal += $item->calculateSubTotal();
         }
+
+        return $subTotal;
+    }
+
+    public function calculateAfterCustomerDiscount()
+    {
+        $subTotal = $this->calculateSubTotal();
 
         if ($this->customer->group) {
-            $total = $total * (100 - $this->customer->group->discount) / 100;
+            $subTotal = $subTotal * (100 - $this->customer->group->discount) / 100;
         }
 
-        $total = $total * (100 - $this->sales_discount) / 100;
+        return $subTotal;
+    }
 
-        return $total;
+    public function calculateAfterSalesDiscount()
+    {
+        $subTotal = $this->calculateAfterCustomerDiscount();
+        $subTotal = $subTotal * (100 - $this->sales_discount) / 100;
+
+        return $subTotal;
+    }
+
+    public function calculateTotal()
+    {
+        return $this->calculateAfterSalesDiscount();
     }
 }

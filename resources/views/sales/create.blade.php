@@ -199,7 +199,7 @@
                                                         placeholder="Enter payment amount"
                                                         min="0"
                                                         v-show="payment.method === 'cash'"
-                                                        required
+                                                        v-bind:required="payment.method === 'cash'"
                                                 />
                                                 <input
                                                         type="text"
@@ -292,7 +292,7 @@
                 },
                 subTotal: function () {
                     var itemsTotal = 0,
-                            $this = this;
+                        $this = this;
 
                     this.cart.forEach(function (cartItem) {
                         itemsTotal += $this.calculateItemPrice(cartItem);
@@ -343,11 +343,14 @@
                 },
                 addToCart: function (product, quantity, availableQuantity) {
                     var sameProduct = false,
-                            $this = this;
+                        shouldAdd = true,
+                        $this = this;
 
                     this.cart.forEach(function (cartItem) {
                         if (cartItem.product.id === product.id) {
                             if (cartItem.quantity + quantity > availableQuantity) {
+                                shouldAdd = false;
+
                                 $this.notify('error', 'Not enough stock');
                             } else {
                                 cartItem.quantity += quantity;
@@ -356,7 +359,7 @@
                         }
                     });
 
-                    if (!sameProduct) {
+                    if (!sameProduct && shouldAdd) {
                         product.availableQuantity = availableQuantity;
 
                         this.cart.push({

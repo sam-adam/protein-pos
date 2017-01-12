@@ -7,7 +7,7 @@
         </div>
     </div>
     @foreach(Session::get('flashes', []) as $type => $value)
-        <div class="alert alert-{{ $type === 'error' ? 'danger' : $type }}">
+        <div class="hidden-print alert alert-{{ $type === 'error' ? 'danger' : $type }}">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
             {{ $value }}
         </div>
