@@ -24,11 +24,13 @@ class SaleService
 {
     protected $inventoryRepo;
     protected $inventoryService;
+    protected $pointService;
 
-    public function __construct(InventoryRepository $inventoryRepo, InventoryService $inventoryService)
+    public function __construct(InventoryRepository $inventoryRepo, InventoryService $inventoryService, PointService $pointService)
     {
         $this->inventoryRepo    = $inventoryRepo;
         $this->inventoryService = $inventoryService;
+        $this->pointService     = $pointService;
     }
 
     public function createWalkInSale(Customer $customer, User $openedBy, array $saleData)
@@ -146,6 +148,15 @@ class SaleService
         $sale->closed_at         = Carbon::now();
         $sale->closed_by_user_id = $closedBy->id;
         $sale->saveOrFail();
+
+        // adjust customer points
+        $earnedPoints = $this->pointService->calculatePointsEarned($sale);
+
+        $sale->earned_points = $earnedPoints;
+        $sale->saveOrFail();
+
+        $sale->customer->points += $earnedPoints;
+        $sale->customer->saveOrFail();
 
         return $sale;
     }
