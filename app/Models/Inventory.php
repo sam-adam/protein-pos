@@ -39,7 +39,7 @@ class Inventory extends BaseModel
 
     public function branchItems()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(BranchInventory::class);
     }
 
     public function isExpired()

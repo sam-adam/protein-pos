@@ -138,6 +138,10 @@ class SaleService
 
         $newPayment->saveOrFail();
 
+        if ($newPayment->payment_method === SalePayment::PAYMENT_METHOD_CASH) {
+            // @ToDo adjust cash
+        }
+
         $sale->paid_at           = Carbon::now();
         $sale->closed_at         = Carbon::now();
         $sale->closed_by_user_id = $closedBy->id;
