@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Product;
-use App\Models\Inventory;
+use App\Models\Branch;
+use App\Models\BranchInventory;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class RemoveInventory extends FormRequest
 {
@@ -26,12 +25,13 @@ class RemoveInventory extends FormRequest
      */
     public function rules()
     {
-        $inventory = Inventory::findOrFail($this->get('inventory_id'));
+        $branchInventory = BranchInventory::findOrFail($this->get('branch_inventory_id'));
 
         $rules = [
-            'inventory_id' => 'bail|required|exists:inventories,id',
-            'quantity'     => 'bail|required|numeric|min:1|max:'.Product::inBranch(Auth::user()->branch)
-                    ->product($inventory->product)
+            'branch_id'           => 'bail|required|exists:branches,id',
+            'branch_inventory_id' => 'bail|required|exists:branch_inventories,id',
+            'quantity'            => 'bail|required|numeric|min:1|max:'.BranchInventory::inBranch(Branch::findOrFail($this->get('branch_id')))
+                    ->product($branchInventory->inventory->product)
                     ->sum('stock')
         ];
 

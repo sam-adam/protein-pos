@@ -223,7 +223,6 @@ class ProductsController extends AuthenticatedController
         $removals    = InventoryRemoval::select('inventory_removals.*')
             ->join('branch_inventories', 'branch_inventories.id', '=', 'inventory_removals.branch_inventory_id')
             ->join('inventories', 'branch_inventories.inventory_id', '=', 'inventories.id')
-            ->where('branch_inventories.branch_id', '=', Auth::user()->branch_id)
             ->where('inventories.product_id', '=', $productId)
             ->orderBy('inventory_removals.created_at', 'desc')
             ->get();
@@ -278,14 +277,40 @@ class ProductsController extends AuthenticatedController
             $branch->closestExpiredInventory  = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false; })->first();
         }
 
-        $expiredInventories = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
-        $closestExpired     = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false; })->first();
+        $expiredInventories   = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
+        $closestExpired       = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false; })->first();
+        $branchInventoryArray = [];
+
+        foreach ($branches as $branch) {
+            $branchInventoryArray[] = [
+                'id'          => $branch->id,
+                'name'        => $branch->name,
+                'inventories' => $branch->branchInventories->map(function (Inventory $inventory) {
+                    $inventoryArr = [
+                        'id'    => $inventory->id,
+                        'items' => $inventory->branchItems->filter(function (BranchInventory $branchInventory) {
+                                return $branchInventory->stock > 0;
+                            })
+                            ->map(function (BranchInventory $branchInventory) {
+                                return [
+                                    'id'       => $branchInventory->id,
+                                    'stock'    => $branchInventory->stock,
+                                    'priority' => $branchInventory->priority
+                                ];
+                            })->toArray()
+                    ];
+
+                    return $inventoryArr;
+                })->toArray()
+            ];
+        }
 
         return view('products.show', [
             'now'                       => Carbon::now(),
             'product'                   => $product,
             'branches'                  => $branches,
             'inventories'               => $inventories,
+            'branchInventoryArray'      => $branchInventoryArray,
             'allowedMovementQuantity'   => $branches[Auth::user()->branch_id]->branchInventories->sum('stock'),
             'expiredInventories'        => $expiredInventories,
             'closestExpired'            => $closestExpired,
@@ -420,7 +445,7 @@ class ProductsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($request, $product) {
-            $branchInventory = BranchInventory::find($request->get('inventory_id'));
+            $branchInventory = BranchInventory::find($request->get('branch_inventory_id'));
 
             if (!$branchInventory) {
                 throw new ModelNotFoundException(BranchInventory::class);
