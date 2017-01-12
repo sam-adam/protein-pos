@@ -9,8 +9,8 @@ namespace App\Models;
  */
 class InventoryRemoval extends BaseModel
 {
-    public function inventory()
+    public function branchInventory()
     {
-        return $this->hasOne(Inventory::class);
+        return $this->belongsTo(BranchInventory::class);
     }
 }

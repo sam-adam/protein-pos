@@ -220,7 +220,8 @@ class ProductsController extends AuthenticatedController
             ->groupBy('inventory_movements.id')
             ->orderBy('inventory_movements.movement_effective_at', 'desc')
             ->get();
-        $removals    = InventoryRemoval::select('inventory_removals.*')
+        $removals    = InventoryRemoval::with('branchInventory.branch')
+            ->select('inventory_removals.*')
             ->join('branch_inventories', 'branch_inventories.id', '=', 'inventory_removals.branch_inventory_id')
             ->join('inventories', 'branch_inventories.inventory_id', '=', 'inventories.id')
             ->where('inventories.product_id', '=', $productId)
@@ -250,7 +251,7 @@ class ProductsController extends AuthenticatedController
         foreach ($removals as $inventoryRemoval) {
             $movementLabels[] = [
                 'id'         => $inventoryRemoval->id,
-                'label'      => 'Removed',
+                'label'      => 'Removed from '.$inventoryRemoval->branchInventory->branch->name,
                 'quantity'   => $inventoryRemoval->quantity,
                 'date'       => $inventoryRemoval->created_at,
                 'dateString' => $inventoryRemoval->created_at->toDayDateTimeString(),
