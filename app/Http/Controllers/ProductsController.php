@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\Collection;
+use App\DataObjects\CollectionDataObject;
 use App\DataObjects\Decorators\Product\BulkContainerDecorator;
 use App\DataObjects\Decorators\Product\PackageDecorator;
 use App\DataObjects\Decorators\Product\StockDecorator;
@@ -493,9 +494,11 @@ class ProductsController extends AuthenticatedController
             $products = $this->productRepo->findByQuery($query);
         }
 
-        $dataObjects = [];
-        $stocks      = $this->inventoryRepo->getProductStocks($products, Auth::user()->branch);
-        $packages    = $this->packageRepo->findAvailablePackages($products);
+        $collection = new CollectionDataObject();
+        $collection->setKey('products');
+
+        $stocks     = $this->inventoryRepo->getProductStocks($products, $branch);
+        $packages   = $this->packageRepo->findAvailablePackages($products);
 
         foreach ($products as $product) {
             $dataObject = new \App\DataObjects\Product($product);
@@ -503,9 +506,9 @@ class ProductsController extends AuthenticatedController
             $dataObject->addDecorator(new StockDecorator($product, $stocks->get($product->id)));
             $dataObject->addDecorator(new PackageDecorator($product, $packages->get($product->id)));
 
-            array_push($dataObjects, $dataObject);
+            $collection->add($dataObject);
         }
 
-        return response()->json($dataObjects);
+        return response()->json($collection);
     }
 }
