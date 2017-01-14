@@ -21,10 +21,11 @@ class InventoryRepository
      * @param Product[] $products
      * @param Branch    $inBranch
      *
-     * @return Product[] $products
+     * @return Collection
      */
-    public function populateProductStock(\ArrayAccess $products, Branch $inBranch = null)
+    public function getProductStocks(\ArrayAccess $products, Branch $inBranch = null)
     {
+        $stocks     = [];
         $productIds = [];
 
         foreach ($products as $product) {
@@ -47,12 +48,12 @@ class InventoryRepository
         $stocks = $stocksQuery->get()->keyBy('product_id');
 
         foreach ($products as $product) {
-            $product->stock = $stocks->has($product->id)
+            $stocks[$product->id] = $stocks->has($product->id)
                 ? intval($stocks[$product->id]->total_stock)
                 : 0;
         }
 
-        return $products;
+        return new Collection($stocks);
     }
 
     /**

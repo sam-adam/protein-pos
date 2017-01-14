@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Collection;
-use App\DTO\ProductWithStock;
+use App\DataObjects\Collection;
+use App\DataObjects\Decorators\Product\BulkContainerDecorator;
+use App\DataObjects\Decorators\Product\PackageDecorator;
+use App\DataObjects\Decorators\Product\StockDecorator;
+use App\DataObjects\ProductWithStock;
 use App\Http\Requests\MoveInventoryToOtherBranch;
 use App\Http\Requests\RemoveInventory;
 use App\Http\Requests\StoreProduct;
@@ -19,6 +22,8 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductVariantGroup;
 use App\Repository\InventoryRepository;
+use App\Repository\PackageRepository;
+use App\Repository\ProductRepository;
 use App\Services\MovementService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -38,13 +43,21 @@ class ProductsController extends AuthenticatedController
 {
     protected $movementService;
     protected $inventoryRepo;
+    protected $packageRepo;
+    protected $productRepo;
 
-    public function __construct(MovementService $movementService, InventoryRepository $inventoryRepo)
-    {
+    public function __construct(
+        MovementService $movementService,
+        InventoryRepository $inventoryRepo,
+        PackageRepository $packageRepo,
+        ProductRepository $productRepo
+    ) {
         parent::__construct();
 
         $this->movementService = $movementService;
         $this->inventoryRepo   = $inventoryRepo;
+        $this->packageRepo     = $packageRepo;
+        $this->productRepo     = $productRepo;
     }
 
     public function index(Request $request)
@@ -290,8 +303,8 @@ class ProductsController extends AuthenticatedController
                     $inventoryArr = [
                         'id'    => $inventory->id,
                         'items' => $inventory->branchItems->filter(function (BranchInventory $branchInventory) {
-                                return $branchInventory->stock > 0;
-                            })
+                            return $branchInventory->stock > 0;
+                        })
                             ->map(function (BranchInventory $branchInventory) {
                                 return [
                                     'id'       => $branchInventory->id,
@@ -468,26 +481,31 @@ class ProductsController extends AuthenticatedController
 
     public function xhrSearch(Request $request)
     {
-        $withStockTransformer = function (Product $product) {
-            return new ProductWithStock($product, $product->stock);
-        };
-
-        $branch = Auth::user()->branch;
+        $products = [];
+        $query    = $request->get('query');
+        $branch   = Auth::user()->branch;
 
         if ($request->get('method') === 'barcode') {
-            if ($product = Product::whereBarcode($request->get('query'))->first()) {
-                return response()->json(new Collection($this->inventoryRepo->populateProductStock([$product], $branch), $withStockTransformer));
+            if ($product = $this->productRepo->findByBarcode($query)) {
+                $products = [$product];
             }
         } else {
-            $products = Product::with('category', 'brand', 'item')->select('products.*')
-                ->where('products.name', 'LIKE', "%{$request->get('query')}%")
-                ->orWhere('products.code', 'LIKE', "%{$request->get('query')}%")
-                ->limit(5)
-                ->get();
-
-            return response()->json(new Collection($this->inventoryRepo->populateProductStock($products, $branch), $withStockTransformer));
+            $products = $this->productRepo->findByQuery($query);
         }
 
-        return response()->json([]);
+        $dataObjects = [];
+        $stocks      = $this->inventoryRepo->getProductStocks($products, Auth::user()->branch);
+        $packages    = $this->packageRepo->findAvailablePackages($products);
+
+        foreach ($products as $product) {
+            $dataObject = new \App\DataObjects\Product($product);
+            $dataObject->addDecorator(new BulkContainerDecorator($product));
+            $dataObject->addDecorator(new StockDecorator($product, $stocks->get($product->id)));
+            $dataObject->addDecorator(new PackageDecorator($product, $packages->get($product->id)));
+
+            array_push($dataObjects, $dataObject);
+        }
+
+        return response()->json($dataObjects);
     }
 }

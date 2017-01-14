@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * Class Package
  *
@@ -9,6 +11,8 @@ namespace App\Models;
  */
 class Package extends BaseModel
 {
+    use SoftDeletes;
+
     public function items()
     {
         return $this->hasMany(PackageProduct::class);

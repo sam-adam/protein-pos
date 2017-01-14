@@ -1,20 +1,18 @@
 <?php
 
-namespace App\DTO;
+namespace App\DataObjects;
 
 use App\Models\Brand as BrandModel;
 
 /**
  * Class Brand
  *
- * @package App\DTO
+ * @package App\DataObjects
  */
-class Brand extends BaseDTO
+class Brand extends ModelDataObjects
 {
-    public $brand;
-
     public function __construct(BrandModel $brand)
     {
-        $this->brand = $brand;
+        $this->setModel($brand);
     }
 }

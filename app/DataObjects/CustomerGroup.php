@@ -1,22 +1,21 @@
 <?php
 
-namespace App\DTO;
+namespace App\DataObjects;
 
 use App\Models\CustomerGroup as CustomerGroupModel;
 
 /**
  * Class CustomerGroup
  *
- * @package App\DTO
+ * @package App\DataObjects
  */
-class CustomerGroup extends BaseDTO
+class CustomerGroup extends ModelDataObjects
 {
     public $group;
     public $groupLabel;
 
     public function __construct(CustomerGroupModel $group)
     {
-        $this->group      = $group;
-        $this->groupLabel = $group->name.' ('.$this->group->discount.'% disc.)';
+        $this->setModel($group);
     }
 }

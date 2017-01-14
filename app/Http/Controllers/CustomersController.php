@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Collection;
-use App\DTO\Customer as CustomerDTO;
+use App\DataObjects\Collection;
+use App\DataObjects\Customer as CustomerDataObjects;
 use App\Http\Requests\StoreCustomer;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
@@ -239,6 +239,6 @@ class CustomersController extends AuthenticatedController
             ->limit(5)
             ->get();
 
-        return response()->json(new Collection($customers, function (Customer $customer) { return new CustomerDTO($customer); }));
+        return response()->json(new Collection($customers, function (Customer $customer) { return new CustomerDataObjects($customer); }));
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Customer as CustomerDTO;
-use App\DTO\ProductWithStock;
+use App\DataObjects\Customer as CustomerDataObjects;
+use App\DataObjects\ProductWithStock;
 use App\Http\Requests\StoreSale;
 use App\Models\Customer;
 use App\Models\Sale;
@@ -51,7 +51,7 @@ class SalesController extends AuthenticatedController
 
         if ($sales) {
             $oldData = [
-                'customerData' => data_get((new CustomerDTO($sales->customer))->toArray(), 'customer'),
+                'customerData' => data_get((new CustomerDataObjects($sales->customer))->toArray(), 'customer'),
                 'cartData'     => []
             ];
 
