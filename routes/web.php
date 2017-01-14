@@ -19,6 +19,7 @@ Route::get('/products/xhr-search', 'ProductsController@xhrSearch')->name('produc
 Route::resource('/products', 'ProductsController');
 //Route::resource('/inventory-movements', 'InventoryMovementsController');
 Route::resource('/product-variants', 'ProductVariantsController');
+Route::get('/packages/{package}/xhr-info', 'PackagesController@xhrInfo')->name('packages.xhr.info');
 Route::resource('/packages', 'PackagesController');
 Route::resource('/customer-groups', 'CustomerGroupsController');
 Route::get('/customers/export-csv', 'CustomersController@exportAsCsv')->name('customers.export');

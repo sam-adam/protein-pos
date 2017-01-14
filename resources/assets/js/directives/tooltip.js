@@ -10,8 +10,7 @@ Vue.directive("tooltip", {
     ],
 
     bind: function (el, binding) {
-        var $el = $(el),
-            $this = this;
+        var $el = $(el);
 
         $el.tooltip({
             animation: $el.data("animation") || true,

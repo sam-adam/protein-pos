@@ -25,7 +25,6 @@ class InventoryRepository
      */
     public function getProductStocks(\ArrayAccess $products, Branch $inBranch = null)
     {
-        $stocks     = [];
         $productIds = [];
 
         foreach ($products as $product) {

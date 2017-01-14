@@ -2,6 +2,7 @@
 
 namespace App\DataObjects;
 
+use App\DataObjects\Decorators\Decorator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -38,7 +39,16 @@ abstract class ModelDataObjects extends BaseDataObject
             $this->model->load($relationProperty);
 
             if ($this->model->{$relationProperty}) {
-                $attributes[Str::camel($relationProperty)] = (new $data['dataObject']($this->model->{$relationProperty}))->toArray();
+                $eagerLoadedModel = (new $data['dataObject']($this->model->{$relationProperty}));
+                $eagerLoadedArray = $eagerLoadedModel->toArray();
+
+                if (isset($data['decorators']) && is_array($data['decorators'])) {
+                    foreach ($data['decorators'] as $decorator) {
+                        $eagerLoadedArray = $decorator->decorate($eagerLoadedArray);
+                    }
+                }
+
+                $attributes[Str::camel($relationProperty)] = $eagerLoadedArray;
             }
 
             unset($attributes[$data['property']]);
@@ -54,5 +64,16 @@ abstract class ModelDataObjects extends BaseDataObject
         }
 
         return $attributes;
+    }
+
+    public function addEagerLoadDecorator($attributeKey, Decorator $decorator)
+    {
+        if (isset($this->eagerLoaded[$attributeKey])) {
+            if (!isset($this->eagerLoaded[$attributeKey]['decorators'])) {
+                $this->eagerLoaded[$attributeKey]['decorators'] = [];
+            }
+
+            $this->eagerLoaded[$attributeKey]['decorators'][] = $decorator;
+        }
     }
 }

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\DataObjects\Decorators\Package\WithItemsDecorator;
 use App\Http\Requests\StorePackage;
 use App\Models\Package;
 use App\Models\PackageProduct;
 use App\Models\Product;
+use App\Repository\InventoryRepository;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -15,6 +19,15 @@ use Illuminate\Support\Facades\DB;
  */
 class PackagesController extends AuthenticatedController
 {
+    protected $inventoryRepo;
+
+    public function __construct(InventoryRepository $inventoryRepo)
+    {
+        parent::__construct();
+
+        $this->inventoryRepo = $inventoryRepo;
+    }
+
     public function index()
     {
         return view('packages.index', ['packages' => Package::with('items.product')->paginate()]);
@@ -111,5 +124,29 @@ class PackagesController extends AuthenticatedController
         $package->delete();
 
         return redirect(route('packages.index'))->with('flashes.success', 'Package deleted');
+    }
+
+    public function xhrInfo($packageId)
+    {
+        $package = Package::with('items.product')->find($packageId);
+
+        if (!$package) {
+            return response()->json();
+        }
+
+        $products = [];
+
+        foreach ($package->items as $item) {
+            if (!isset($products[$item->product->id])) {
+                $products[$item->product->id] = $item->product;
+            }
+        }
+
+        $stocks = $this->inventoryRepo->getProductStocks(new Collection($products), Auth::user()->branch);
+
+        $dataObject = new \App\DataObjects\Package($package);
+        $dataObject->addDecorator(new WithItemsDecorator($package, $stocks));
+
+        return response()->json($dataObject);
     }
 }

@@ -75,7 +75,7 @@
                                                 <tr v-if="cartItem.product.inPackages">
                                                     <td><strong>Available Sets</strong></td>
                                                     <td colspan="3">
-                                                        <button v-for="package in cartItem.product.inPackages" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view'">
+                                                        <button v-for="package in cartItem.product.inPackages" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
                                                             @{{ package.name }}
                                                         </button>
                                                     </td>
