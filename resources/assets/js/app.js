@@ -19,6 +19,7 @@ window.moment = require('moment');
  */
 $(function() {
     $('#side-menu').metisMenu();
+    $('[data-toggle="tooltip"]').tooltip();
 });
 
 //Loads the correct sidebar on window load,
@@ -100,6 +101,8 @@ $(function() {
 
 Vue.component('SearchProduct', require('./components/SearchProduct.vue'));
 Vue.component('SearchCustomer', require('./components/SearchCustomer.vue'));
+
+require("./directives/tooltip.js");
 
 // const app = new Vue({
 //     el: '#app'

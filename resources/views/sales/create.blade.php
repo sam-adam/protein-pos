@@ -72,6 +72,14 @@
                                                     <td><strong>Brand</strong></td>
                                                     <td>@{{ cartItem.product.brand ? cartItem.product.brand.name : "-" }}</td>
                                                 </tr>
+                                                <tr v-if="cartItem.product.inPackages">
+                                                    <td><strong>Available Sets</strong></td>
+                                                    <td colspan="3">
+                                                        <button v-for="package in cartItem.product.inPackages" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view'">
+                                                            @{{ package.name }}
+                                                        </button>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </td>
                                     </tr>
@@ -108,7 +116,7 @@
                                             <div class="col-xs-6">@{{ customer.email || "-" }}</div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-xs-2">Point:</div>
+                                            <div class="col-xs-2">Points:</div>
                                             <div class="col-xs-6">@{{ customer.points }}</div>
                                         </div>
                                     </div>
