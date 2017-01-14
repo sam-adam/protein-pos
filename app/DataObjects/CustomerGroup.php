@@ -12,10 +12,17 @@ use App\Models\CustomerGroup as CustomerGroupModel;
 class CustomerGroup extends ModelDataObjects
 {
     public $group;
-    public $groupLabel;
 
     public function __construct(CustomerGroupModel $group)
     {
         $this->setModel($group);
+    }
+
+    /** {@inheritDoc} */
+    public function toArray()
+    {
+        return array_merge(parent::toArray(), [
+            'label' => $this->model->name.' ('.$this->model->discount.'% discount)'
+        ]);
     }
 }

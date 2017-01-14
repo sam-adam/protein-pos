@@ -16,7 +16,7 @@
                             <search-product
                                     src="{{ route('products.xhr.search') }}"
                                     :existing-items="cart"
-                                    v-on:product-selected="addToCart($event.inventory.product, 1, $event.availableQuantity)"
+                                    v-on:product-selected="addToCart($event.product, 1, $event.availableQuantity)"
                                     v-on:insufficient-stock="notify('error', $event.remark)"
                             ></search-product>
                         </div>
@@ -84,7 +84,7 @@
                 <div class="col-md-5">
                     <div class="panel panel-default">
                         <div class="panel-body" id="search-customer-panel">
-                            <search-customer src="{{ route('customers.xhr.search') }}" v-on:customer-selected="setCustomer($event.customer)" v-show="!isCustomerSelected"></search-customer>
+                            <search-customer src="{{ route('customers.xhr.search') }}" v-on:customer-selected="setCustomer($event)" v-show="!isCustomerSelected"></search-customer>
                             <div class="customer-info" v-show="isCustomerSelected">
                                 <div class="row">
                                     <div class="col-xs-12">
@@ -93,9 +93,9 @@
                                             @{{ customer.name }}
                                         </h4>
                                         <div>
-                                        <span class="label label-success" v-show="customer.group">
+                                        <span class="label label-success" v-show="isCustomerInGroup" v-if="isCustomerInGroup">
                                             <i class="fa fa-star"></i>
-                                            @{{ customer.groupLabel }}
+                                            @{{ customer.group.label }}
                                         </span>
                                         </div>
                                         <br/>
@@ -138,7 +138,7 @@
                                 <tr>
                                     <td>Customer Discount:</td>
                                     <td>
-                                        @{{ customer.group ? customer.group.discount + "%" : "-" }}
+                                        @{{ isCustomerInGroup ? customer.group.discount + "%" : "-" }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -266,12 +266,21 @@
                         newItems.forEach(function (item, index) {
                             if (item.quantity === 0) {
                                 $this.removeFromCart(index);
+                            } else if (item.quantity > item.product.stock) {
+                                $this.notify("error", "Insufficient stock");
+
+                                item.quantity = item.product.stock;
                             }
                         });
                     }
                 }
             },
             computed: {
+                isCustomerInGroup: function () {
+                    return this.customer
+                            && this.customer.hasOwnProperty('group')
+                            && this.customer.group;
+                },
                 isCartEmpty: function () {
                     return this.cart.length === 0;
                 },
@@ -298,7 +307,7 @@
                         itemsTotal += $this.calculateItemPrice(cartItem);
                     });
 
-                    if ($this.customer.group) {
+                    if ($this.isCustomerInGroup) {
                         itemsTotal = $this.applyDiscount(itemsTotal, this.customer.group.discount);
                     }
 

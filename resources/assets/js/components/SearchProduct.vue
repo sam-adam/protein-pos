@@ -25,24 +25,24 @@
             </div>
         </div>
         <ul v-show="hasItems">
-            <li v-for="(inventory, index) in items" :class="activeClass(index)" @mousedown="hit" @mousemove="setActive(index)">
+            <li v-for="(product, index) in items" :class="activeClass(index)" @mousedown="hit" @mousemove="setActive(index)">
                 <div class="row">
                     <div class="col-xs-10">
                         <div class="name">
-                            {{ inventory.actualProduct.name }}
-                            <span v-show="!inventory.canBeSold" class="label label-danger">
+                            {{ product.name }}
+                            <span v-show="product.stock === 0" class="label label-danger">
                                 <i class="fa fa-fw fa-exclamation-circle"></i>
-                                {{ inventory.remark }}
+                                Out of stock
                             </span>
                         </div>
-                        <div class="screen-name">{{ inventory.actualProduct.brand ? inventory.actualProduct.brand.name : 'Not branded' }}</div>
+                        <div class="screen-name">{{ product.brand ? product.brand.name : 'Not branded' }}</div>
                         <div class="screen-name">
-                            Price: {{ inventory.actualProduct.price }}, Category: {{ inventory.actualProduct.category ? inventory.actualProduct.category.name : 'Uncategorized' }}
+                            Price: {{ product.price }}, Category: {{ product.category ? product.category.name : 'Uncategorized' }}
                         </div>
                     </div>
                     <div class="col-xs-2">
                         <div class="stock text-center">
-                            {{ calculateAvailable(inventory) }}
+                            {{ calculateAvailable(product) }}
                         </div>
                         <div class="stock-message text-center">item(s) avail.</div>
                     </div>
@@ -67,40 +67,36 @@
             }
         },
         methods: {
-            calculateAvailable (inventory) {
+            calculateAvailable (product) {
                 var inCartQuantity = 0;
 
                 if (Array.isArray(this.existingItems)) {
                     this.existingItems.forEach(function (item) {
-                        if (item.product.id === inventory.product.id) {
+                        if (item.product.id === product.id) {
                             inCartQuantity = item.quantity;
                         }
                     });
                 }
 
-                return inventory.availableStock - inCartQuantity;
+                return product.stock - inCartQuantity;
             },
-            onHit (inventory) {
-                if (inventory.canBeSold) {
+            onHit (product) {
+                if (product.stock > 0) {
                     this.$emit('product-selected', {
-                        inventory: inventory,
-                        availableQuantity: inventory.availableStock
+                        product: product,
+                        availableQuantity: product.stock
                     });
-                } else if (inventory.remark) {
+                } else if (product.stock === 0) {
                     this.$emit('insufficient-stock', {
-                        inventory: inventory,
-                        remark: inventory.remark
+                        product: product,
+                        remark: "Out of stock"
                     })
                 }
 
                 this.reset();
             },
             prepareResponseData (response) {
-                if (response.hasOwnProperty('items')) {
-                    return response.items;
-                }
-
-                return response;
+                return response.products;
             }
         }
     }

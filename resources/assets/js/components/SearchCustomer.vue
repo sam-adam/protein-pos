@@ -28,14 +28,14 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="name">
-                            {{ customer.customer.name }}
-                            <span class="label label-success" v-show="customer.isInGroup">
+                            {{ customer.name }}
+                            <span class="label label-success" v-show="customer.group">
                                 <i class="fa fa-star"></i>
-                                {{ customer.customer.groupLabel }}
+                                {{ customer.group.label }}
                             </span>
                         </div>
                         <div class="screen-name">
-                            <i class="fa fa-phone"></i> {{ customer.customer.phone || "-" }} &nbsp; <i class="fa fa-envelope"></i> {{ customer.customer.email }}
+                            <i class="fa fa-phone"></i> {{ customer.phone || "-" }} &nbsp; <i class="fa fa-envelope"></i> {{ customer.email }}
                         </div>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                 this.$emit('customer-selected', customer);
             },
             prepareResponseData (response) {
-                return response.products;
+                return response.customers;
             }
         }
     }

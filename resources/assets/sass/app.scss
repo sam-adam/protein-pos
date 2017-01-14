@@ -205,3 +205,9 @@ table#sales-summary-table {
     }
   }
 }
+
+@media (min-width: 768px) {
+  .navbar-right {
+    margin-right: 0px;
+  }
+}

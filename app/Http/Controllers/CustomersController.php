@@ -246,6 +246,8 @@ class CustomersController extends AuthenticatedController
             $collection->add($dataObject);
         }
 
+        $collection->setKey('customers');
+
         return response()->json($collection);
     }
 }

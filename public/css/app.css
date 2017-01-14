@@ -12041,6 +12041,12 @@ table#sales-summary-table tr.dashed > td:last-child {
   border-right: none;
 }
 
+@media (min-width: 768px) {
+  .navbar-right {
+    margin-right: 0px;
+  }
+}
+
 /*# sourceMappingURL=main.css.map */
 
 /*# sourceMappingURL=app.css.map */
