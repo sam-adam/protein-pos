@@ -62,11 +62,7 @@
                 this.$emit('customer-selected', customer);
             },
             prepareResponseData (response) {
-                if (response.hasOwnProperty('items')) {
-                    return response.items;
-                }
-
-                return response;
+                return response.products;
             }
         }
     }

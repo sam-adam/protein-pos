@@ -13,8 +13,12 @@ class Customer extends ModelDataObjects
 {
     protected $eagerLoaded = [
         'group' => [
-            'property'    => 'customer_group_id',
-            'dataObjects' => CustomerGroup::class
+            'property'   => 'customer_group_id',
+            'dataObject' => CustomerGroup::class
+        ],
+        'registeredBranch' => [
+            'property' => 'registered_branch_id',
+            'dataObject' => Branch::class
         ]
     ];
 

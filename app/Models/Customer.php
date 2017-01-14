@@ -17,4 +17,9 @@ class Customer extends BaseModel
     {
         return $this->belongsTo(CustomerGroup::class, 'customer_group_id');
     }
+
+    public function registeredBranch()
+    {
+        return $this->belongsTo(Branch::class, 'registered_branch_id');
+    }
 }

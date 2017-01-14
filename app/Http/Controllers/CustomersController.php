@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\Collection;
+use App\DataObjects\CollectionDataObject;
 use App\DataObjects\Customer as CustomerDataObjects;
 use App\Http\Requests\StoreCustomer;
 use App\Models\Customer;
@@ -233,12 +234,18 @@ class CustomersController extends AuthenticatedController
 
     public function xhrSearch(Request $request)
     {
-        $query     = $request->query('query');
-        $customers = Customer::where('name', 'like', "%{$query}%")
+        $query      = $request->query('query');
+        $collection = new CollectionDataObject();
+        $customers  = Customer::where('name', 'like', "%{$query}%")
             ->orWhere('email', 'like', "%{$query}%")
             ->limit(5)
             ->get();
 
-        return response()->json(new Collection($customers, function (Customer $customer) { return new CustomerDataObjects($customer); }));
+        foreach ($customers as $customer) {
+            $dataObject = new \App\DataObjects\Customer($customer);
+            $collection->add($dataObject);
+        }
+
+        return response()->json($collection);
     }
 }
