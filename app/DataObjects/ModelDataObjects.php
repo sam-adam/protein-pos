@@ -5,7 +5,6 @@ namespace App\DataObjects;
 use App\DataObjects\Decorators\Decorator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 /**
  * Class ModelDataObjects
@@ -40,15 +39,14 @@ abstract class ModelDataObjects extends BaseDataObject
 
             if ($this->model->{$relationProperty}) {
                 $eagerLoadedModel = (new $data['dataObject']($this->model->{$relationProperty}));
-                $eagerLoadedArray = $eagerLoadedModel->toArray();
 
                 if (isset($data['decorators']) && is_array($data['decorators'])) {
                     foreach ($data['decorators'] as $decorator) {
-                        $eagerLoadedArray = $decorator->decorate($eagerLoadedArray);
+                        $eagerLoadedModel->addDecorator($decorator);
                     }
                 }
 
-                $attributes[Str::camel($relationProperty)] = $eagerLoadedArray;
+                $attributes[$relationProperty] = $eagerLoadedModel->toArray();;
             }
 
             unset($attributes[$data['property']]);

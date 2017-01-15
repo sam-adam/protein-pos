@@ -25,7 +25,7 @@ class StoreProductVariant extends FormRequest
      */
     public function rules()
     {
-        $variant   = ProductVariantGroup::find(Route::input('product-variant'));
+        $variant   = ProductVariantGroup::find(Route::input('product_variant'));
         $variantId = $variant ? $variant->id : 'NULL';
         $rules   = [
             'name' => "bail|required|unique:product_variant_groups,name,{$variantId},id,deleted_at,NULL"
