@@ -29,28 +29,38 @@ class VariantDecorator implements Decorator
             unset($attributes['product_variant_group_id']);
         }
 
+        $attributes['all_variants'] = [
+            $this->getProductDataObject($this->product)
+        ];
+
         if ($variantGroup = $this->product->variantGroup) {
             if ($variants = $variantGroup->products) {
                 $attributes['variants'] = [];
 
                 foreach ($variants as $variant) {
                     if ((int) $variant->id !== (int) $this->product->id) {
-                        $productDataObject = new Product($variant);
-                        $stockDecorator    = new StockDecorator($variant);
-                        $stockDecorator->setStockCallback(function (ProductModel $product) {
-                            return isset($this->productStocks[$product->id])
-                                ? $this->productStocks[$product->id]
-                                : 0;
-                        });
-
-                        $productDataObject->addDecorator($stockDecorator);
-
-                        $attributes['variants'][] = $productDataObject;
+                        $attributes['variants'][]     = $this->getProductDataObject($variant);
+                        $attributes['all_variants'][] = $this->getProductDataObject($variant);
                     }
                 }
             }
         }
 
         return $attributes;
+    }
+
+    private function getProductDataObject(ProductModel $product)
+    {
+        $productDataObject = new Product($product);
+        $stockDecorator    = new StockDecorator($product);
+        $stockDecorator->setStockCallback(function (ProductModel $product) {
+            return isset($this->productStocks[$product->id])
+                ? $this->productStocks[$product->id]
+                : 0;
+        });
+
+        $productDataObject->addDecorator($stockDecorator);
+
+        return $productDataObject;
     }
 }

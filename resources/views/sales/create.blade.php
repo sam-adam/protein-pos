@@ -108,17 +108,29 @@
                                         <tr>
                                             <td>&nbsp;</td>
                                             <td colspan="5">
-                                                <table class="table table-condensed">
+                                                <table class="table table-condensed table-middle">
                                                     <thead>
                                                         <tr>
-                                                            <th>Package Item</th>
-                                                            <th>Quantity</th>
+                                                            <th>
+                                                                Package Item
+                                                                <span class="label label-success" v-show="packageItem.package.isCustomizable">Customizable</span>
+                                                            </th>
+                                                            <th class="text-center">Quantity</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <template v-for="packageProduct in packageItem.package.items">
                                                             <tr>
-                                                                <td>@{{ packageProduct.product.name }}</td>
+                                                                <td>
+                                                                    <select v-if="packageItem.package.isCustomizable" class="form-control" v-bind:name="'packages[' + packageItem.package.id + '][product_id]'">
+                                                                        <option v-for="variant in packageProduct.product.allVariants" v-model="variant.id">
+                                                                            @{{ variant.name }}
+                                                                        </option>
+                                                                    </select>
+                                                                    <p v-if="!packageItem.package.isCustomizable" class="form-control-static">
+                                                                        @{{ packageProduct.product.name }}
+                                                                    </p>
+                                                                </td>
                                                                 <td class="text-center">@{{ packageProduct.quantity }}</td>
                                                             </tr>
                                                         </template>
