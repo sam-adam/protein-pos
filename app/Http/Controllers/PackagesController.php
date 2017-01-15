@@ -8,6 +8,7 @@ use App\Models\Package;
 use App\Models\PackageProduct;
 use App\Models\Product;
 use App\Repository\InventoryRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,8 +34,9 @@ class PackagesController extends AuthenticatedController
         return view('packages.index', ['packages' => Package::with('items.product')->paginate()]);
     }
 
-    public function show($packageId)
+    public function show(Request $request, $packageId)
     {
+        /** @var Package $package */
         $package = Package::with('items.product.variantGroup.products')->find($packageId);
 
         if (!$package) {
@@ -57,11 +59,15 @@ class PackagesController extends AuthenticatedController
             }
         }
 
-        $stocks = $this->inventoryRepo->getProductStocks(new Collection($products), Auth::user()->branch);
+        $stocks     = $this->inventoryRepo->getProductStocks(new Collection($products), Auth::user()->branch);
+        $dataObject = new \App\DataObjects\Package($package);
+        $dataObject->addDecorator(new WithItemsDecorator($package, $stocks));
 
         return view('packages.show', [
-            'package' => $package,
-            'stocks'  => $stocks
+            'package'     => $package,
+            'stocks'      => $stocks,
+            'packageJson' => json_encode($dataObject),
+            'intent'      => $request->get('intent')
         ]);
     }
 
@@ -155,6 +161,7 @@ class PackagesController extends AuthenticatedController
 
     public function xhrInfo($packageId)
     {
+        /** @var Package $package */
         $package = Package::with('items.product')->find($packageId);
 
         if (!$package) {

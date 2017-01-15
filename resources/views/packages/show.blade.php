@@ -48,7 +48,7 @@
                         <div class="form-group">
                             <label for="price" class="col-sm-2 control-label">Products</label>
                             <div class="col-sm-7">
-                                <table class="table table-condensed table-middle table-bordered">
+                                <table class="table table-condensed table-bordered table-striped">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
@@ -60,53 +60,86 @@
                                     <tbody>
                                         @foreach($package->items as $item)
                                             <tr>
-                                                <td>{{ $item->product->name }}</td>
+                                                <td>
+                                                    {{ $item->product->name }}
+                                                    @if($package->is_customizable && $item->product->variantGroup)
+                                                        <table class="table table-condensed">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Variant</th>
+                                                                    <th>Price</th>
+                                                                    <th>Quantity</th>
+                                                                    <th>Stock</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($item->product->variantGroup->products as $variant)
+                                                                    @if($variant->id !== $item->product_id)
+                                                                        <tr>
+                                                                            <td>{{ $variant->name }}</td>
+                                                                            <td>{{ number_format($variant->price) }}</td>
+                                                                            <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
+                                                                            <td>{{ number_format($stocks[$variant->id]) }}</td>
+                                                                        </tr>
+                                                                        @endif
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    @endif
+                                                </td>
                                                 <td>{{ number_format($item->product->price) }}</td>
                                                 <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
                                                 <td>{{ number_format($stocks[$item->product->id]) }}</td>
                                             </tr>
-                                            @if($package->is_customizable && $item->product->variantGroup)
-                                                @foreach($item->product->variantGroup->products as $variant)
-                                                    @if($variant->id !== $item->product_id)
-                                                        <tr>
-                                                            <td colspan="4">
-                                                                <strong>Variants</strong>
-                                                                <table class="table table-condensed">
-                                                                    <tbody>
-                                                                        <td></td>
-                                                                        <td>{{ $variant->name }}</td>
-                                                                        <td>{{ number_format($variant->price) }}</td>
-                                                                        <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
-                                                                        <td>{{ number_format($stocks[$variant->id]) }}</td>
-                                                                    </tbody>
-                                                                </table>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                @endforeach
-                                            @endif
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-3">
-                                <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-primary btn-block">
-                                    <i class="fa fa-fw fa-pencil"></i>
-                                    Edit
-                                </a>
+                        @if($intent === 'getPackage')
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-7">
+                                    <button href="{{ route('packages.edit', $package->id) }}" class="btn btn-success btn-block" onclick="choosePackage()">
+                                        <i class="fa fa-fw fa-cart-plus"></i>
+                                        Add to cart
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-sm-2">
-                                <a href="{{ Session::get('last_package_page') ?: route('packages.index') }}" class="btn btn-default btn-block">
-                                    <i class="fa fa-arrow-left fa-fw"></i>
-                                    Back
-                                </a>
+                        @else
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-3">
+                                    <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-primary btn-block">
+                                        <i class="fa fa-fw fa-pencil"></i>
+                                        Edit
+                                    </a>
+                                </div>
+                                <div class="col-sm-2">
+                                    <a href="{{ Session::get('last_package_page') ?: route('packages.index') }}" class="btn btn-default btn-block">
+                                        <i class="fa fa-arrow-left fa-fw"></i>
+                                        Back
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     </form>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    @parent
+    @if($intent === 'getPackage')
+        <script type="text/javascript">
+            function choosePackage() {
+                var event = new CustomEvent("package-selected", {
+                    detail: {"package": {!! $packageJson !!}}
+                });
+
+                window.dispatchEvent(event);
+                window.close();
+            }
+        </script>
+    @endif
 @endsection

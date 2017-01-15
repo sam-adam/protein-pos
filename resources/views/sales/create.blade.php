@@ -38,53 +38,95 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <template v-for="(productItem, index) in cart.products">
-                                    <tr>
-                                        <td style="vertical-align: middle;" class="text-center">
-                                            <a class="btn btn-xs text-danger" v-on:click="removeProductFromCart(index)">
-                                                <i class="fa fa-times-circle fa-2x"></i>
-                                            </a>
-                                        </td>
-                                        <td style="vertical-align: middle;">@{{ productItem.product.name }}</td>
-                                        <td style="vertical-align: middle;" class="text-center">@{{ productItem.product.price }}</td>
-                                        <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                            <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
-                                            <input v-bind:name="'products[' + productItem.product.id + '][quantity]'" type="number" class="form-control" v-model="productItem.quantity" min="0" v-bind:max="productItem.availableQuantity"/>
-                                        </td>
-                                        <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                            <input v-bind:name="'products[' + productItem.product.id + '][discount]'" type="number" class="form-control" v-model="productItem.discount" min="0"/>
-                                        </td>
-                                        <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(productItem) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>&nbsp;</td>
-                                        <td colspan="5">
-                                            <table class="table table-condensed">
-                                                <tr>
-                                                    <td style="width: 25%;"><strong>Barcode</strong></td>
-                                                    <td style="width: 25%;">@{{ productItem.product.barcode || "-" }}</td>
-                                                    <td style="width: 25%;"><strong>Category</strong></td>
-                                                    <td style="width: 25%;">@{{ productItem.product.category ? productItem.product.category.name : "-" }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Available Stock</strong></td>
-                                                    <td>@{{ productItem.product.availableQuantity }}</td>
-                                                    <td><strong>Brand</strong></td>
-                                                    <td>@{{ productItem.product.brand ? productItem.product.brand.name : "-" }}</td>
-                                                </tr>
-                                                <tr v-if="productItem.product.inPackages">
-                                                    <td><strong>Available Sets</strong></td>
-                                                    <td colspan="3">
-                                                        <button v-for="package in productItem.product.inPackages" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
-                                                            <i class="fa fa-eye"></i>
-                                                            @{{ package.name }}
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </template>
+                                    <template v-for="(productItem, index) in cart.products">
+                                        <tr>
+                                            <td style="vertical-align: middle;" class="text-center">
+                                                <a class="btn btn-xs text-danger" v-on:click="removeProductFromCart(index)">
+                                                    <i class="fa fa-times-circle fa-2x"></i>
+                                                </a>
+                                            </td>
+                                            <td style="vertical-align: middle;">@{{ productItem.product.name }}</td>
+                                            <td style="vertical-align: middle;" class="text-center">@{{ productItem.product.price }}</td>
+                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                                <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
+                                                <input v-bind:name="'products[' + productItem.product.id + '][quantity]'" type="number" class="form-control" v-model="productItem.quantity" min="0" v-bind:max="productItem.availableQuantity"/>
+                                            </td>
+                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                                <input v-bind:name="'products[' + productItem.product.id + '][discount]'" type="number" class="form-control" v-model="productItem.discount" min="0"/>
+                                            </td>
+                                            <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(productItem) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td colspan="5">
+                                                <table class="table table-condensed">
+                                                    <tr>
+                                                        <td style="width: 25%;"><strong>Barcode</strong></td>
+                                                        <td style="width: 25%;">@{{ productItem.product.barcode || "-" }}</td>
+                                                        <td style="width: 25%;"><strong>Category</strong></td>
+                                                        <td style="width: 25%;">@{{ productItem.product.category ? productItem.product.category.name : "-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Available Stock</strong></td>
+                                                        <td>@{{ productItem.product.availableQuantity }}</td>
+                                                        <td><strong>Brand</strong></td>
+                                                        <td>@{{ productItem.product.brand ? productItem.product.brand.name : "-" }}</td>
+                                                    </tr>
+                                                    <tr v-if="productItem.product.inPackages">
+                                                        <td><strong>Available Sets</strong></td>
+                                                        <td colspan="3">
+                                                            <template v-for="package in productItem.product.inPackages">
+                                                                <button v-on:click="viewPackage(package.id)" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
+                                                                    <i class="fa fa-eye"></i>
+                                                                    @{{ package.name }}
+                                                                </button>
+                                                            </template>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template v-for="(packageItem, index) in cart.packages">
+                                        <tr>
+                                            <td style="vertical-align: middle;" class="text-center">
+                                                <a class="btn btn-xs text-danger" v-on:click="removePackageFromCart(index)">
+                                                    <i class="fa fa-times-circle fa-2x"></i>
+                                                </a>
+                                            </td>
+                                            <td style="vertical-align: middle;">@{{ packageItem.package.name }}</td>
+                                            <td style="vertical-align: middle;" class="text-center">@{{ packageItem.package.price }}</td>
+                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                                <input v-bind:name="'packages[' + packageItem.package.id + '][id]'" type="hidden" v-model="packageItem.package.id"/>
+                                                <input v-bind:name="'packages[' + packageItem.package.id + '][quantity]'" type="number" class="form-control" v-model="packageItem.quantity" min="0"/>
+                                            </td>
+                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                                <input v-bind:name="'packages[' + packageItem.package.id + '][discount]'" type="number" class="form-control" v-model="packageItem.discount" min="0"/>
+                                            </td>
+                                            <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(packageItem) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td colspan="5">
+                                                <table class="table table-condensed">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Package Item</th>
+                                                            <th>Quantity</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template v-for="packageProduct in packageItem.package.items">
+                                                            <tr>
+                                                                <td>@{{ packageProduct.product.name }}</td>
+                                                                <td class="text-center">@{{ packageProduct.quantity }}</td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
@@ -320,6 +362,10 @@
                         itemsTotal += $this.calculateItemPrice(cartItem);
                     });
 
+                    this.cart.packages.forEach(function (cartItem) {
+                        itemsTotal += $this.calculateItemPrice(cartItem);
+                    });
+
                     if ($this.isCustomerInGroup) {
                         itemsTotal = $this.applyDiscount(itemsTotal, this.customer.group.discount);
                     }
@@ -349,7 +395,9 @@
                     return original * (100 + tax) / 100
                 },
                 calculateItemPrice: function (item) {
-                    return this.applyDiscount(item.product.price * item.quantity, item.discount);
+                    var cartItem = item.hasOwnProperty("product") ? item.product : item.package;
+
+                    return this.applyDiscount(cartItem.price * item.quantity, item.discount);
                 },
                 setCustomer: function (customer) {
                     this.customer = customer;
@@ -391,6 +439,25 @@
                         })
                     }
                 },
+                addPackageToCart: function (package, quantity) {
+                    var samePackage = false,
+                        shouldAdd = true;
+
+                    this.cart.packages.forEach(function (cartItem) {
+                        if (cartItem.package.id === package.id) {
+                            cartItem.quantity += quantity;
+                            samePackage = true;
+                        }
+                    });
+
+                    if (!samePackage && shouldAdd) {
+                        this.cart.packages.push({
+                            package: package,
+                            quantity: quantity,
+                            discount: 0
+                        })
+                    }
+                },
                 removeProductFromCart: function (index) {
                     this.cart.products.splice(index, 1);
                 },
@@ -398,6 +465,15 @@
                     var fn = window.toastr[type];
 
                     fn(message);
+                },
+                viewPackage: function (packageId) {
+                    var $this = this,
+                        features = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes',
+                        packageWindow =  window.open("/packages/" + packageId + "?external=1&intent=getPackage", "choose_package_window", features);
+
+                    packageWindow.addEventListener("package-selected", function (event) {
+                        $this.addPackageToCart(event.detail.package, 1, event.detail.availableQuantity);
+                    });
                 }
             }
         });
