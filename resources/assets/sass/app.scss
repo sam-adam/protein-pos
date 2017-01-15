@@ -207,6 +207,15 @@ table#sales-summary-table {
 }
 
 @media (min-width: 768px) {
+  .fullscreen {
+    #page-wrapper {
+      margin-left: 0;
+    }
+    nav.navbar {
+      display: none;
+    }
+  }
+
   .navbar-right {
     margin-right: 0px;
   }

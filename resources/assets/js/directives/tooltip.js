@@ -1,14 +1,6 @@
 import Vue from "vue";
 
 Vue.directive("tooltip", {
-    params: [
-        'animation',
-        'container',
-        'html',
-        'placement',
-        'trigger',
-    ],
-
     bind: function (el, binding) {
         var $el = $(el);
 

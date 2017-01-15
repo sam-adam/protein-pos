@@ -15,8 +15,8 @@
                         <div class="panel-body" id="search-product-panel">
                             <search-product
                                     src="{{ route('products.xhr.search') }}"
-                                    :existing-items="cart"
-                                    v-on:product-selected="addToCart($event.product, 1, $event.availableQuantity)"
+                                    :existing-items="cart.products"
+                                    v-on:product-selected="addProductToCart($event.product, 1, $event.availableQuantity)"
                                     v-on:insufficient-stock="notify('error', $event.remark)"
                             ></search-product>
                         </div>
@@ -38,23 +38,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <template v-for="(cartItem, index) in cart">
+                                <template v-for="(productItem, index) in cart.products">
                                     <tr>
                                         <td style="vertical-align: middle;" class="text-center">
-                                            <a class="btn btn-xs text-danger" v-on:click="removeFromCart(index)">
+                                            <a class="btn btn-xs text-danger" v-on:click="removeProductFromCart(index)">
                                                 <i class="fa fa-times-circle fa-2x"></i>
                                             </a>
                                         </td>
-                                        <td style="vertical-align: middle;">@{{ cartItem.product.name }}</td>
-                                        <td style="vertical-align: middle;" class="text-center">@{{ cartItem.product.price }}</td>
+                                        <td style="vertical-align: middle;">@{{ productItem.product.name }}</td>
+                                        <td style="vertical-align: middle;" class="text-center">@{{ productItem.product.price }}</td>
                                         <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                            <input v-bind:name="'products[' + cartItem.product.id + '][id]'" type="hidden" v-model="cartItem.product.id"/>
-                                            <input v-bind:name="'products[' + cartItem.product.id + '][quantity]'" type="number" class="form-control" v-model="cartItem.quantity" min="0" v-bind:max="cartItem.availableQuantity"/>
+                                            <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
+                                            <input v-bind:name="'products[' + productItem.product.id + '][quantity]'" type="number" class="form-control" v-model="productItem.quantity" min="0" v-bind:max="productItem.availableQuantity"/>
                                         </td>
                                         <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                            <input v-bind:name="'products[' + cartItem.product.id + '][discount]'" type="number" class="form-control" v-model="cartItem.discount" min="0"/>
+                                            <input v-bind:name="'products[' + productItem.product.id + '][discount]'" type="number" class="form-control" v-model="productItem.discount" min="0"/>
                                         </td>
-                                        <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(cartItem) }}</td>
+                                        <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(productItem) }}</td>
                                     </tr>
                                     <tr>
                                         <td>&nbsp;</td>
@@ -62,20 +62,21 @@
                                             <table class="table table-condensed">
                                                 <tr>
                                                     <td style="width: 25%;"><strong>Barcode</strong></td>
-                                                    <td style="width: 25%;">@{{ cartItem.product.barcode || "-" }}</td>
+                                                    <td style="width: 25%;">@{{ productItem.product.barcode || "-" }}</td>
                                                     <td style="width: 25%;"><strong>Category</strong></td>
-                                                    <td style="width: 25%;">@{{ cartItem.product.category ? cartItem.product.category.name : "-" }}</td>
+                                                    <td style="width: 25%;">@{{ productItem.product.category ? productItem.product.category.name : "-" }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td><strong>Available Stock</strong></td>
-                                                    <td>@{{ cartItem.product.availableQuantity }}</td>
+                                                    <td>@{{ productItem.product.availableQuantity }}</td>
                                                     <td><strong>Brand</strong></td>
-                                                    <td>@{{ cartItem.product.brand ? cartItem.product.brand.name : "-" }}</td>
+                                                    <td>@{{ productItem.product.brand ? productItem.product.brand.name : "-" }}</td>
                                                 </tr>
-                                                <tr v-if="cartItem.product.inPackages">
+                                                <tr v-if="productItem.product.inPackages">
                                                     <td><strong>Available Sets</strong></td>
                                                     <td colspan="3">
-                                                        <button v-for="package in cartItem.product.inPackages" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
+                                                        <button v-for="package in productItem.product.inPackages" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
+                                                            <i class="fa fa-eye"></i>
                                                             @{{ package.name }}
                                                         </button>
                                                     </td>
@@ -256,7 +257,10 @@
             data: {
                 query: "",
                 salesDiscount: 0,
-                cart: [],
+                cart: {
+                    products: [],
+                    packages: []
+                },
                 customer: {!! json_encode($customerData) !!},
                 payment: {
                     method: 'cash',
@@ -271,9 +275,9 @@
                     handler: function (oldItems, newItems) {
                         var $this = this;
 
-                        newItems.forEach(function (item, index) {
+                        newItems.products.forEach(function (item, index) {
                             if (item.quantity === 0) {
-                                $this.removeFromCart(index);
+                                $this.removeProductFromCart(index);
                             } else if (item.quantity > item.product.stock) {
                                 $this.notify("error", "Insufficient stock");
 
@@ -290,7 +294,8 @@
                             && this.customer.group;
                 },
                 isCartEmpty: function () {
-                    return this.cart.length === 0;
+                    return this.cart.products.length === 0
+                            && this.cart.packages.length === 0;
                 },
                 isCustomerSelected: function () {
                     return this.customer.hasOwnProperty('id');
@@ -311,7 +316,7 @@
                     var itemsTotal = 0,
                         $this = this;
 
-                    this.cart.forEach(function (cartItem) {
+                    this.cart.products.forEach(function (cartItem) {
                         itemsTotal += $this.calculateItemPrice(cartItem);
                     });
 
@@ -358,12 +363,12 @@
                         this.payment.amount = this.grandTotal;
                     }
                 },
-                addToCart: function (product, quantity, availableQuantity) {
+                addProductToCart: function (product, quantity, availableQuantity) {
                     var sameProduct = false,
                         shouldAdd = true,
                         $this = this;
 
-                    this.cart.forEach(function (cartItem) {
+                    this.cart.products.forEach(function (cartItem) {
                         if (cartItem.product.id === product.id) {
                             if (cartItem.quantity + quantity > availableQuantity) {
                                 shouldAdd = false;
@@ -379,15 +384,15 @@
                     if (!sameProduct && shouldAdd) {
                         product.availableQuantity = availableQuantity;
 
-                        this.cart.push({
+                        this.cart.products.push({
                             product: product,
                             quantity: quantity,
                             discount: 0
                         })
                     }
                 },
-                removeFromCart: function (index) {
-                    this.cart.splice(index, 1);
+                removeProductFromCart: function (index) {
+                    this.cart.products.splice(index, 1);
                 },
                 notify: function (type, message) {
                     var fn = window.toastr[type];

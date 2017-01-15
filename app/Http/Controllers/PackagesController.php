@@ -33,9 +33,36 @@ class PackagesController extends AuthenticatedController
         return view('packages.index', ['packages' => Package::with('items.product')->paginate()]);
     }
 
-    public function show()
+    public function show($packageId)
     {
-        return view('packages.show');
+        $package = Package::with('items.product.variantGroup.products')->find($packageId);
+
+        if (!$package) {
+            return redirect()->back()->with('flashes.danger', 'Package not found');
+        }
+
+        $products = [];
+
+        foreach ($package->items as $item) {
+            if (!isset($products[$item->product->id])) {
+                $products[$item->product->id] = $item->product;
+
+                if ($item->product->variantGroup) {
+                    foreach ($item->product->variantGroup->products as $variant) {
+                        if (!isset($products[$variant->id])) {
+                            $products[$variant->id] = $variant;
+                        }
+                    }
+                }
+            }
+        }
+
+        $stocks = $this->inventoryRepo->getProductStocks(new Collection($products), Auth::user()->branch);
+
+        return view('packages.show', [
+            'package' => $package,
+            'stocks'  => $stocks
+        ]);
     }
 
     public function create()
@@ -139,6 +166,14 @@ class PackagesController extends AuthenticatedController
         foreach ($package->items as $item) {
             if (!isset($products[$item->product->id])) {
                 $products[$item->product->id] = $item->product;
+
+                if ($item->product->variantGroup) {
+                    foreach ($item->product->variantGroup->products as $variant) {
+                        if (!isset($products[$variant->id])) {
+                            $products[$variant->id] = $variant;
+                        }
+                    }
+                }
             }
         }
 

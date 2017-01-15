@@ -14,10 +14,12 @@ use App\Models\Product as ProductModel;
 class VariantDecorator implements Decorator
 {
     private $product;
+    private $productStocks;
 
-    public function __construct(ProductModel $product)
+    public function __construct(ProductModel $product, $productStocks)
     {
-        $this->product = $product;
+        $this->product       = $product;
+        $this->productStocks = $productStocks;
     }
 
     /** {@inheritDoc} */
@@ -34,7 +36,14 @@ class VariantDecorator implements Decorator
                 foreach ($variants as $variant) {
                     if ((int) $variant->id !== (int) $this->product->id) {
                         $productDataObject = new Product($variant);
-                        $productDataObject->addDecorator(new StockDecorator($variant));
+                        $stockDecorator    = new StockDecorator($variant);
+                        $stockDecorator->setStockCallback(function (ProductModel $product) {
+                            return isset($this->productStocks[$product->id])
+                                ? $this->productStocks[$product->id]
+                                : 0;
+                        });
+
+                        $productDataObject->addDecorator($stockDecorator);
 
                         $attributes['variants'][] = $productDataObject;
                     }

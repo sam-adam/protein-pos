@@ -8,12 +8,12 @@
     <link href="{{ elixir('css/app.css') }}" rel="stylesheet">
     @yield('styles')
 </head>
-<body>
+<body class="{{ $isExternalWindow ? 'fullscreen' : '' }}">
     <div id="preloader" class="hidden">
         <div id="status"><i class="fa fa-spinner fa-spin"></i></div>
     </div>
     <div id="wrapper">
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-static-top " role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
