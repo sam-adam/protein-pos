@@ -20,6 +20,13 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 class MovementService
 {
+    private $inventoryService;
+
+    public function __construct(InventoryService $inventoryService)
+    {
+        $this->inventoryService = $inventoryService;
+    }
+
     /**
      * Create a movement
      *
@@ -72,6 +79,12 @@ class MovementService
 
             if (!$movementItem) {
                 throw new PersistenceException($movementItem);
+            }
+
+            $this->inventoryService->reOrderPriority($product, $toBranch);
+
+            if ($fromBranch) {
+                $this->inventoryService->reOrderPriority($product, $fromBranch);
             }
         }
 

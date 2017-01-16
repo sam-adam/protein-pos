@@ -13,6 +13,12 @@ use App\Models\Product;
  */
 class InventoryService
 {
+    /**
+     * Reorder the priority of a product
+     *
+     * @param Product $product
+     * @param Branch  $inBranch
+     */
     public function reOrderPriority(Product $product, Branch $inBranch)
     {
         $currentPriority   = 1;

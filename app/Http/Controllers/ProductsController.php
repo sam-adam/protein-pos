@@ -286,8 +286,8 @@ class ProductsController extends AuthenticatedController
 
                 return $inventory;
             });
-            $branch->expiredBranchInventories = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
-            $branch->closestExpiredInventory  = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false; })->first();
+            $branch->expiredBranchInventories = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired() && $inventory->stock > 0; });
+            $branch->closestExpiredInventory  = $branch->branchInventories->filter(function (Inventory $inventory) { return $inventory->isExpired() === false && $inventory->stock > 0; })->first();
         }
 
         $expiredInventories   = $inventories->filter(function (Inventory $inventory) { return $inventory->isExpired(); });
