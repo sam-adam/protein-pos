@@ -42,7 +42,7 @@ class SaleService
     {
         $newSale                    = new Sale();
         $newSale->opened_at         = Carbon::now();
-        $newSale->opened_by_user_id = $openedBy;
+        $newSale->opened_by_user_id = $openedBy->id;
         $newSale->branch_id         = $openedBy->branch_id;
         $newSale->customer_id       = $customer->id;
         $newSale->customer_discount = $customer->group ? $customer->group->discount : 0;

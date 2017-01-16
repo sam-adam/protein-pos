@@ -131,6 +131,32 @@ class SalesController extends AuthenticatedController
         }
     }
 
+    public function complete(Request $request, $saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        if ($sale->isPaid()) {
+            return redirect()->back()->with('flashes.danger', 'Sale already paid');
+        }
+
+        if ($sale->isCancelled()) {
+            return redirect()->back()->with('flashes.danger', 'Sale already cancelled');
+        }
+
+        DB::transaction(function () use ($sale) {
+            return $this->saleService->finishSale($sale, Auth::user(), [
+                'method' => 'CASH',
+                'amount' => $sale->calculateTotal()
+            ]);
+        });
+
+        return redirect()->back()->with('flashes.success', 'Sale completed');
+    }
+
     public function viewPrint($aleId)
     {
         $sale = Sale::find($aleId);

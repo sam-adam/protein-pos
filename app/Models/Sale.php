@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+
 /**
  * Class Sale
  *
@@ -36,6 +38,31 @@ class Sale extends BaseModel
         return $this->hasMany(SalePayment::class);
     }
 
+    public function scopeDelivery(Builder $query)
+    {
+        return $query->where('is_delivery', '=', true);
+    }
+
+    public function scopePaid(Builder $query)
+    {
+        return $query->whereNotNull('paid_at');
+    }
+
+    public function scopeUnPaid(Builder $query)
+    {
+        return $query->whereNull('paid_at');
+    }
+
+    public function scopeCancelled(Builder $query)
+    {
+        return $query->whereNotNull('cancelled_at');
+    }
+
+    public function scopeNotCancelled(Builder $query)
+    {
+        return $query->whereNull('cancelled_at');
+    }
+
     public function getType()
     {
         return $this->is_delivery ? 'Delivery' : 'Walk In';
@@ -44,6 +71,11 @@ class Sale extends BaseModel
     public function isFinished()
     {
         return $this->closed_at !== null;
+    }
+
+    public function isCancelled()
+    {
+        return $this->cancelled_at !== null;
     }
 
     public function isPaid()
