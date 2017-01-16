@@ -180,6 +180,17 @@ class SalesController extends AuthenticatedController
         return redirect()->back()->with('flashes.success', 'Sale cancelled');
     }
 
+    public function show($saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        return view('sales.show', ['sale' => $sale]);
+    }
+
     public function viewPrint($aleId)
     {
         $sale = Sale::find($aleId);

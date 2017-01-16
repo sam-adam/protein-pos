@@ -18,6 +18,21 @@ class Sale extends BaseModel
         'opened_at', 'closed_at', 'cancelled_at', 'paid_at'
     ];
 
+    public function openedBy()
+    {
+        return $this->belongsTo(User::class, 'opened_by_user_id');
+    }
+
+    public function closedBy()
+    {
+        return $this->belongsTo(User::class, 'closed_by_user_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);

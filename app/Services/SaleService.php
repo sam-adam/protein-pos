@@ -268,6 +268,10 @@ class SaleService
             // @ToDo adjust cash
         }
 
+        if ($sale->is_delivery) {
+            $sale->delivered_at = Carbon::now();
+        }
+
         $sale->paid_at           = Carbon::now();
         $sale->closed_at         = Carbon::now();
         $sale->closed_by_user_id = $closedBy->id;
