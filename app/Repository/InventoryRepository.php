@@ -66,6 +66,9 @@ class InventoryRepository
      */
     public function checkIfStockSufficient(Product $product, $quantity, Branch $inBranch = null)
     {
-        return $quantity <= $this->populateProductStock(new Collection([$product]), $inBranch);
+        $stocks = $this->getProductStocks(new Collection([$product]), $inBranch);
+
+        return $stocks->has($product->id)
+            && $quantity <= $stocks->get($product->id);
     }
 }

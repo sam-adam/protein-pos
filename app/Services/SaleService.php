@@ -135,7 +135,7 @@ class SaleService
                     $newSalePackageItem->original_price      = $selectedProduct->price;
                     $newSalePackageItem->saveOrFail();
 
-                    $newSalePackageItem->items->push($newSalePackageItem);
+                    $newSalePackage->items->push($newSalePackageItem);
                 }
             }
 
