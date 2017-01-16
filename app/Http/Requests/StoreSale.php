@@ -61,7 +61,8 @@ class StoreSale extends FormRequest
             $productId = data_get($this->get("products"), "{$index}.id");
             $product   = Product::findOrFail($productId);
 
-            return $inventoryRepo->checkIfStockSufficient($product, $value, Auth::user()->branch);
+            return $product->is_service
+                || $inventoryRepo->checkIfStockSufficient($product, $value, Auth::user()->branch);
         }, 'Insufficient stock');
 
         return $factory->make(

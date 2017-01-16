@@ -58,15 +58,12 @@ class SaleService
         foreach (data_get($saleData, 'items', []) ?: [] as $item) {
             $product           = Product::findOrFail(data_get($item, 'id'));
             $requestedQuantity = data_get($item, 'quantity');
-            $usedInventories   = $this->useInventory($product, $openedBy->branch, $requestedQuantity);
 
-            foreach ($usedInventories as $usedInventory) {
-                // save sale item
+            if ($product->is_service) {
                 $newSaleItem                      = new SaleItem();
                 $newSaleItem->sale_id             = $newSale->id;
                 $newSaleItem->product_id          = $product->id;
-                $newSaleItem->branch_inventory_id = $usedInventory['branchInventory']->id;
-                $newSaleItem->quantity            = $usedInventory['availableQuantity'];
+                $newSaleItem->quantity            = $requestedQuantity;
                 $newSaleItem->price               = data_get($item, 'price', $product->price);
                 $newSaleItem->original_price      = $product->price;
                 $newSaleItem->discount            = data_get($item, 'discount', 0);
@@ -74,6 +71,24 @@ class SaleService
                 $newSaleItem->saveOrFail();
 
                 $newSale->items->push($newSaleItem);
+            } else {
+                $usedInventories   = $this->useInventory($product, $openedBy->branch, $requestedQuantity);
+
+                foreach ($usedInventories as $usedInventory) {
+                    // save sale item
+                    $newSaleItem                      = new SaleItem();
+                    $newSaleItem->sale_id             = $newSale->id;
+                    $newSaleItem->product_id          = $product->id;
+                    $newSaleItem->branch_inventory_id = $usedInventory['branchInventory']->id;
+                    $newSaleItem->quantity            = $usedInventory['availableQuantity'];
+                    $newSaleItem->price               = data_get($item, 'price', $product->price);
+                    $newSaleItem->original_price      = $product->price;
+                    $newSaleItem->discount            = data_get($item, 'discount', 0);
+                    $newSaleItem->subtotal            = $newSaleItem->calculateSubTotal();
+                    $newSaleItem->saveOrFail();
+
+                    $newSale->items->push($newSaleItem);
+                }
             }
 
             // save the total sale

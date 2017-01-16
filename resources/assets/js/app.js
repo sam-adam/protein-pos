@@ -99,10 +99,10 @@ $(function() {
     resizeHandler();
 });
 
+require("./directives/tooltip.js");
+
 Vue.component('SearchProduct', require('./components/SearchProduct.vue'));
 Vue.component('SearchCustomer', require('./components/SearchCustomer.vue'));
-
-require("./directives/tooltip.js");
 
 // const app = new Vue({
 //     el: '#app'

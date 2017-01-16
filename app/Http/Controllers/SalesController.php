@@ -121,6 +121,7 @@ class SalesController extends AuthenticatedController
                 'doPrint'         => true
             ]);
         } catch (\Exception $ex) {
+            var_dump($ex);exit;
             return redirect()->back()->with('flashes.error', $ex->getMessage());
         }
     }

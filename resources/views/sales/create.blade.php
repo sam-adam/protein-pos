@@ -93,7 +93,7 @@
                                                         <td><strong>Available Sets</strong></td>
                                                         <td colspan="3">
                                                             <template v-for="package in productItem.product.inPackages">
-                                                                <button v-on:click="viewPackage(package.id)" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
+                                                                <button v-on:click="viewPackage($event, package.id)" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
                                                                     <i class="fa fa-eye"></i>
                                                                     @{{ package.name }}
                                                                 </button>
@@ -511,26 +511,18 @@
 
                     fn(message);
                 },
-                viewPackage: function (packageId) {
-                    var $this = this,
-                        features = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes',
-                        packageWindow =  window.open("/packages/" + packageId + "?external=1&intent=getPackage", "choose_package_window", features);
+                viewPackage: function ($event, packageId) {
+                    if ($event.x !== 0) {
+                        var $this = this,
+                            features = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes',
+                            packageWindow =  window.open("/packages/" + packageId + "?external=1&intent=getPackage", "choose_package_window", features);
 
-                    packageWindow.addEventListener("package-selected", function (event) {
-                        $this.addPackageToCart(event.detail.package, 1, event.detail.availableQuantity);
-                    });
+                        packageWindow.addEventListener("package-selected", function (event) {
+                            $this.addPackageToCart(event.detail.package, 1, event.detail.availableQuantity);
+                        });
+                    }
                 }
             }
-        });
-
-        $(document).ready(function () {
-            $(window).on("paste", function (e) {
-                if ($(e.target).attr("id") === $queryBox.attr("id")) {
-                    setTimeout(function () {
-                        app.findByBarcode($queryBox.val());
-                    }, 100);
-                }
-            });
         });
     </script>
 @endsection
