@@ -80,6 +80,7 @@ class SalesController extends AuthenticatedController
                 $cashier  = Auth::user();
                 $newSale  = $this->saleService->createWalkInSale($customer, $cashier, [
                     'items'          => $request->get('products'),
+                    'packages'       => $request->get('packages'),
                     'sales_discount' => $request->get('sales_discount'),
                     'remark'         => $request->get('remark'),
                 ]);

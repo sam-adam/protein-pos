@@ -23,6 +23,11 @@ class Sale extends BaseModel
         return $this->hasMany(SaleItem::class);
     }
 
+    public function packages()
+    {
+        return $this->hasMany(SalePackage::class);
+    }
+
     public function payments()
     {
         return $this->hasMany(SalePayment::class);

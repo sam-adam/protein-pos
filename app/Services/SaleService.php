@@ -5,15 +5,16 @@ namespace App\Services;
 use App\Exceptions\InsufficientStockException;
 use App\Models\BranchInventory;
 use App\Models\Customer;
+use App\Models\Package;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\SalePackage;
 use App\Models\SalePayment;
 use App\Models\Setting;
 use App\Models\User;
 use App\Repository\InventoryRepository;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class SaleService
@@ -48,6 +49,7 @@ class SaleService
         $newSale->saveOrFail();
 
         $newSale->items()->initRelation([], 'items');
+        $newSale->items()->initRelation([], 'packages');
 
         foreach (data_get($saleData, 'items', []) as $item) {
             $product           = Product::findOrFail(data_get($item, 'id'));
@@ -100,6 +102,23 @@ class SaleService
             // reorder priority
             $this->inventoryService->reOrderPriority($product, $openedBy->branch);
         }
+
+        foreach (data_get($saleData, 'packages', []) as $requestedPackage) {
+            $package           = Package::findOrFail(data_get($requestedPackage, 'id'));
+            $requestedQuantity = data_get($requestedPackage, 'quantity');
+            $addedQuantity     = 0;
+
+            $newSalePackage                 = new SalePackage();
+            $newSalePackage->package_id     = $package->id;
+            $newSalePackage->quantity       = $requestedQuantity;
+            $newSalePackage->price          = $package->price;
+            $newSalePackage->original_price = $package->price;
+            $newSalePackage->discount       = data_get($requestedPackage, 'discount', 0);
+            $newSalePackage->subtotal       = $newSalePackage->calculateSubTotal();
+            $newSalePackage->saveOrFail();
+        }
+        var_dump(data_get($saleData, 'packages', []));
+        exit;
 
         return $newSale;
     }

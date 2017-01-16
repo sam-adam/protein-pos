@@ -130,6 +130,7 @@
                                                                     </select>
                                                                     <p v-if="!packageItem.package.isCustomizable" class="form-control-static">
                                                                         @{{ packageProduct.product.name }}
+                                                                        <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][product_id]'" v-model="packageProduct.product.id" />
                                                                     </p>
                                                                 </td>
                                                                 <td class="text-center">@{{ packageProduct.quantity }}</td>
