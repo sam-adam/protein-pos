@@ -38,7 +38,7 @@ class SaleService
         $this->pointService     = $pointService;
     }
 
-    public function createWalkInSale(Customer $customer, User $openedBy, array $saleData)
+    public function createSale(Customer $customer, User $openedBy, array $saleData)
     {
         $newSale                    = new Sale();
         $newSale->opened_at         = Carbon::now();
@@ -47,7 +47,7 @@ class SaleService
         $newSale->customer_id       = $customer->id;
         $newSale->customer_discount = $customer->group ? $customer->group->discount : 0;
         $newSale->sales_discount    = data_get($saleData, 'sales_discount', 0);
-        $newSale->is_delivery       = false;
+        $newSale->is_delivery       = data_get($saleData, 'is_delivery', false);
         $newSale->remark            = data_get($saleData, 'remark');
         $newSale->total             = 0;
         $newSale->saveOrFail();

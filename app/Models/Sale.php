@@ -46,6 +46,11 @@ class Sale extends BaseModel
         return $this->closed_at !== null;
     }
 
+    public function isPaid()
+    {
+        return $this->paid_at !== null;
+    }
+
     public function calculateSubTotal()
     {
         $subTotal = 0;

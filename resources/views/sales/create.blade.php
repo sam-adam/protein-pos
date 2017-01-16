@@ -264,43 +264,51 @@
                                         </table>
                                     </td>
                                 </tr>
-                                <tr class="dashed">
-                                    <td colspan="2">
-                                        <h5 class="sales-info">Payment</h5>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-xs-offset-1 col-xs-5">
-                                                <button type="button" class="btn" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
-                                                <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
+                                @if($immediatePayment)
+                                    <tr class="dashed">
+                                        <td colspan="2">
+                                            <h5 class="sales-info">Payment</h5>
+                                            <br/>
+                                            <div class="row">
+                                                <div class="col-xs-offset-1 col-xs-5">
+                                                    <button type="button" class="btn" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
+                                                    <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <input
+                                                            type="number"
+                                                            name="payment_amount"
+                                                            v-model="payment.amount"
+                                                            class="form-control text-right"
+                                                            placeholder="Enter payment amount"
+                                                            min="0"
+                                                            v-show="payment.method === 'cash'"
+                                                            v-bind:required="payment.method === 'cash'"
+                                                    />
+                                                    <input
+                                                            type="text"
+                                                            name="credit_card_number"
+                                                            class="form-control text-right"
+                                                            placeholder="Enter credit card num."
+                                                            v-model="payment.cardNumber"
+                                                            v-show="payment.method === 'credit_card'"
+                                                            v-bind:required="payment.method === 'credit_card'"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div class="col-xs-6">
-                                                <input
-                                                        type="number"
-                                                        name="payment_amount"
-                                                        v-model="payment.amount"
-                                                        class="form-control text-right"
-                                                        placeholder="Enter payment amount"
-                                                        min="0"
-                                                        v-show="payment.method === 'cash'"
-                                                        v-bind:required="payment.method === 'cash'"
-                                                />
-                                                <input
-                                                        type="text"
-                                                        name="credit_card_number"
-                                                        class="form-control text-right"
-                                                        placeholder="Enter credit card num."
-                                                        v-model="payment.cardNumber"
-                                                        v-show="payment.method === 'credit_card'"
-                                                        v-bind:required="payment.method === 'credit_card'"
-                                                />
-                                            </div>
-                                        </div>
-                                        <input type="hidden" name="payment_method" v-model="payment.method"/>
-                                    </td>
-                                </tr>
+                                            <input type="hidden" name="immediate_payment" value="{{ $immediatePayment }}" />
+                                            <input type="hidden" name="payment_method" v-model="payment.method"/>
+                                        </td>
+                                    </tr>
+                                @else
+                                    <input type="hidden" name="immediate_payment" value="{{ $immediatePayment ? 1 : 0 }}" />
+                                    <input type="hidden" name="payment_method" value="cash" />
+                                @endif
                                 <tr>
                                     <td colspan="2">
-                                        <button type="submit" class="btn btn-block btn-primary" v-bind:disabled="!isCompletable">Complete Sale</button>
+                                        <button type="submit" class="btn btn-block btn-primary" v-bind:disabled="!isCompletable">
+                                            {{ $immediatePayment ? 'Complete Sale' : 'Book Delivery' }}
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -373,18 +381,27 @@
                             && this.cart.packages.length === 0
                             && this.cart.persistentItems.length === 0;
                 },
+                isAnyProductSelected: function () {
+                    return (this.cart.products.length + this.cart.packages.length + this.cart.persistentItems.length) > this.cart.persistentItems.length;
+                },
                 isCustomerSelected: function () {
                     return this.customer.hasOwnProperty('id');
                 },
                 isPaymentCompleted: function () {
+                    if ({{ $immediatePayment ? 'false' : 'true' }}) {
+                        return true;
+                    }
+
                     if (this.payment.method === 'cash') {
                         return this.payment.amount >= this.grandTotal;
                     } else if (this.payment.method === 'credit_card') {
                         return this.payment.cardNumber;
                     }
+
+                    return false;
                 },
                 isCompletable: function () {
-                    return this.isCartEmpty === false
+                    return this.isAnyProductSelected
                             && this.isCustomerSelected
                             && this.isPaymentCompleted;
                 },

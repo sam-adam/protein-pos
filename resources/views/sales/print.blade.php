@@ -30,10 +30,14 @@
         <div class="col-xs-12">
             <div class="panel">
                 <div class="panel-body">
-                    <button class="btn btn-primary btn-lg" onclick="window.print()">
+                    <button class="btn btn-primary" onclick="window.print()">
                         <i class="fa fa-print"></i>
                         Print Invoice
                     </button>
+                    <a href="{{ route('sales.create') }}" class="btn btn-default">
+                        <i class="fa fa-plus"></i>
+                        New Sale
+                    </a>
                 </div>
             </div>
         </div>
@@ -52,15 +56,24 @@
                         {{ $sale->customer->address }}<br>
                     </address>
                 </div>
+                @if($sale->is_delivery)
+                    <div class="col-xs-6 text-right">
+                        <address><strong>Delivery</strong></address>
+                    </div>
+                @endif
             </div>
             <div class="row">
                 <div class="col-xs-6">
                     <address>
                         <strong>Payment Method:</strong><br>
-                        @if($payment->payment_method === 'CASH')
-                            Cash
+                        @if($sale->isPaid())
+                            @if($payment->payment_method === 'CASH')
+                                Cash
+                            @else
+                                Credit Card ending **** {{ substr($payment->card_number, -4) }}<br>
+                            @endif
                         @else
-                            Credit Card ending **** {{ substr($payment->card_number, -4) }}<br>
+                            Cash on delivery
                         @endif
                     </address>
                 </div>
@@ -140,24 +153,34 @@
                                         <td class="text-right">{{  number_format($sale->calculateAfterSalesDiscount()) }}</td>
                                     </tr>
                                 @endif
-                                @if($payment->payment_method === 'CREDIT_CARD')
+                                @if($sale->isPaid())
+                                    @if($payment->payment_method === 'CREDIT_CARD')
+                                        <tr>
+                                            <td class="no-line"></td>
+                                            <td class="no-line"></td>
+                                            <td class="no-line"></td>
+                                            <td class="text-right">
+                                                <strong>Credit Card Tax ({{ number_format($payment->card_tax).'%' }})</strong>
+                                            </td>
+                                            <td class="text-right">{{ number_format($payment->calculateTotal()) }}</td>
+                                        </tr>
+                                    @endif
                                     <tr>
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
-                                        <td class="text-right">
-                                            <strong>Credit Card Tax ({{ number_format($payment->card_tax).'%' }})</strong>
-                                        </td>
+                                        <td class="text-right"><strong>Total</strong></td>
                                         <td class="text-right">{{ number_format($payment->calculateTotal()) }}</td>
                                     </tr>
+                                @else
+                                    <tr>
+                                        <td class="no-line"></td>
+                                        <td class="no-line"></td>
+                                        <td class="no-line"></td>
+                                        <td class="text-right"><strong>Total</strong></td>
+                                        <td class="text-right">{{ number_format($sale->calculateTotal()) }}</td>
+                                    </tr>
                                 @endif
-                                <tr>
-                                    <td class="no-line"></td>
-                                    <td class="no-line"></td>
-                                    <td class="no-line"></td>
-                                    <td class="text-right"><strong>Total</strong></td>
-                                    <td class="text-right">{{ number_format($payment->calculateTotal()) }}</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>

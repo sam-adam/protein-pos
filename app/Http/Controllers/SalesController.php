@@ -90,9 +90,10 @@ class SalesController extends AuthenticatedController
         }
 
         return view('sales.create', array_merge([
-            'customerData'    => [],
-            'creditCardTax'   => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
-            'persistentItems' => $persistentItems
+            'customerData'     => [],
+            'creditCardTax'    => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
+            'persistentItems'  => $persistentItems,
+            'immediatePayment' => $request->get('type') !== 'delivery'
         ], $oldData));
     }
 
@@ -102,18 +103,23 @@ class SalesController extends AuthenticatedController
             $sale = DB::transaction(function () use ($request) {
                 $customer = Customer::findOrFail($request->get('customer_id'));
                 $cashier  = Auth::user();
-                $newSale  = $this->saleService->createWalkInSale($customer, $cashier, [
+                $newSale  = $this->saleService->createSale($customer, $cashier, [
                     'items'          => $request->get('products'),
                     'packages'       => $request->get('packages'),
                     'sales_discount' => $request->get('sales_discount'),
                     'remark'         => $request->get('remark'),
+                    'is_delivery'    => !$request->get('immediate_payment')
                 ]);
 
-                return $this->saleService->finishSale($newSale, Auth::user(), [
-                    'method'      => $request->get('payment_method'),
-                    'amount'      => $request->get('payment_amount'),
-                    'card_number' => $request->get('credit_card_number')
-                ]);
+                if ($request->get('immediate_payment')) {
+                    return $this->saleService->finishSale($newSale, Auth::user(), [
+                        'method'      => $request->get('payment_method'),
+                        'amount'      => $request->get('payment_amount'),
+                        'card_number' => $request->get('credit_card_number')
+                    ]);
+                }
+
+                return $newSale;
             });
 
             return redirect(route('sales.print', $sale->id))->with([
@@ -121,7 +127,6 @@ class SalesController extends AuthenticatedController
                 'doPrint'         => true
             ]);
         } catch (\Exception $ex) {
-            var_dump($ex);exit;
             return redirect()->back()->with('flashes.error', $ex->getMessage());
         }
     }
@@ -136,7 +141,7 @@ class SalesController extends AuthenticatedController
 
         return view('sales.print', [
             'sale'    => $sale,
-            'payment' => $sale->payments->first()
+            'payment' => $sale->isPaid() ? $sale->payments->first() : null
         ]);
     }
 }
