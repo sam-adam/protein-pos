@@ -37,7 +37,7 @@
                             <i class="fa fa-check"></i>
                             Finished
                         </span>
-                    @elseif($sale->is_delivery && $sale->isFinished())
+                    @elseif($sale->is_delivery && !$sale->isFinished())
                         <span class="label label-danger">
                             <i class="fa fa-exclamation-circle"></i>
                             Delivery Pending
@@ -116,12 +116,28 @@
         </div>
         <div class="col-md-3">
             @if(!$sale->isCancelled())
-                <a href="{{ route('sales.print', $sale->id) }}" class="btn btn-primary btn-lg btn-block">
+                <a href="{{ route('sales.print', $sale->id) }}" class="btn btn-primary btn-lg btn-block" style="margin-bottom: 10px;">
                     <i class="fa fa-print fa-fw"></i>
                     Print
                 </a>
             @endif
-            <a href="{{ Session::get('last_sale_page') ?: route('sales.index') }}" class="btn btn-default btn-lg btn-block">
+            @if($sale->is_delivery && !$sale->isFinished())
+                <form method="post" action="{{ route('sales.complete', $sale->id) }}" onsubmit="return confirm('Completing delivery! Are you sure?');" style="margin-bottom: 10px;">
+                    {{ csrf_field() }}
+                    <button type="submit" class="btn btn-success btn-lg btn-block">
+                        <i class="fa fa-check"></i>
+                        Complete
+                    </button>
+                </form>
+                <form method="post" action="{{ route('sales.cancel', $sale->id) }}" onsubmit="return confirm('Cancelling delivery! Are you sure?');" style="margin-bottom: 10px;">
+                    {{ csrf_field() }}
+                    <button type="submit" class="btn btn-danger btn-lg btn-block">
+                        <i class="fa fa-trash"></i>
+                        Cancel
+                    </button>
+                </form>
+            @endif
+            <a href="{{ Session::get('last_sale_page') ?: route('sales.index') }}" class="btn btn-default btn-lg btn-block" style="margin-bottom: 10px;">
                 <i class="fa fa-arrow-left fa-fw"></i>
                 Back
             </a>

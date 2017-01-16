@@ -29,7 +29,7 @@
                     <div class="col-xs-12">
                         <div class="name">
                             {{ customer.name }}
-                            <span class="label label-success" v-show="customer.group">
+                            <span class="label label-success" v-if="customer.group">
                                 <i class="fa fa-star"></i>
                                 {{ customer.group.label }}
                             </span>
