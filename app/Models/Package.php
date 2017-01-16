@@ -20,21 +20,23 @@ class Package extends BaseModel
 
     public function canBeSold($stocks)
     {
-        $emptyProducts = [];
+        $insufficientStockProducts = [];
 
         foreach ($this->items as $packageItem) {
-            if (data_get($stocks, $packageItem->product_id, 0) === 0) {
-                $emptyProducts[$packageItem->product_id] = $packageItem->product;
+            if (data_get($stocks, $packageItem->product_id, 0) < $packageItem->quantity) {
+                $insufficientStockProducts[$packageItem->product_id] = $packageItem;
             }
         }
 
-        if (count($emptyProducts) > 0 && $this->is_customizable) {
+        if (count($insufficientStockProducts) > 0 && $this->is_customizable) {
             $hasVariants = [];
 
-            foreach ($emptyProducts as $productId => $product) {
+            foreach ($insufficientStockProducts as $productId => $packageItem) {
+                $product = $packageItem->product;
+
                 if ($product->variantGroup && $product->variantGroup->products) {
                     foreach ($product->variantGroup->products as $variant) {
-                        if (data_get($stocks, $variant->id, 0) > 0) {
+                        if (data_get($stocks, $variant->id, 0) >= $packageItem->quantity) {
                             $hasVariants[$productId] = $variant;
                         }
                     }
@@ -42,13 +44,13 @@ class Package extends BaseModel
             }
 
             foreach ($hasVariants as $productId => $variant) {
-                if (isset($emptyProducts[$productId])) {
-                    unset($emptyProducts[$productId]);
+                if (isset($insufficientStockProducts[$productId])) {
+                    unset($insufficientStockProducts[$productId]);
                 }
             }
         }
 
-        return count($emptyProducts) === 0;
+        return count($insufficientStockProducts) === 0;
     }
 
     public function getActualPrice()

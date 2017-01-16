@@ -37,6 +37,8 @@ class StoreSale extends FormRequest
             'products.*.id'       => 'bail|required|exists:products,id',
             'products.*.quantity' => 'bail|required|numeric|min:1|stock_is_sufficient',
             'products.*.discount' => 'bail|required|numeric|min:0|max:100',
+            'packages.*.id'       => 'bail|required|exists:packages,id',
+            'packages.*.discount' => 'bail|required|numeric|min:0|max:100',
             'customer_id'         => 'bail|required|exists:customers,id',
             'sales_discount'      => 'bail|required|numeric|min:0|max:100'
         ];

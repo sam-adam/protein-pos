@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\DataObjects\Collection;
 use App\DataObjects\CollectionDataObject;
 use App\DataObjects\Decorators\Product\BulkContainerDecorator;
 use App\DataObjects\Decorators\Product\PackageDecorator;
 use App\DataObjects\Decorators\Product\StockDecorator;
-use App\DataObjects\ProductWithStock;
 use App\Http\Requests\MoveInventoryToOtherBranch;
 use App\Http\Requests\RemoveInventory;
 use App\Http\Requests\StoreProduct;
@@ -232,7 +230,7 @@ class ProductsController extends AuthenticatedController
             ->join('inventory_movement_items', 'inventory_movements.id', '=', 'inventory_movement_items.inventory_movement_id')
             ->where('inventory_movement_items.product_id', '=', $productId)
             ->groupBy('inventory_movements.id')
-            ->orderBy('inventory_movements.movement_effective_at', 'desc')
+            ->orderBy('inventory_movements.created_at', 'desc')
             ->get();
         $removals    = InventoryRemoval::with('branchInventory.branch')
             ->select('inventory_removals.*')
@@ -255,7 +253,7 @@ class ProductsController extends AuthenticatedController
                 'quantity'   => $movement->items->filter(function (InventoryMovementItem $movementItem) use ($productId) {
                     return $movementItem->product_id == $productId;
                 })->sum('quantity'),
-                'date'       => $movement->movement_effective_at,
+                'date'       => $movement->created_at,
                 'dateString' => $movement->movement_effective_at->toDayDateTimeString(),
                 'actor'      => $movement->creator->name,
                 'remark'     => $movement->remark
