@@ -13,6 +13,7 @@ class Setting extends BaseModel
 {
     const KEY_CREDIT_CARD_TAX      = 'credit_card_tax';
     const KEY_SALES_POINT_BASELINE = 'sales_point_baseline';
+    const KEY_DELIVERY_PRODUCT_ID  = 'delivery_product_id';
 
     protected $fillable = ['key'];
 

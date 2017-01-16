@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\Customer as CustomerDataObjects;
-use App\DataObjects\ProductWithStock;
+use App\DataObjects\Product;
 use App\Http\Requests\StoreSale;
 use App\Models\Customer;
 use App\Models\Sale;
@@ -36,7 +36,12 @@ class SalesController extends AuthenticatedController
         $this->inventoryRepo = $inventoryRepo;
     }
 
-    public function index(Request $request, $salesId = null)
+    public function index()
+    {
+        return view('sales.index', ['sales' => Sale::paginate()]);
+    }
+
+    public function create(Request $request, $salesId = null)
     {
         $oldData = [];
         $sales   = Sale::find($salesId);
@@ -56,7 +61,7 @@ class SalesController extends AuthenticatedController
             ];
 
             foreach ($sales->items as $item) {
-                $oldData['cartData'][] = new ProductWithStock(
+                $oldData['cartData'][] = new Product(
                     $item->product,
                     $this->inventoryRepo->populateProductStock(
                         new Collection([$item->product]),
@@ -68,7 +73,10 @@ class SalesController extends AuthenticatedController
 
         return view('sales.create', array_merge([
             'customerData'  => [],
-            'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0)
+            'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
+            'persistItem'   => [
+
+            ]
         ], $oldData));
     }
 

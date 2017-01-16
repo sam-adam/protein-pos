@@ -9,6 +9,9 @@ namespace App\Models;
  */
 class Sale extends BaseModel
 {
+    protected $casts = [
+        'is_delivery' => 'boolean'
+    ];
     protected $dates = [
         'opened_at', 'closed_at', 'cancelled_at', 'paid_at'
     ];
@@ -31,6 +34,11 @@ class Sale extends BaseModel
     public function payments()
     {
         return $this->hasMany(SalePayment::class);
+    }
+
+    public function getType()
+    {
+        return $this->is_delivery ? 'Delivery' : 'Walk In';
     }
 
     public function isFinished()

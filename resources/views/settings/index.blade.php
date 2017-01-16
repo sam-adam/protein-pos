@@ -22,10 +22,24 @@
                             </div>
                         </div>
                         <div class="form-group {{ $errors->has('sales_point_baseline') ? 'has-error' : '' }}">
-                            <label class="control-label col-sm-3" for="sales-point-baselin">Sales Point Earning Baseline</label>
+                            <label class="control-label col-sm-3" for="sales-point-baseline">Sales Point Earning Baseline</label>
                             <div class="col-sm-1">
                                 <input type="text" class="form-control" name="sales_point_baseline" value="{{ old('sales_point_baseline') ?: $salesPointBaseline }}" placeholder="How much a customer need to purchase for a point" />
                                 @foreach($errors->get('sales_point_baseline') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="form-group {{ $errors->has('delivery_product_id') ? 'has-error' : '' }}">
+                            <label class="control-label col-sm-3" for="Delivery Product Id">Delivery Service</label>
+                            <div class="col-sm-3">
+                                <select name="delivery_product_id" class="form-control">
+                                    <option value>Select Product</option>
+                                    @foreach($serviceProducts as $serviceProduct)
+                                        <option value="{{ $serviceProduct->id }}" @if((old('delivery_product_id') ?: $deliveryProductId) == $serviceProduct->id) selected @endif>{{ $serviceProduct->name }}</option>
+                                    @endforeach
+                                </select>
+                                @foreach($errors->get('delivery_product_id') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
                             </div>

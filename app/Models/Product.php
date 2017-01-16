@@ -63,6 +63,11 @@ class Product extends BaseModel
         return $this->hasMany(Product::class, 'product_item_id', 'id');
     }
 
+    public function scopeService(Builder $query)
+    {
+        return $query->where('is_service', '=', true);
+    }
+
     public function scopeNonContainer(Builder $query)
     {
         return $query->whereNull('product_item_id');
