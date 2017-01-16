@@ -18,6 +18,39 @@ class Package extends BaseModel
         return $this->hasMany(PackageProduct::class);
     }
 
+    public function canBeSold($stocks)
+    {
+        $emptyProducts = [];
+
+        foreach ($this->items as $packageItem) {
+            if (data_get($stocks, $packageItem->product_id, 0) === 0) {
+                $emptyProducts[$packageItem->product_id] = $packageItem->product;
+            }
+        }
+
+        if (count($emptyProducts) > 0 && $this->is_customizable) {
+            $hasVariants = [];
+
+            foreach ($emptyProducts as $productId => $product) {
+                if ($product->variantGroup && $product->variantGroup->products) {
+                    foreach ($product->variantGroup->products as $variant) {
+                        if (data_get($stocks, $variant->id, 0) > 0) {
+                            $hasVariants[$productId] = $variant;
+                        }
+                    }
+                }
+            }
+
+            foreach ($hasVariants as $productId => $variant) {
+                if (isset($emptyProducts[$productId])) {
+                    unset($emptyProducts[$productId]);
+                }
+            }
+        }
+
+        return count($emptyProducts) === 0;
+    }
+
     public function getActualPrice()
     {
         $actualPrice = 0;

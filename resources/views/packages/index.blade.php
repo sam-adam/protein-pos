@@ -56,6 +56,10 @@
                                             <i class="fa fa-pencil"></i>
                                             Edit
                                         </a>
+                                        <a href="{{ route('packages.show', $package->id) }}" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-eye"></i>
+                                            View
+                                        </a>
                                         <form method="post" action="{{ route('packages.destroy', $package->id) }}" style="display: inline;" onsubmit="return confirm('Deleting package! Are you sure?');">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}

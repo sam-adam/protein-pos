@@ -6,6 +6,12 @@
 
 @section('content')
     @parent
+    @if(!$package->canBeSold($stocks) && $intent === 'getPackage')
+        <div class="hidden-print alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            Not enough stock
+        </div>
+    @endif
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -99,7 +105,7 @@
                         @if($intent === 'getPackage')
                             <div class="form-group">
                                 <div class="col-sm-offset-2 col-sm-7">
-                                    <button href="{{ route('packages.edit', $package->id) }}" class="btn btn-success btn-block" onclick="choosePackage()">
+                                    <button href="{{ route('packages.edit', $package->id) }}" class="btn btn-success btn-block" @if($package->canBeSold($stocks)) onclick="choosePackage()" @endif @if(!$package->canBeSold($stocks)) disabled="" @endif>
                                         <i class="fa fa-fw fa-cart-plus"></i>
                                         Add to cart
                                     </button>

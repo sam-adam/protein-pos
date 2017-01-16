@@ -116,6 +116,7 @@
                                                                 <span class="label label-success" v-show="packageItem.package.isCustomizable">Customizable</span>
                                                             </th>
                                                             <th class="text-center">Quantity</th>
+                                                            <th class="text-center">Stock</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -132,6 +133,7 @@
                                                                     </p>
                                                                 </td>
                                                                 <td class="text-center">@{{ packageProduct.quantity }}</td>
+                                                                <td class="text-center">@{{ packageProduct.product.stock }}</td>
                                                             </tr>
                                                         </template>
                                                     </tbody>
