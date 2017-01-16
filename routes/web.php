@@ -34,6 +34,7 @@ Route::post('/shifts/{shift}/out', 'ShiftsController@clockOut')->name('shifts.ou
 Route::resource('/shifts', 'ShiftsController');
 Route::get('/sales/{sales}/print', 'SalesController@viewPrint')->name('sales.print');
 Route::post('/sales/{sales}/complete', 'SalesController@complete')->name('sales.complete');
+Route::post('/sales/{sales}/cancel', 'SalesController@cancel')->name('sales.cancel');
 Route::resource('/sales', 'SalesController');
 Route::get('/settings', 'SettingsController@index')->name('settings.index');
 Route::post('/settings', 'SettingsController@update')->name('settings.update');

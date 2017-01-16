@@ -26,11 +26,18 @@
                                         <td>{{ $incompleteDelivery->opened_at->toDayDateTimeString() }}</td>
                                         <td>{{ $incompleteDelivery->customer->name }}</td>
                                         <td>
-                                            <form method="post" action="{{ route('sales.complete', $incompleteDelivery->id) }}">
+                                            <form style="display: inline-block;" method="post" action="{{ route('sales.complete', $incompleteDelivery->id) }}" onsubmit="return confirm('Completing delivery! Are you sure?');">
                                                 {{ csrf_field() }}
                                                 <button type="submit" class="btn btn-success btn-xs">
                                                     <i class="fa fa-check"></i>
-                                                    Completed
+                                                    Complete
+                                                </button>
+                                            </form>
+                                            <form style="display: inline-block;" method="post" action="{{ route('sales.cancel', $incompleteDelivery->id) }}" onsubmit="return confirm('Cancelling delivery! Are you sure?');">
+                                                {{ csrf_field() }}
+                                                <button type="submit" class="btn btn-danger btn-xs">
+                                                    <i class="fa fa-trash"></i>
+                                                    Cancel
                                                 </button>
                                             </form>
                                         </td>

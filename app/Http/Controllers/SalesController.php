@@ -131,7 +131,7 @@ class SalesController extends AuthenticatedController
         }
     }
 
-    public function complete(Request $request, $saleId)
+    public function complete($saleId)
     {
         $sale = Sale::find($saleId);
 
@@ -155,6 +155,29 @@ class SalesController extends AuthenticatedController
         });
 
         return redirect()->back()->with('flashes.success', 'Sale completed');
+    }
+
+    public function cancel($saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        if ($sale->isPaid()) {
+            return redirect()->back()->with('flashes.danger', 'Sale already paid');
+        }
+
+        if ($sale->isCancelled()) {
+            return redirect()->back()->with('flashes.danger', 'Sale already cancelled');
+        }
+
+        DB::transaction(function () use ($sale) {
+            return $this->saleService->cancelSale($sale, Auth::user());
+        });
+
+        return redirect()->back()->with('flashes.success', 'Sale cancelled');
     }
 
     public function viewPrint($aleId)

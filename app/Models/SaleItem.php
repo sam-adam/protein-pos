@@ -25,7 +25,7 @@ class SaleItem extends Model
 
     public function branchInventory()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(BranchInventory::class);
     }
 
     public function calculateSubTotal()

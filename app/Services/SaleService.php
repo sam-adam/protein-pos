@@ -38,6 +38,15 @@ class SaleService
         $this->pointService     = $pointService;
     }
 
+    /**
+     * Create a new sale
+     *
+     * @param Customer $customer
+     * @param User     $openedBy
+     * @param array    $saleData
+     *
+     * @return \App\Models\Sale
+     */
     public function createSale(Customer $customer, User $openedBy, array $saleData)
     {
         $newSale                    = new Sale();
@@ -60,19 +69,19 @@ class SaleService
             $requestedQuantity = data_get($item, 'quantity');
 
             if ($product->is_service) {
-                $newSaleItem                      = new SaleItem();
-                $newSaleItem->sale_id             = $newSale->id;
-                $newSaleItem->product_id          = $product->id;
-                $newSaleItem->quantity            = $requestedQuantity;
-                $newSaleItem->price               = data_get($item, 'price', $product->price);
-                $newSaleItem->original_price      = $product->price;
-                $newSaleItem->discount            = data_get($item, 'discount', 0);
-                $newSaleItem->subtotal            = $newSaleItem->calculateSubTotal();
+                $newSaleItem                 = new SaleItem();
+                $newSaleItem->sale_id        = $newSale->id;
+                $newSaleItem->product_id     = $product->id;
+                $newSaleItem->quantity       = $requestedQuantity;
+                $newSaleItem->price          = data_get($item, 'price', $product->price);
+                $newSaleItem->original_price = $product->price;
+                $newSaleItem->discount       = data_get($item, 'discount', 0);
+                $newSaleItem->subtotal       = $newSaleItem->calculateSubTotal();
                 $newSaleItem->saveOrFail();
 
                 $newSale->items->push($newSaleItem);
             } else {
-                $usedInventories   = $this->useInventory($product, $openedBy->branch, $requestedQuantity);
+                $usedInventories = $this->useInventory($product, $openedBy->branch, $requestedQuantity);
 
                 foreach ($usedInventories as $usedInventory) {
                     // save sale item
@@ -152,6 +161,9 @@ class SaleService
 
                     $newSalePackage->items->push($newSalePackageItem);
                 }
+
+                // reorder priority
+                $this->inventoryService->reOrderPriority($selectedProduct, $openedBy->branch);
             }
 
             $newSale->packages->push($newSalePackage);
@@ -207,6 +219,15 @@ class SaleService
         return $usedInventories;
     }
 
+    /**
+     * Mark the payment of a sale
+     *
+     * @param Sale  $sale
+     * @param User  $closedBy
+     * @param array $paymentData
+     *
+     * @return \App\Models\Sale
+     */
     public function finishSale(Sale $sale, User $closedBy, array $paymentData)
     {
         if ($sale->isFinished()) {
@@ -260,6 +281,49 @@ class SaleService
 
         $sale->customer->points += $earnedPoints;
         $sale->customer->saveOrFail();
+
+        return $sale;
+    }
+
+    /**
+     * Cancel a pending sale
+     *
+     * @param Sale $sale
+     * @param User $cancelledBy
+     *
+     * @return Sale
+     */
+    public function cancelSale(Sale $sale, User $cancelledBy)
+    {
+        if ($sale->isCancelled()) {
+            return $sale;
+        }
+
+        foreach ($sale->items as $saleItem) {
+            if (!$saleItem->product->is_service) {
+                $branchInventory = BranchInventory::findOrFail($saleItem->branch_inventory_id);
+                $branchInventory->quantity += $saleItem->quantity;
+                $branchInventory->saveOrFail();
+
+                $this->inventoryService->reOrderPriority($saleItem->product, $sale->creator->branch);
+            }
+        }
+
+        foreach ($sale->packages as $salePackage) {
+            foreach ($salePackage->items as $packageItem) {
+                $branchInventory = BranchInventory::findOrFail($packageItem->branch_inventory_id);
+                $branchInventory->quantity += $packageItem->quantity;
+                $branchInventory->saveOrFail();
+
+                $this->inventoryService->reOrderPriority($packageItem->product, $sale->creator->branch);
+            }
+        }
+
+        $sale->cancelled_at      = Carbon::now();
+        $sale->cancelled_by      = $cancelledBy->id;
+        $sale->closed_at         = Carbon::now();
+        $sale->closed_by_user_id = $cancelledBy->id;
+        $sale->saveOrFail();
 
         return $sale;
     }
