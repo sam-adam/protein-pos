@@ -42,8 +42,14 @@ class Sale extends BaseModel
     {
         $subTotal = 0;
 
+        /** @var SaleItem $item */
         foreach ($this->items as $item) {
             $subTotal += $item->calculateSubTotal();
+        }
+
+        /** @var SalePackage $package */
+        foreach ($this->packages as $package) {
+            $subTotal += $package->calculateSubTotal();
         }
 
         return $subTotal;

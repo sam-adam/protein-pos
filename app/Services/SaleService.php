@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\InsufficientStockException;
+use App\Models\Branch;
 use App\Models\BranchInventory;
 use App\Models\Customer;
 use App\Models\Package;
@@ -10,11 +11,14 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SalePackage;
+use App\Models\SalePackageItem;
 use App\Models\SalePayment;
 use App\Models\Setting;
 use App\Models\User;
 use App\Repository\InventoryRepository;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Collection;
 
 /**
  * Class SaleService
@@ -51,39 +55,18 @@ class SaleService
         $newSale->items()->initRelation([], 'items');
         $newSale->items()->initRelation([], 'packages');
 
-        foreach (data_get($saleData, 'items', []) as $item) {
+        foreach (data_get($saleData, 'items', []) ?: [] as $item) {
             $product           = Product::findOrFail(data_get($item, 'id'));
             $requestedQuantity = data_get($item, 'quantity');
-            $addedQuantity     = 0;
+            $usedInventories   = $this->useInventory($product, $openedBy->branch, $requestedQuantity);
 
-            if (!$this->inventoryRepo->checkIfStockSufficient($product, $requestedQuantity)) {
-                throw new InsufficientStockException($product, $requestedQuantity);
-            }
-
-            while ($addedQuantity < $requestedQuantity) {
-                $stillRequiredQuantity = $requestedQuantity - $addedQuantity;
-                $branchInventory       = BranchInventory::notEmpty()
-                    ->inBranch($openedBy->branch)
-                    ->product($product)
-                    ->orderBy('priority', 'asc')
-                    ->first();
-
-                if (!$branchInventory) {
-                    throw new InsufficientStockException($product, $requestedQuantity);
-                }
-
-                $availableQuantity = min($stillRequiredQuantity, $branchInventory->stock);
-
-                // adjust stock
-                $branchInventory->stock -= $availableQuantity;
-                $branchInventory->saveOrFail();
-
+            foreach ($usedInventories as $usedInventory) {
                 // save sale item
                 $newSaleItem                      = new SaleItem();
                 $newSaleItem->sale_id             = $newSale->id;
                 $newSaleItem->product_id          = $product->id;
-                $newSaleItem->branch_inventory_id = $branchInventory->id;
-                $newSaleItem->quantity            = $availableQuantity;
+                $newSaleItem->branch_inventory_id = $usedInventory['branchInventory']->id;
+                $newSaleItem->quantity            = $usedInventory['availableQuantity'];
                 $newSaleItem->price               = data_get($item, 'price', $product->price);
                 $newSaleItem->original_price      = $product->price;
                 $newSaleItem->discount            = data_get($item, 'discount', 0);
@@ -91,8 +74,6 @@ class SaleService
                 $newSaleItem->saveOrFail();
 
                 $newSale->items->push($newSaleItem);
-
-                $addedQuantity += $availableQuantity;
             }
 
             // save the total sale
@@ -103,12 +84,13 @@ class SaleService
             $this->inventoryService->reOrderPriority($product, $openedBy->branch);
         }
 
-        foreach (data_get($saleData, 'packages', []) as $requestedPackage) {
+        foreach (data_get($saleData, 'packages', []) ?: [] as $requestedPackage) {
             $package           = Package::findOrFail(data_get($requestedPackage, 'id'));
             $requestedQuantity = data_get($requestedPackage, 'quantity');
-            $addedQuantity     = 0;
 
+            // create new sale package
             $newSalePackage                 = new SalePackage();
+            $newSalePackage->sale_id        = $newSale->id;
             $newSalePackage->package_id     = $package->id;
             $newSalePackage->quantity       = $requestedQuantity;
             $newSalePackage->price          = $package->price;
@@ -116,11 +98,98 @@ class SaleService
             $newSalePackage->discount       = data_get($requestedPackage, 'discount', 0);
             $newSalePackage->subtotal       = $newSalePackage->calculateSubTotal();
             $newSalePackage->saveOrFail();
+
+            $newSalePackage->items()->initRelation([], 'items');
+
+            foreach ($package->items as $packageItem) {
+                $selectedProduct = null;
+
+                // find the selected product or variant
+                foreach (data_get($requestedPackage, 'products') as $productId) {
+                    if ($selectedProduct === null) {
+                        if ((int) $packageItem->product->id === (int) $productId) {
+                            $selectedProduct = Product::findOrFail($productId);
+                        } elseif ($packageItem->product->variantGroup) {
+                            foreach ($packageItem->product->variantGroup->products as $variant) {
+                                if ((int) $packageItem->product->id === (int) $variant->id) {
+                                    $selectedProduct = $variant;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ($selectedProduct === null) {
+                    throw (new ModelNotFoundException())->setModel(Product::class, $packageItem->product->id);
+                }
+
+                // get the branch inventories
+                $usedInventories = $this->useInventory($selectedProduct, $openedBy->branch, $requestedQuantity);
+
+                foreach ($usedInventories as $usedInventory) {
+                    $newSalePackageItem                      = new SalePackageItem();
+                    $newSalePackageItem->sale_package_id     = $newSalePackage->id;
+                    $newSalePackageItem->product_id          = $selectedProduct->id;
+                    $newSalePackageItem->branch_inventory_id = $usedInventory['branchInventory']->id;
+                    $newSalePackageItem->quantity            = $usedInventory['availableQuantity'];
+                    $newSalePackageItem->original_price      = $selectedProduct->price;
+                    $newSalePackageItem->saveOrFail();
+
+                    $newSalePackageItem->items->push($newSalePackageItem);
+                }
+            }
+
+            $newSale->packages->push($newSalePackage);
         }
-        var_dump(data_get($saleData, 'packages', []));
-        exit;
 
         return $newSale;
+    }
+
+    /**
+     * Get branch inventories
+     *
+     * @param Product $product
+     * @param Branch  $inBranch
+     * @param int     $requestedQuantity
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function useInventory(Product $product, Branch $inBranch, $requestedQuantity)
+    {
+        $usedInventories = new Collection();
+        $addedQuantity   = 0;
+
+        if (!$this->inventoryRepo->checkIfStockSufficient($product, $requestedQuantity)) {
+            throw new InsufficientStockException($product, $requestedQuantity);
+        }
+
+        while ($addedQuantity < $requestedQuantity) {
+            $stillRequiredQuantity = $requestedQuantity - $addedQuantity;
+            $branchInventory       = BranchInventory::notEmpty()
+                ->inBranch($inBranch)
+                ->product($product)
+                ->orderBy('priority', 'asc')
+                ->first();
+
+            if (!$branchInventory) {
+                throw new InsufficientStockException($product, $requestedQuantity);
+            }
+
+            $availableQuantity = min($stillRequiredQuantity, $branchInventory->stock);
+
+            // adjust stock
+            $branchInventory->stock -= $availableQuantity;
+            $branchInventory->saveOrFail();
+
+            $addedQuantity += $availableQuantity;
+
+            $usedInventories->push([
+                'branchInventory'   => $branchInventory,
+                'availableQuantity' => $availableQuantity
+            ]);
+        }
+
+        return $usedInventories;
     }
 
     public function finishSale(Sale $sale, User $closedBy, array $paymentData)

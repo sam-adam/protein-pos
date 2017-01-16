@@ -123,14 +123,14 @@
                                                         <template v-for="packageProduct in packageItem.package.items">
                                                             <tr>
                                                                 <td>
-                                                                    <select v-if="packageItem.package.isCustomizable" class="form-control" v-bind:name="'packages[' + packageItem.package.id + '][product_id]'">
+                                                                    <select v-if="packageItem.package.isCustomizable" class="form-control" v-bind:name="'packages[' + packageItem.package.id + '][products][]'">
                                                                         <option v-for="variant in packageProduct.product.allVariants" v-model="variant.id">
                                                                             @{{ variant.name }}
                                                                         </option>
                                                                     </select>
                                                                     <p v-if="!packageItem.package.isCustomizable" class="form-control-static">
                                                                         @{{ packageProduct.product.name }}
-                                                                        <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][product_id]'" v-model="packageProduct.product.id" />
+                                                                        <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][products][]'" v-model="packageProduct.product.id" />
                                                                     </p>
                                                                 </td>
                                                                 <td class="text-center">@{{ packageProduct.quantity }}</td>
