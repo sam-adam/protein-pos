@@ -38,6 +38,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                    <template v-for="(product, index) in cart.persistentItems">
+                                        <tr>
+                                            <td style="vertical-align: middle;" class="text-center"></td>
+                                            <td style="vertical-align: middle;">@{{ product.name }}</td>
+                                            <td style="vertical-align: middle;" class="text-center">@{{ product.price }}</td>
+                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                                <input v-bind:name="'products[' + product.id + '][id]'" type="hidden" v-model="product.id"/>
+                                                <input v-bind:name="'products[' + product.id + '][quantity]'" type="hidden" class="form-control" value="1" />
+                                                <p class="form-control-static">1</p>
+                                            </td>
+                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                                <input v-bind:name="'products[' + product.id + '][discount]'" type="hidden" class="form-control" value="0" />
+                                                <p class="form-control-static">0</p>
+                                            </td>
+                                            <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice({"product": product, "quantity": 1, "discount": 0}) }}</td>
+                                        </tr>
+                                    </template>
                                     <template v-for="(productItem, index) in cart.products">
                                         <tr>
                                             <td style="vertical-align: middle;" class="text-center">
@@ -316,7 +333,8 @@
                 salesDiscount: 0,
                 cart: {
                     products: [],
-                    packages: []
+                    packages: [],
+                    persistentItems: {!! json_encode($persistentItems) !!}
                 },
                 customer: {!! json_encode($customerData) !!},
                 payment: {
@@ -352,7 +370,8 @@
                 },
                 isCartEmpty: function () {
                     return this.cart.products.length === 0
-                            && this.cart.packages.length === 0;
+                            && this.cart.packages.length === 0
+                            && this.cart.persistentItems.length === 0;
                 },
                 isCustomerSelected: function () {
                     return this.customer.hasOwnProperty('id');
@@ -379,6 +398,14 @@
 
                     this.cart.packages.forEach(function (cartItem) {
                         itemsTotal += $this.calculateItemPrice(cartItem);
+                    });
+
+                    this.cart.persistentItems.forEach(function (product) {
+                        itemsTotal += $this.calculateItemPrice({
+                            product: product,
+                            quantity: 1,
+                            discount: 0
+                        });
                     });
 
                     if ($this.isCustomerInGroup) {
@@ -475,6 +502,9 @@
                 },
                 removeProductFromCart: function (index) {
                     this.cart.products.splice(index, 1);
+                },
+                removePackageFromCart: function (index) {
+                    this.cart.packages.splice(index, 1);
                 },
                 notify: function (type, message) {
                     var fn = window.toastr[type];

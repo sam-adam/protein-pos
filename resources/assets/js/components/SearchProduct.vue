@@ -96,14 +96,14 @@
                 this.reset();
             },
             prepareResponseData (response) {
-                return response.products;
+                if (response.method === 'barcode') {
+                    this.onHit(response.products[0]);
+                } else {
+                    return response.products;
+                }
             }
         }
     }
-
-    window.addEventListener("paste", function () {
-
-    }, false);
 </script>
 <style scoped>
     .typeahead {

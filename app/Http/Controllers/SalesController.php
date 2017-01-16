@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\Customer as CustomerDataObjects;
-use App\DataObjects\Product;
+use App\DataObjects\Product as ProductDataObject;
 use App\Http\Requests\StoreSale;
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\Shift;
@@ -43,15 +44,32 @@ class SalesController extends AuthenticatedController
 
     public function create(Request $request, $salesId = null)
     {
-        $oldData = [];
-        $sales   = Sale::find($salesId);
-        $user    = Auth::user();
-        $shift   = Shift::inBranch($user->branch)->open()
+        $oldData         = [];
+        $persistentItems = [];
+        $sales           = Sale::find($salesId);
+        $user            = Auth::user();
+        $shift           = Shift::inBranch($user->branch)->open()
             ->where('opened_by_user_id', $user->id)
             ->first();
 
         if (!$shift) {
             return redirect()->route('shifts.viewIn', ['redirect' => $request->fullUrl()])->with('flashes.error', 'Please clock in before making sales');
+        }
+
+        if ($request->get('type') === 'delivery') {
+            $deliveryProductId = Setting::getValueByKey(Setting::KEY_DELIVERY_PRODUCT_ID);
+
+            if (!$deliveryProductId) {
+                return redirect(route('settings.index'))->with('flashes.danger', 'Please create a delivery service item');
+            }
+
+            $deliveryProduct = Product::find($deliveryProductId);
+
+            if (!$deliveryProduct || !$deliveryProduct->is_service) {
+                return redirect(route('settings.index'))->with('flashes.danger', 'Please create a delivery service item');
+            }
+
+            $persistentItems[] = new ProductDataObject($deliveryProduct);
         }
 
         if ($sales) {
@@ -61,7 +79,7 @@ class SalesController extends AuthenticatedController
             ];
 
             foreach ($sales->items as $item) {
-                $oldData['cartData'][] = new Product(
+                $oldData['cartData'][] = new ProductDataObject(
                     $item->product,
                     $this->inventoryRepo->populateProductStock(
                         new Collection([$item->product]),
@@ -72,11 +90,9 @@ class SalesController extends AuthenticatedController
         }
 
         return view('sales.create', array_merge([
-            'customerData'  => [],
-            'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
-            'persistItem'   => [
-
-            ]
+            'customerData'    => [],
+            'creditCardTax'   => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
+            'persistentItems' => $persistentItems
         ], $oldData));
     }
 

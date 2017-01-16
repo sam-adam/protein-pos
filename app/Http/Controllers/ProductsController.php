@@ -28,6 +28,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -480,14 +481,13 @@ class ProductsController extends AuthenticatedController
 
     public function xhrSearch(Request $request)
     {
-        $products = [];
+        $method   = 'normal';
         $query    = $request->get('query');
         $branch   = Auth::user()->branch;
 
-        if ($request->get('method') === 'barcode') {
-            if ($product = $this->productRepo->findByBarcode($query)) {
-                $products = [$product];
-            }
+        if ($product = $this->productRepo->findByBarcode($query)) {
+            $products = new Collection([$product]);
+            $method   = 'barcode';
         } else {
             $products = $this->productRepo->findByQuery($query);
         }
@@ -506,6 +506,8 @@ class ProductsController extends AuthenticatedController
 
             $collection->add($dataObject);
         }
+
+        $collection->addAttributes('method', $method);
 
         return response()->json($collection);
     }

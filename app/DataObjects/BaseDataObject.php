@@ -14,6 +14,8 @@ abstract class BaseDataObject implements Serializable
 {
     /** @var Decorator[] */
     protected $decorators = [];
+    /** @var array */
+    protected $attributes = [];
 
     /**
      * Add a decorator
@@ -42,7 +44,7 @@ abstract class BaseDataObject implements Serializable
         $serialized = $this->applyDecorators($serialized);
         $serialized = $this->toCamel($serialized);
 
-        return $serialized;
+        return array_merge($serialized, $this->attributes);
     }
 
     /**
@@ -81,5 +83,19 @@ abstract class BaseDataObject implements Serializable
         }
 
         return $camelizedArray;
+    }
+
+    /**
+     * Add an attribute
+     *
+     * @param array $attributes
+     *
+     * @return $this
+     */
+    public function addAttributes($key, $value)
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
     }
 }
