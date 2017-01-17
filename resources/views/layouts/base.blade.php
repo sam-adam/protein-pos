@@ -112,9 +112,10 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url('sales') }}">
+                            <a href="#">
                                 <i class="fa fa-fw fa-shopping-cart"></i>
                                 Sales
+                                <span class="fa arrow"></span>
                             </a>
                             <ul class="nav nav-second-level">
                                 <li>
@@ -139,6 +140,30 @@
                                 <i class="fa fa-fw fa-gear"></i>
                                 Settings
                             </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-fw fa-book"></i>
+                                Reports
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="{{ url('reports/sales') }}">
+                                        Sales
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('reports/stock') }}">
+                                        Stock
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('reports/product') }}">
+                                        Product
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

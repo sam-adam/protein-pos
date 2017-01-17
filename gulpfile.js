@@ -33,11 +33,18 @@ elixir(mix => {
     mix.styles([
         '../../../node_modules/metismenu/dist/metisMenu.min.css',
         '../../../node_modules/toastr/build/toastr.min.css',
+        '../../../node_modules/daterangepicker/daterangepicker-bs3.min.css',
         '../../../public/css/third-party.css',
         '../../../public/css/main.css'
     ], 'public/css/app.css');
 
-    mix.copy(['resources/assets/fonts'], 'public/build/fonts');
+    mix.copy([
+        'resources/assets/fonts'
+    ], 'public/build/fonts');
+
+    mix.copy([
+        'node_modules/bootstrap/fonts',
+    ], 'public/build/fonts/bootstrap');
 
     mix.version([
         'public/css/app.css',

@@ -68,7 +68,7 @@
                     Transactions
                 </div>
                 <div class="panel-body">
-                    @include('sales.table', ['sales' => $sales])
+                    @include('sales.components.table', ['sales' => $sales])
                 </div>
                 <div class="panel-footer text-right">
                     <a href="{{ route('sales.create', ['customer' => $customer->id]) }}" class="btn btn-primary">

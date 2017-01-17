@@ -38,3 +38,6 @@ Route::post('/sales/{sales}/cancel', 'SalesController@cancel')->name('sales.canc
 Route::resource('/sales', 'SalesController');
 Route::get('/settings', 'SettingsController@index')->name('settings.index');
 Route::post('/settings', 'SettingsController@update')->name('settings.update');
+Route::get('/reports/sales', 'ReportsController@sales')->name('reports.sales');
+Route::get('/reports/stock', 'ReportsController@stock')->name('reports.stock');
+Route::get('/reports/product', 'ReportsController@product')->name('reports.product');

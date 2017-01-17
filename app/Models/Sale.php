@@ -63,6 +63,11 @@ class Sale extends BaseModel
         return $query->whereNotNull('paid_at');
     }
 
+    public function scopeFinished(Builder $query)
+    {
+        return $query->whereNotNull('closed_at');
+    }
+
     public function scopeUnPaid(Builder $query)
     {
         return $query->whereNull('paid_at');

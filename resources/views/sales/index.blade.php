@@ -14,7 +14,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        @include('sales.table', ['sales' => $sales])
+                        @include('sales.components.table', ['sales' => $sales])
                     </div>
                     <div class="row">
                         <div class="col-xs-6">
