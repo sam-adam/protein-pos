@@ -161,7 +161,23 @@
                         <tbody>
                             @foreach($sale->packages as $package)
                                 <tr>
-                                    <td></td>
+                                    <td>{{ $package->package->name }}</td>
+                                    <td class="text-right">{{ number_format($package->quantity) }}</td>
+                                    <td class="text-right">{{ number_format($package->discount) }}%</td>
+                                    <td class="text-right">{{ number_format($package->price) }}</td>
+                                    <td class="text-right">{{ number_format($package->calculateSubtotal()) }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <table class="table table-condensed">
+                                            @foreach($package->items as $packageItem)
+                                                <tr>
+                                                    <td>{{ $packageItem->product->name }}</td>
+                                                    <td>{{ $packageItem->quantity }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </table>
+                                    </td>
                                 </tr>
                             @endforeach
                             @foreach($sale->items as $item)

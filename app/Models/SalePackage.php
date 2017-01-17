@@ -25,7 +25,7 @@ class SalePackage extends Model
 
     public function items()
     {
-        return $this->hasMany(SalePackageItem::class);
+        return $this->hasMany(SalePackageItem::class, 'sale_package_id');
     }
 
     public function calculateSubTotal()

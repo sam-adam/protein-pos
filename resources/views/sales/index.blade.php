@@ -34,7 +34,11 @@
                                     <td>{{ $sale->getType() }}</td>
                                     <td>{{ $sale->remark }}</td>
                                     <td>
-                                        <a href="{{ route('sales.print', $sale->id) }}" class="btn btn-primary">
+                                        <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-search-plus"></i>
+                                            View
+                                        </a>
+                                        <a href="{{ route('sales.print', $sale->id) }}" class="btn btn-default btn-sm">
                                             <i class="fa fa-print"></i>
                                             Print
                                         </a>
