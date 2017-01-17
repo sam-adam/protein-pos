@@ -8,7 +8,7 @@
     @parent
     <form>
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <select name="branch" class="form-control">
                     <option value>Select Branch</option>
                     @foreach($branches as $branch)
@@ -26,6 +26,13 @@
                     <input name="to" value="{{ $to->timestamp }}" type="hidden" />
                 </div>
             </div>
+            <div class="col-sm-2">
+                <select name="type" class="form-control">
+                    <option value>All Type</option>
+                    <option value="walkin" @if($type === 'walkin') selected @endif>Walk In</option>
+                    <option value="delivery" @if($type === 'delivery') selected @endif>Delivery</option>
+                </select>
+            </div>
             <div class="col-sm-3">
                 <label class="radio-inline">
                     <input type="radio" name="mode" value="daily" @if($mode == 'daily') checked @endif> Daily
@@ -37,7 +44,7 @@
                     <input type="radio" name="mode" value="monthly" @if($mode == 'monthly') checked @endif> Monthly
                 </label>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 <button type="submit" class="btn btn-block btn-primary">Submit</button>
             </div>
         </div>
