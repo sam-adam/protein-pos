@@ -87,7 +87,7 @@
     </div>
     <div class="modal fade" id="clock-out-modal" tabindex="-1" role="dialog" aria-labelledby="clock-out-modal-label">
         <div class="modal-dialog" role="document">
-            <form method="post" action="{{ route('shifts.out', $shift->id) }}" class="form-horizontal">
+            <form method="post" class="form-horizontal">
                 {{ csrf_field() }}
                 <div class="modal-content">
                     <div class="modal-header">
