@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\DataObjects\Collection;
 use App\DataObjects\CollectionDataObject;
-use App\DataObjects\Customer as CustomerDataObjects;
 use App\Http\Requests\StoreCustomer;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
+use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -112,7 +111,10 @@ class CustomersController extends AuthenticatedController
         }
 
         return view('customers.show', [
-            'customer' => $customer
+            'customer' => $customer,
+            'sales'    => Sale::where('customer_id', '=', $customer->id)
+                ->orderBy('opened_at', 'desc')
+                ->get()
         ]);
     }
 

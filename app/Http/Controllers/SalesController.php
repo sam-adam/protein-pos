@@ -44,7 +44,7 @@ class SalesController extends AuthenticatedController
 
     public function create(Request $request, $salesId = null)
     {
-        $oldData         = [];
+        $existingData    = [];
         $persistentItems = [];
         $sales           = Sale::find($salesId);
         $user            = Auth::user();
@@ -73,13 +73,13 @@ class SalesController extends AuthenticatedController
         }
 
         if ($sales) {
-            $oldData = [
-                'customerData' => data_get((new CustomerDataObjects($sales->customer))->toArray(), 'customer'),
+            $existingData = [
+                'customerData' => (new CustomerDataObjects($sales->customer))->toArray(),
                 'cartData'     => []
             ];
 
             foreach ($sales->items as $item) {
-                $oldData['cartData'][] = new ProductDataObject(
+                $existingData['cartData'][] = new ProductDataObject(
                     $item->product,
                     $this->inventoryRepo->populateProductStock(
                         new Collection([$item->product]),
@@ -87,6 +87,8 @@ class SalesController extends AuthenticatedController
                     )
                 );
             }
+        } elseif($customer = Customer::find($request->get('customer'))) {
+            $existingData['customerData'] = (new CustomerDataObjects($customer))->toArray();
         }
 
         return view('sales.create', array_merge([
@@ -94,7 +96,7 @@ class SalesController extends AuthenticatedController
             'creditCardTax'    => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
             'persistentItems'  => $persistentItems,
             'immediatePayment' => $request->get('type') !== 'delivery'
-        ], $oldData));
+        ], $existingData));
     }
 
     public function store(StoreSale $request)
