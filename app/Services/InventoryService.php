@@ -35,4 +35,17 @@ class InventoryService
             $currentPriority++;
         }
     }
+
+    /**
+     * Adjust a container stock based on quantity
+     *
+     * @param BranchInventory $branchInventory
+     */
+    public function adjustContainerStock(BranchInventory $branchInventory)
+    {
+        if ($container = $branchInventory->container) {
+            $container->stock = round(floor($branchInventory->stock / $container->content_quantity));
+            $container->saveOrFail();
+        }
+    }
 }

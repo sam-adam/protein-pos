@@ -167,22 +167,23 @@ class MovementService
             if ($product->isBulkContainer()) {
                 $productItem = Product::findOrFail($product->product_item_id);
 
-                $newInventory                       = new Inventory();
-                $newInventory->product_id           = $productItem->id;
-                $newInventory->priority             = $this->getNewInventoryPriority($productItem);
-                $newInventory->cost                 = $movementItem->cost / $product->product_item_quantity;
-                $newInventory->expired_at           = $movementItem->expired_at;
-                $newInventory->expiry_reminder_date = $movementItem->expiry_reminder_date;
-                $newInventory->initial_movement_id  = $movement->id;
-                $newInventory->saveOrFail();
+                $newInventoryItem                       = new Inventory();
+                $newInventoryItem->product_id           = $productItem->id;
+                $newInventoryItem->priority             = $this->getNewInventoryPriority($productItem);
+                $newInventoryItem->cost                 = $movementItem->cost / $product->product_item_quantity;
+                $newInventoryItem->expired_at           = $movementItem->expired_at;
+                $newInventoryItem->expiry_reminder_date = $movementItem->expiry_reminder_date;
+                $newInventoryItem->initial_movement_id  = $movement->id;
+                $newInventoryItem->saveOrFail();
 
-                $newBranchInventory                   = new BranchInventory();
-                $newBranchInventory->branch_id        = $movement->to_branch_id;
-                $newBranchInventory->inventory_id     = $newInventory->id;
-                $newBranchInventory->priority         = $this->getNewBranchInventoryPriority($productItem, $movement->to);
-                $newBranchInventory->stock            = $movementItem->quantity * $product->product_item_quantity;
-                $newBranchInventory->content_quantity = 1;
-                $newBranchInventory->saveOrFail();
+                $newBranchInventoryItem                   = new BranchInventory();
+                $newBranchInventoryItem->branch_id        = $movement->to_branch_id;
+                $newBranchInventoryItem->inventory_id     = $newInventoryItem->id;
+                $newBranchInventoryItem->priority         = $this->getNewBranchInventoryPriority($productItem, $movement->to);
+                $newBranchInventoryItem->stock            = $movementItem->quantity * $product->product_item_quantity;
+                $newBranchInventoryItem->container_id     = $newBranchInventory->id;
+                $newBranchInventoryItem->content_quantity = 1;
+                $newBranchInventoryItem->saveOrFail();
             }
         }
     }

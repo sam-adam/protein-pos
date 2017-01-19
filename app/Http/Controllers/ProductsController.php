@@ -23,6 +23,7 @@ use App\Models\ProductVariantGroup;
 use App\Repository\InventoryRepository;
 use App\Repository\PackageRepository;
 use App\Repository\ProductRepository;
+use App\Services\InventoryService;
 use App\Services\MovementService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -42,22 +43,25 @@ use Illuminate\Support\Facades\Session;
 class ProductsController extends AuthenticatedController
 {
     protected $movementService;
+    protected $inventoryService;
     protected $inventoryRepo;
     protected $packageRepo;
     protected $productRepo;
 
     public function __construct(
         MovementService $movementService,
+        InventoryService $inventoryService,
         InventoryRepository $inventoryRepo,
         PackageRepository $packageRepo,
         ProductRepository $productRepo
     ) {
         parent::__construct();
 
-        $this->movementService = $movementService;
-        $this->inventoryRepo   = $inventoryRepo;
-        $this->packageRepo     = $packageRepo;
-        $this->productRepo     = $productRepo;
+        $this->movementService  = $movementService;
+        $this->inventoryService = $inventoryService;
+        $this->inventoryRepo    = $inventoryRepo;
+        $this->packageRepo      = $packageRepo;
+        $this->productRepo      = $productRepo;
     }
 
     public function index(Request $request)
@@ -474,6 +478,10 @@ class ProductsController extends AuthenticatedController
 
             $branchInventory->stock -= $newRemoval->quantity;
             $branchInventory->saveOrFail();
+
+            if ($branchInventory->container) {
+                $this->inventoryService->adjustContainerStock($branchInventory);
+            }
         });
 
         return redirect()->back()->with('flashes.success', 'Inventory removed');
@@ -481,9 +489,9 @@ class ProductsController extends AuthenticatedController
 
     public function xhrSearch(Request $request)
     {
-        $method   = 'normal';
-        $query    = $request->get('query');
-        $branch   = Auth::user()->branch;
+        $method = 'normal';
+        $query  = $request->get('query');
+        $branch = Auth::user()->branch;
 
         if ($product = $this->productRepo->findByBarcode($query)) {
             $products = new Collection([$product]);
@@ -495,8 +503,8 @@ class ProductsController extends AuthenticatedController
         $collection = new CollectionDataObject();
         $collection->setKey('products');
 
-        $stocks     = $this->inventoryRepo->getProductStocks($products, $branch);
-        $packages   = $this->packageRepo->findAvailablePackages($products);
+        $stocks   = $this->inventoryRepo->getProductStocks($products, $branch);
+        $packages = $this->packageRepo->findAvailablePackages($products);
 
         foreach ($products as $product) {
             $dataObject = new \App\DataObjects\Product($product);

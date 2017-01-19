@@ -52,4 +52,9 @@ class BranchInventory extends Model
     {
         return $this->belongsTo(Inventory::class);
     }
+
+    public function container()
+    {
+        return $this->belongsTo(BranchInventory::class, 'container_id');
+    }
 }
