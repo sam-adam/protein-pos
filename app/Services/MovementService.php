@@ -120,7 +120,7 @@ class MovementService
                     ->orderBy('inventories.priority', 'asc')
                     ->orderBy('branch_inventories.priority', 'asc')
                     ->get();
-                $lowerPriorityInBranch    = $sortedSameProductInBranch->filter(function (BranchInventory $branchInventory) use ($incomingGlobalPriority) {
+                $lowerPriorityInBranch     = $sortedSameProductInBranch->filter(function (BranchInventory $branchInventory) use ($incomingGlobalPriority) {
                     return $branchInventory->inventory->priority > $incomingGlobalPriority;
                 });
 
@@ -145,26 +145,61 @@ class MovementService
     {
         /** @var InventoryMovementItem $movementItem */
         foreach ($movement->items as $movementItem) {
-            $generalPriority = Inventory::where('product_id', '=', $movementItem->product_id)->max('priority');
-            $generalPriority = $generalPriority ? $generalPriority + 1 : 1;
-            $branchPriority  = BranchInventory::inBranch($movement->to)->product($movementItem->product)->max('branch_inventories.priority');
-            $branchPriority  = $branchPriority ? $branchPriority + 1 : 1;
+            $product = $movementItem->product;
 
             $newInventory                       = new Inventory();
             $newInventory->product_id           = $movementItem->product_id;
-            $newInventory->priority             = $generalPriority;
+            $newInventory->priority             = $this->getNewInventoryPriority($product);
             $newInventory->cost                 = $movementItem->cost;
             $newInventory->expired_at           = $movementItem->expired_at;
             $newInventory->expiry_reminder_date = $movementItem->expiry_reminder_date;
             $newInventory->initial_movement_id  = $movement->id;
             $newInventory->saveOrFail();
 
-            $newBranchInventory               = new BranchInventory();
-            $newBranchInventory->branch_id    = $movement->to_branch_id;
-            $newBranchInventory->inventory_id = $newInventory->id;
-            $newBranchInventory->priority     = $branchPriority;
-            $newBranchInventory->stock        = $movementItem->quantity;
+            $newBranchInventory                   = new BranchInventory();
+            $newBranchInventory->branch_id        = $movement->to_branch_id;
+            $newBranchInventory->inventory_id     = $newInventory->id;
+            $newBranchInventory->priority         = $this->getNewBranchInventoryPriority($product, $movement->to);
+            $newBranchInventory->stock            = $movementItem->quantity;
+            $newBranchInventory->content_quantity = $product->isBulkContainer() ? $product->product_item_quantity : 1;
             $newBranchInventory->saveOrFail();
+
+            if ($product->isBulkContainer()) {
+                $productItem = Product::findOrFail($product->product_item_id);
+
+                $newInventory                       = new Inventory();
+                $newInventory->product_id           = $productItem->id;
+                $newInventory->priority             = $this->getNewInventoryPriority($productItem);
+                $newInventory->cost                 = $movementItem->cost / $product->product_item_quantity;
+                $newInventory->expired_at           = $movementItem->expired_at;
+                $newInventory->expiry_reminder_date = $movementItem->expiry_reminder_date;
+                $newInventory->initial_movement_id  = $movement->id;
+                $newInventory->saveOrFail();
+
+                $newBranchInventory                   = new BranchInventory();
+                $newBranchInventory->branch_id        = $movement->to_branch_id;
+                $newBranchInventory->inventory_id     = $newInventory->id;
+                $newBranchInventory->priority         = $this->getNewBranchInventoryPriority($productItem, $movement->to);
+                $newBranchInventory->stock            = $movementItem->quantity * $product->product_item_quantity;
+                $newBranchInventory->content_quantity = 1;
+                $newBranchInventory->saveOrFail();
+            }
         }
+    }
+
+    public function getNewInventoryPriority(Product $product)
+    {
+        $priority = Inventory::where('product_id', '=', $product->id)->max('priority');
+        $priority = $priority ? $priority + 1 : 1;
+
+        return $priority;
+    }
+
+    public function getNewBranchInventoryPriority(Product $product, Branch $branch)
+    {
+        $priority = BranchInventory::inBranch($branch)->product($product)->max('branch_inventories.priority');
+        $priority = $priority ? $priority + 1 : 1;
+
+        return $priority;
     }
 }

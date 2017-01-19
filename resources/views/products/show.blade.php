@@ -23,7 +23,7 @@
                         <div class="row">
                             <label for="price" class="col-sm-2 control-label">Price</label>
                             <div class="col-sm-10">
-                                <p class="form-control-static">{{ number_format($product->price) }}</p>
+                                <p class="form-control-static">{{ number_format($product->price, 1) }}</p>
                             </div>
                         </div>
                         <div class="row">
@@ -434,7 +434,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group {{ $errors->has('cost') ? 'has-error' : '' }}">
-                                            <label class="control-label col-sm-4">Cost / Item</label>
+                                            <label class="control-label col-sm-4">Cost / {{ $product->isBulkContainer() ? 'Container' : 'Item' }}</label>
                                             <div class="col-sm-8">
                                                 <input type="text" name="cost" class="form-control" value="{{ old('cost') }}" placeholder="Eg: 10000" required/>
                                                 @foreach($errors->get('cost') as $error)

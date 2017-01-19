@@ -20,7 +20,7 @@
                             <td>{{ number_format($branchItem->priority) }}</td>
                             <td>{{ number_format($inventory->priority) }}</td>
                             <td>{{ number_format($branchItem->stock) }}</td>
-                            <td>{{ number_format($inventory->cost) }}</td>
+                            <td>{{ number_format($inventory->cost, 1) }}</td>
                             <td>{{ $inventory->expired_at->toFormattedDateString() }}</td>
                             <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toFormattedDateString() : '-' }}</td>
                             <td>{{ $inventory->created_at->toDayDateTimeString() }}</td>

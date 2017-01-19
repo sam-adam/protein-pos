@@ -18,12 +18,9 @@ class AlterTableBranchInventoriesAddContainerFields extends Migration
                 ->nullable();
             $table->unsignedInteger('content_quantity')
                 ->default(1);
-            $table->boolean('is_content_still_whole')
-                ->default(true);
 
             $table->index(['container_id']);
             $table->index(['content_quantity']);
-            $table->index(['is_content_still_whole']);
         });
     }
 
@@ -37,7 +34,6 @@ class AlterTableBranchInventoriesAddContainerFields extends Migration
         Schema::table('branch_inventories', function (Blueprint $table) {
             $table->dropColumn('container_id');
             $table->dropColumn('content_quantity');
-            $table->dropColumn('is_content_still_whole');
         });
     }
 }

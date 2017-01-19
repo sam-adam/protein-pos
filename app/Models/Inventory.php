@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Inventory extends BaseModel
 {
+    protected $casts = [
+        'cost' => 'float'
+    ];
     protected $dates = [
         'created_at',
         'updated_at',
