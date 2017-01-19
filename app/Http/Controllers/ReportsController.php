@@ -54,7 +54,28 @@ class ReportsController extends AuthenticatedController
         ]);
     }
 
-    public function stock() { }
+    public function stock(Request $request)
+    {
+        $branch = Branch::find($request->get('branch'));
+        $from   = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
+        $to     = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
+        $mode   = $request->get('mode') ?: 'daily';
+
+        if (!$branch) {
+            $movements = new Collection();
+        } else {
+
+        }
+
+        return view('reports.stock', [
+            'branchId'  => $request->get('branch'),
+            'branches'  => Branch::orderBy('name', 'asc')->get(),
+            'movements' => $movements,
+            'from'      => $from,
+            'to'        => $to,
+            'mode'      => $mode
+        ]);
+    }
 
     public function product() { }
 }
