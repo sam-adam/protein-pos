@@ -39,11 +39,9 @@ class StockDecorator implements Decorator
     /** {@inheritDoc} */
     public function decorate(array $attributes)
     {
-        if (!$this->product->isBulkContainer()) {
-            $attributes['stock'] = $this->stockCallback
-                ? call_user_func($this->stockCallback, $this->product)
-                : $this->stock;
-        }
+        $attributes['stock'] = $this->stockCallback
+            ? call_user_func($this->stockCallback, $this->product)
+            : $this->stock;
 
         return $attributes;
     }

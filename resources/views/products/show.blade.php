@@ -12,6 +12,13 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         General - {{ $product->name }} {{ $product->is_service ? '(Service Item)' : '' }}
+                        @if($product->isBulkContainer())
+                            &nbsp;
+                            <span class="label label-info">
+                                <i class="fa fa-info-circle"></i>
+                                Container
+                            </span>
+                        @endif
                     </div>
                     <div class="panel-body form-horizontal">
                         <div class="row">
@@ -67,6 +74,16 @@
                                     @endif
                                 </div>
                             </div>
+                            @if($product->isBulkContainer())
+                                <div class="row">
+                                    <label for="brand" class="col-sm-2 control-label">Content</label>
+                                    <div class="col-sm-10">
+                                        <p class="form-control-static">
+                                            <a href="{{ route('products.show', $product->item->id) }}" target="_blank">{{ $product->item->name }}</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-5">

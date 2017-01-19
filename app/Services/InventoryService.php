@@ -13,6 +13,9 @@ use App\Models\Product;
  */
 class InventoryService
 {
+    const MOVEMENT_TYPE_ADDITION    = 'add';
+    const MOVEMENT_TYPE_SUBTRACTION = 'sub';
+
     /**
      * Reorder the priority of a product
      *
@@ -41,11 +44,25 @@ class InventoryService
      *
      * @param BranchInventory $branchInventory
      */
-    public function adjustContainerStock(BranchInventory $branchInventory)
+    public function adjustContainerStock(BranchInventory $branchInventory, $containerMovementQuantity = 0, $movementType = self::MOVEMENT_TYPE_ADDITION)
     {
-        if ($container = $branchInventory->container) {
+        if ($container = $branchInventory->container) { // inventory belongs to a container
             $container->stock = round(floor($branchInventory->stock / $container->content_quantity));
             $container->saveOrFail();
+
+            $this->reOrderPriority($branchInventory->inventory->product, $branchInventory->branch);
+            $this->reOrderPriority($container->inventory->product, $branchInventory->branch);
+        } elseif ($item = BranchInventory::where('container_id', '=', $branchInventory->id)->first()) { // inventory is a container
+            if ($movementType === self::MOVEMENT_TYPE_ADDITION) {
+                $item->stock += $containerMovementQuantity * $branchInventory->content_quantity;
+            } else {
+                $item->stock -= $containerMovementQuantity * $branchInventory->content_quantity;
+            }
+
+            $item->saveOrFail();
+
+            $this->reOrderPriority($branchInventory->inventory->product, $branchInventory->branch);
+            $this->reOrderPriority($item->inventory->product, $branchInventory->branch);
         }
     }
 }

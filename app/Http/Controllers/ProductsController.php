@@ -479,9 +479,7 @@ class ProductsController extends AuthenticatedController
             $branchInventory->stock -= $newRemoval->quantity;
             $branchInventory->saveOrFail();
 
-            if ($branchInventory->container) {
-                $this->inventoryService->adjustContainerStock($branchInventory);
-            }
+            $this->inventoryService->adjustContainerStock($branchInventory, $newRemoval->quantity, InventoryService::MOVEMENT_TYPE_SUBTRACTION);
         });
 
         return redirect()->back()->with('flashes.success', 'Inventory removed');

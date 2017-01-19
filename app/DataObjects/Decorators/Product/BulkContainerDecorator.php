@@ -33,7 +33,7 @@ class BulkContainerDecorator implements Decorator
 
         if ($this->product->isBulkContainer()) {
             $attributes['isBulkContainer'] = true;
-            $attributes['item']            = new Product($this->product->item());
+            $attributes['item']            = new Product($this->product->item);
             $attributes['quantity']        = $this->product->product_item_quantity;
         } else {
             $attributes['quantity']        = 1;

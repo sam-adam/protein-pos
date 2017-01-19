@@ -138,6 +138,9 @@ class MovementService
 
             $destinationBranchInventory->stock += $movementItem->quantity;
             $destinationBranchInventory->saveOrFail();
+
+            $this->inventoryService->adjustContainerStock($sourceInventory, $movementItem->quantity, InventoryService::MOVEMENT_TYPE_SUBTRACTION);
+            $this->inventoryService->adjustContainerStock($destinationBranchInventory, $movementItem->quantity, InventoryService::MOVEMENT_TYPE_ADDITION);
         }
     }
 

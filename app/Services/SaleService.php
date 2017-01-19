@@ -208,6 +208,8 @@ class SaleService
             $branchInventory->stock -= $availableQuantity;
             $branchInventory->saveOrFail();
 
+            $this->inventoryService->adjustContainerStock($branchInventory, $availableQuantity, InventoryService::MOVEMENT_TYPE_SUBTRACTION);
+
             $addedQuantity += $availableQuantity;
 
             $usedInventories->push([
@@ -309,7 +311,7 @@ class SaleService
                 $branchInventory->quantity += $saleItem->quantity;
                 $branchInventory->saveOrFail();
 
-                $this->inventoryService->reOrderPriority($saleItem->product, $sale->creator->branch);
+                $this->inventoryService->adjustContainerStock($branchInventory, $saleItem->quantity, InventoryService::MOVEMENT_TYPE_ADDITION);
             }
         }
 
@@ -319,7 +321,7 @@ class SaleService
                 $branchInventory->quantity += $packageItem->quantity;
                 $branchInventory->saveOrFail();
 
-                $this->inventoryService->reOrderPriority($packageItem->product, $sale->creator->branch);
+                $this->inventoryService->adjustContainerStock($branchInventory, $packageItem->quantity, InventoryService::MOVEMENT_TYPE_ADDITION);
             }
         }
 
