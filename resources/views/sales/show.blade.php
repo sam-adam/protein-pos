@@ -186,7 +186,6 @@
                         <tr>
                             <th class="text-left">Name</th>
                             <th class="text-right">Quantity</th>
-                            <th class="text-right">Discount</th>
                             <th class="text-right">Price</th>
                             <th class="text-right">Subtotal</th>
                         </tr>
@@ -196,7 +195,6 @@
                             <tr>
                                 <td>{{ $package->package->name }}</td>
                                 <td class="text-right">{{ number_format($package->quantity) }}</td>
-                                <td class="text-right">{{ number_format($package->discount) }}%</td>
                                 <td class="text-right">{{ number_format($package->price) }}</td>
                                 <td class="text-right">{{ number_format($package->calculateSubtotal()) }}</td>
                             </tr>
@@ -226,7 +224,6 @@
                             <tr>
                                 <td>{{ $item->product->name }}</td>
                                 <td class="text-right">{{ number_format($item->quantity) }}</td>
-                                <td class="text-right">{{ number_format($item->discount) }}%</td>
                                 <td class="text-right">{{ number_format($item->price) }}</td>
                                 <td class="text-right">{{ number_format($item->calculateSubtotal()) }}</td>
                             </tr>
