@@ -40,7 +40,7 @@ class CustomGuard extends SessionGuard
     {
         $branch = $user->branch;
 
-        if (!$branch->isActivated() || !$branch->isLicensed()) {
+        if (!$branch->isActive() || !$branch->isLicensed()) {
             Session::flush();
             Session::flash('flashes.error', "Cannot login to branch '{$branch->name}'");
 
