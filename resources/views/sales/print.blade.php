@@ -101,7 +101,6 @@
                                     <td><strong>Item</strong></td>
                                     <td class="text-center"><strong>Price</strong></td>
                                     <td class="text-center"><strong>Quantity</strong></td>
-                                    <td class="text-center"><strong>Discount</strong></td>
                                     <td class="text-right"><strong>Totals</strong></td>
                                 </tr>
                             </thead>
@@ -111,7 +110,6 @@
                                         <td>{{ $salePackage->package->name }}</td>
                                         <td class="text-center">{{ number_format($salePackage->price) }}</td>
                                         <td class="text-center">{{ number_format($salePackage->quantity) }}</td>
-                                        <td class="text-center">{{ $salePackage->discount ? number_format($salePackage->discount).'%' : '-' }}</td>
                                         <td class="text-right">{{ number_format($salePackage->calculateSubTotal()) }}</td>
                                     </tr>
                                 @endforeach
@@ -120,7 +118,6 @@
                                         <td>{{ $item->product->name }}</td>
                                         <td class="text-center">{{ number_format($item->price) }}</td>
                                         <td class="text-center">{{ number_format($item->quantity) }}</td>
-                                        <td class="text-center">{{ $item->discount ? number_format($item->discount).'%' : '-' }}</td>
                                         <td class="text-right">{{ number_format($item->calculateSubTotal()) }}</td>
                                     </tr>
                                 @endforeach
