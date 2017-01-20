@@ -15,7 +15,7 @@
 @section('content')
     @parent
     <div id="app" v-cloak>
-        <form method="post" action="{{ route('sales.store') }}" onsubmit="return app.isCompletable;">
+        <form method="post" action="{{ route('sales.store') }}" onsubmit="return app.isCompletable && confirm('Completing sales! Continue?');">
             {{ csrf_field() }}
             <div class="row">
                 <div class="col-md-7">

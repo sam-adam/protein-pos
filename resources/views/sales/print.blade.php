@@ -124,13 +124,11 @@
                                 <tr>
                                     <td class="thick-line"></td>
                                     <td class="thick-line"></td>
-                                    <td class="thick-line"></td>
                                     <td class="thick-line text-right"><strong>Subtotal</strong></td>
                                     <td class="thick-line text-right">{{ number_format($sale->calculateSubTotal()) }}</td>
                                 </tr>
                                 @if($sale->customer_discount)
                                     <tr>
-                                        <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="text-right">
@@ -155,7 +153,6 @@
                                         <tr>
                                             <td class="no-line"></td>
                                             <td class="no-line"></td>
-                                            <td class="no-line"></td>
                                             <td class="text-right">
                                                 <strong>Credit Card Tax ({{ number_format($payment->card_tax).'%' }})</strong>
                                             </td>
@@ -165,13 +162,11 @@
                                     <tr>
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
-                                        <td class="no-line"></td>
                                         <td class="text-right"><strong>Total</strong></td>
                                         <td class="text-right">{{ number_format($payment->calculateTotal()) }}</td>
                                     </tr>
                                 @else
                                     <tr>
-                                        <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="text-right"><strong>Total</strong></td>
