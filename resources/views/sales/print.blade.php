@@ -79,8 +79,8 @@
                 </div>
                 <div class="col-xs-6 text-right">
                     <address>
-                        <strong>Order Date:</strong><br>
-                        {{ $sale->opened_at->toFormattedDateString() }}<br><br>
+                        <strong>Order Date & Time:</strong><br>
+                        {{ $sale->opened_at->toFormattedDateString().' '.$sale->opened_at->toTimeString() }}<br><br>
                     </address>
                 </div>
             </div>
