@@ -186,10 +186,10 @@
                                 <br/>
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <button class="btn btn-primary btn-block">
+                                        <a v-bind:href="'{{ route('customers.show', 'PLACEHOLDER') }}'.replace('PLACEHOLDER', this.customer.id)" target="_blank" class="btn btn-primary btn-block">
                                             <i class="fa fa-search-plus"></i>
                                             Show details
-                                        </button>
+                                        </a>
                                     </div>
                                     <div class="col-xs-6">
                                         <button class="btn btn-default btn-block" v-on:click="setCustomer({})">
@@ -257,7 +257,7 @@
                                             <h5 class="sales-info">Payment</h5>
                                             <br/>
                                             <div class="row">
-                                                <div class="col-xs-5 text-left">
+                                                <div class="col-xs-5">
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
                                                 </div>
