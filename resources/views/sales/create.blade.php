@@ -4,6 +4,14 @@
     - Create Sales
 @endsection
 
+@section('styles')
+    <style type="text/css">
+        .cart-table {
+            margin-bottom: 0;
+        }
+    </style>
+@endsection
+
 @section('content')
     @parent
     <div id="app" v-cloak>
@@ -26,7 +34,7 @@
                             <div v-show="isCartEmpty">
                                 <span class="label label-primary">No items on cart</span>
                             </div>
-                            <table class="table table-hover" v-show="!isCartEmpty">
+                            <table class="table cart-table table-hover" v-show="!isCartEmpty">
                                 <thead>
                                 <tr class="register-items-header">
                                     <th class="text-center"></th>
@@ -76,7 +84,7 @@
                                         <tr>
                                             <td>&nbsp;</td>
                                             <td colspan="5">
-                                                <table class="table table-condensed">
+                                                <table class="table cart-table table-condensed">
                                                     <tr>
                                                         <td><strong>Barcode</strong></td>
                                                         <td>@{{ productItem.product.barcode || "-" }}</td>
