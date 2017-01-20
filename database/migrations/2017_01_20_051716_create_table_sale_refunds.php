@@ -15,13 +15,13 @@ class CreateTableSaleRefunds extends Migration
     {
         Schema::create('sale_refunds', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('sales_id');
+            $table->unsignedInteger('sale_id');
             $table->float('total');
             $table->unsignedInteger('created_by');
             $table->unsignedInteger('updated_by')
                 ->nullable();
 
-            $table->index(['sales_id']);
+            $table->index(['sale_id']);
             $table->index(['total']);
             $table->index(['created_by']);
             $table->index(['updated_by']);

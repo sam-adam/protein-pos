@@ -39,7 +39,9 @@ class SalesController extends AuthenticatedController
 
     public function index()
     {
-        return view('sales.index', ['sales' => Sale::paginate()]);
+        $sales = Sale::with('refunds')->orderBy('id', 'desc')->paginate();
+
+        return view('sales.index', ['sales' => $sales]);
     }
 
     public function create(Request $request, $salesId = null)

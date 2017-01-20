@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class SaleRefundItem
+ *
+ * @package App\Models
+ */
+class SaleRefundItem extends Model
+{
+    public function saleItem()
+    {
+        return $this->hasOne(SaleItem::class);
+    }
+}

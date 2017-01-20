@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 /**
  * Class Sale
@@ -106,6 +107,57 @@ class Sale extends BaseModel
     public function isPaid()
     {
         return $this->paid_at !== null;
+    }
+
+    public function getRefundableItems()
+    {
+        $refunds = $this->refunds;
+
+        if ($refunds->count() === 0) {
+            return $this->items;
+        }
+
+        $refundableItems = new Collection($this->items->all());
+
+        foreach ($refundableItems as $refundableItem) {
+            foreach ($refunds as $refund) {
+                foreach ($refund->items as $refundedItem) {
+                    if ((int) $refundedItem->sale_item_id === (int) $refundableItem->id) {
+                        $refundableItem->quantity -= $refundedItem->quantity;
+                    }
+                }
+            }
+        }
+
+        return $refundableItems->filter(function (SaleItem $saleItem) { return $saleItem->quantity > 0; });
+    }
+
+    public function getRefundablePackages()
+    {
+        $refunds = $this->refunds;
+
+        if ($refunds->count() === 0) {
+            return $this->packages;
+        }
+
+        $refundablePackages = new Collection($this->items->all());
+
+        foreach ($refundablePackages as $refundablePackage) {
+            foreach ($refunds as $refund) {
+                foreach ($refund->packages as $refundedPackage) {
+                    if ((int) $refundedPackage->sale_package_id === (int) $refundablePackage->id) {
+                        $refundablePackage->quantity -= $refundedPackage->quantity;
+                    }
+                }
+            }
+        }
+
+        return $refundablePackages->filter(function (SalePackage $salePackage) { return $salePackage->quantity > 0; });
+    }
+
+    public function isRefundable()
+    {
+        return $this->getRefundableItems() + $this->getRefundablePackages() > 0;
     }
 
     public function calculateSubTotal()
