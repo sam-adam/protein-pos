@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateSettings;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Setting;
+use Illuminate\Http\Request;
 
 /**
  * Class SettingsController
@@ -13,13 +15,19 @@ use App\Models\Setting;
  */
 class SettingsController extends AuthenticatedController
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($redirectTo = $request->get('redirect-to')) {
+            $request->session()->flash('redirect-to', $redirectTo);
+        }
+
         return view('settings.index', [
             'creditCardTax'      => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 2),
             'salesPointBaseline' => Setting::getValueByKey(Setting::KEY_SALES_POINT_BASELINE, 0),
             'deliveryProductId'  => Setting::getValueByKey(Setting::KEY_DELIVERY_PRODUCT_ID),
-            'serviceProducts'    => Product::service()->get()
+            'walkInCustomerId'   => Setting::getValueByKey(Setting::KEY_WALK_IN_CUSTOMER_ID),
+            'serviceProducts'    => Product::service()->get(),
+            'customers'          => Customer::orderBy('name', 'asc')->get()
         ]);
     }
 
@@ -37,6 +45,12 @@ class SettingsController extends AuthenticatedController
         $deliveryProductId->value = $request->get('delivery_product_id');
         $deliveryProductId->saveOrFail();
 
-        return redirect()->route('settings.index')->with('flashes.success', 'Settings updated');
+        $walkInCustomerId        = Setting::firstOrCreate(['key' => Setting::KEY_WALK_IN_CUSTOMER_ID]);
+        $walkInCustomerId->value = $request->get('walk_in_customer_id');
+        $walkInCustomerId->saveOrFail();
+
+        $redirectTo = $request->session()->get('redirect-to');
+
+        return redirect($redirectTo ?: route('settings.index'))->with('flashes.success', 'Settings updated');
     }
 }

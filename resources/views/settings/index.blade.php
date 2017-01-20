@@ -44,6 +44,20 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="form-group {{ $errors->has('walk_in_customer_id') ? 'has-error' : '' }}">
+                            <label class="control-label col-sm-3" for="Delivery Product Id">Walk In Customer</label>
+                            <div class="col-sm-3">
+                                <select name="walk_in_customer_id" class="form-control">
+                                    <option value>Select Customer</option>
+                                    @foreach($customers as $customer)
+                                        <option value="{{ $customer->id }}" @if((old('walk_in_customer_id') ?: $walkInCustomerId) == $customer->id) selected @endif>{{ $customer->name }}</option>
+                                    @endforeach
+                                </select>
+                                @foreach($errors->get('walk_in_customer_id') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-4">
                                 <button type="submit" class="btn btn-success btn-lg btn-block">

@@ -50,6 +50,7 @@ class SalesController extends AuthenticatedController
         $persistentItems = [];
         $sales           = Sale::find($salesId);
         $user            = Auth::user();
+        $walkInCustomer  = Customer::find(Setting::getValueByKey(Setting::KEY_WALK_IN_CUSTOMER_ID));
         $shift           = Shift::inBranch($user->branch)->open()
             ->where('opened_by_user_id', $user->id)
             ->first();
@@ -62,7 +63,7 @@ class SalesController extends AuthenticatedController
             $deliveryProductId = Setting::getValueByKey(Setting::KEY_DELIVERY_PRODUCT_ID);
 
             if (!$deliveryProductId) {
-                return redirect(route('settings.index'))->with('flashes.danger', 'Please create a delivery service item');
+                return redirect(route('settings.index', ['redirect-to' => $request->fullUrl()]))->with('flashes.danger', 'Please create a delivery service item');
             }
 
             $deliveryProduct = Product::find($deliveryProductId);
@@ -72,6 +73,8 @@ class SalesController extends AuthenticatedController
             }
 
             $persistentItems[] = new ProductDataObject($deliveryProduct);
+        } elseif (!$walkInCustomer) {
+            return redirect(route('settings.index', ['redirect-to' => $request->fullUrl()]))->with('flashes.danger', 'Please choose the default walk in customer');
         }
 
         if ($sales) {
@@ -91,9 +94,12 @@ class SalesController extends AuthenticatedController
             }
         } elseif($customer = Customer::find($request->get('customer'))) {
             $existingData['customerData'] = (new CustomerDataObjects($customer))->toArray();
+        } elseif ($request->get('type') !== 'delivery') {
+            $existingData['customerData'] = (new CustomerDataObjects($walkInCustomer))->toArray();
         }
 
         return view('sales.create', array_merge([
+            'walkInCustomer'   => $walkInCustomer,
             'customerData'     => [],
             'creditCardTax'    => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
             'persistentItems'  => $persistentItems,

@@ -157,7 +157,7 @@ class Sale extends BaseModel
 
     public function isRefundable()
     {
-        return $this->getRefundableItems() + $this->getRefundablePackages() > 0;
+        return $this->getRefundableItems()->count() + $this->getRefundablePackages()->count() > 0;
     }
 
     public function calculateSubTotal()
