@@ -34,8 +34,8 @@ class UsersController extends AuthenticatedController
         $newUser->role                        = $request->get('role');
         $newUser->max_price_discount          = $request->get('max_price_discount') ?: null;
         $newUser->max_percentage_discount     = $request->get('max_percentage_discount') ?: null;
-        $newUser->can_give_discount           = $request->get('can_give_discount') ?: null;
-        $newUser->can_give_unlimited_discount = $request->get('can_give_unlimited_discount') ?: null;
+        $newUser->can_give_discount           = $request->get('can_give_discount') ?: false;
+        $newUser->can_give_unlimited_discount = $request->get('can_give_unlimited_discount') ?: false;
         $newUser->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User added');

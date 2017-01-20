@@ -53,6 +53,11 @@ class Sale extends BaseModel
         return $this->hasMany(SalePayment::class);
     }
 
+    public function refunds()
+    {
+        return $this->hasMany(SaleRefund::class);
+    }
+
     public function scopeDelivery(Builder $query)
     {
         return $query->where('is_delivery', '=', true);
