@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    - Create New Product Variant
+    - Print Invoice
 @endsection
 
 @section('styles')
@@ -30,10 +30,10 @@
         <div class="col-xs-12">
             <div class="panel">
                 <div class="panel-body">
-                    <button class="btn btn-primary" onclick="window.print()">
+                    <a class="btn btn-primary" href="{{ route('sales.do_print', $sale->id) }}">
                         <i class="fa fa-print"></i>
                         Print Invoice
-                    </button>
+                    </a>
                     <a href="{{ route('sales.create') }}" class="btn btn-default">
                         <i class="fa fa-plus"></i>
                         New Sale
@@ -141,7 +141,6 @@
                                     <tr>
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
-                                        <td class="no-line"></td>
                                         <td class="text-right">
                                             <strong>Sale Discount ({{ number_format($sale->sales_discount).'%' }})</strong>
                                         </td>
@@ -184,6 +183,8 @@
 
 @section('scripts')
     @if(Session::get('doPrint'))
-        <script type="text/javascript">window.print()</script>
+        <script type="text/javascript">
+            window.location = "{{ route('sales.do_print', $sale->id) }}";
+        </script>
     @endif
 @endsection

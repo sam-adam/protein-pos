@@ -12,10 +12,15 @@ use App\Models\Setting;
 use App\Models\Shift;
 use App\Repository\InventoryRepository;
 use App\Services\SaleService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Readers\LaravelExcelReader;
+use Maatwebsite\Excel\Writers\LaravelExcelWriter;
 
 /**
  * Class SalesController
@@ -92,7 +97,7 @@ class SalesController extends AuthenticatedController
                     )
                 );
             }
-        } elseif($customer = Customer::find($request->get('customer'))) {
+        } elseif ($customer = Customer::find($request->get('customer'))) {
             $existingData['customerData'] = (new CustomerDataObjects($customer))->toArray();
         } elseif ($request->get('type') !== 'delivery') {
             $existingData['customerData'] = (new CustomerDataObjects($walkInCustomer))->toArray();
@@ -201,9 +206,9 @@ class SalesController extends AuthenticatedController
         return view('sales.show', ['sale' => $sale]);
     }
 
-    public function viewPrint($aleId)
+    public function viewPrint($saleId)
     {
-        $sale = Sale::find($aleId);
+        $sale = Sale::find($saleId);
 
         if (!$sale) {
             return redirect()->back()->with('flashes.danger', 'Sale not found');
@@ -213,5 +218,42 @@ class SalesController extends AuthenticatedController
             'sale'    => $sale,
             'payment' => $sale->isPaid() ? $sale->payments->first() : null
         ]);
+    }
+
+    public function doPrint($saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        Excel::load(resource_path('docs/ReceiptTemplate.xls'), function (LaravelExcelReader $reader) use ($sale) {
+            $startingRow = 11;
+            $discountRow = 14;
+            $totalRow    = 15;
+
+            $worksheet   = $reader->sheet('Sheet1');
+            $worksheet->getCell('B6')->setValue($sale->opened_at->format('d m y'));
+            $worksheet->getCell('B7')->setValue($sale->opened_at->format('H:i A'));
+            $worksheet->getCell('B8')->setValue($sale->id);
+
+            $currentRow = $startingRow;
+
+            foreach ($sale->items as $saleItem) {
+                $worksheet->appendRow($currentRow, [$saleItem->quantity, $saleItem->product->name, $saleItem->calculateSubTotal()]);
+
+                $currentRow += 1;
+            }
+
+            foreach ($sale->packages as $salePackage) {
+                $worksheet->appendRow($currentRow, [$salePackage->quantity, $salePackage->package->name, $salePackage->calculateSubTotal()]);
+
+                $currentRow += 1;
+            }
+
+            $worksheet->getCell('C'.($discountRow + ($currentRow - $startingRow - 1)))->setValue($sale->calculateTotal() - $sale->calculateSubTotal());
+            $worksheet->getCell('C'.($totalRow + ($currentRow - $startingRow - 1)))->setValue($sale->calculateTotal());
+        })->setFileName('receipt-'.$sale->id.'-'.Carbon::now()->format('YmdHis'))->export('xls');
     }
 }
