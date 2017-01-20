@@ -48,6 +48,30 @@
                             <a href="{{ url('/') }}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
+                            <a href="#">
+                                <i class="fa fa-fw fa-shopping-cart"></i>
+                                Sales
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="{{ url('sales') }}">
+                                        List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('sales/create') }}">
+                                        Create - Walk In
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url('sales/create?type=delivery') }}">
+                                        Create - Delivery
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
                             <a href="{{ url('users') }}">
                                 <i class="fa fa-fw fa-user-circle"></i>
                                 Users
@@ -110,30 +134,6 @@
                                 <i class="fa fa-fw fa-clock-o"></i>
                                 Shifts
                             </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-fw fa-shopping-cart"></i>
-                                Sales
-                                <span class="fa arrow"></span>
-                            </a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="{{ url('sales') }}">
-                                        List
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('sales/create') }}">
-                                        Create - Walk In
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('sales/create?type=delivery') }}">
-                                        Create - Delivery
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
                         <li>
                             <a href="{{ url('settings') }}">
