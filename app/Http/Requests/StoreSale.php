@@ -43,10 +43,6 @@ class StoreSale extends FormRequest
             'sales_discount'      => 'bail|required|numeric|min:0|max:100'
         ];
 
-        if ($this->get('payment_method') === SalePayment::PAYMENT_METHOD_CREDIT_CARD) {
-            $rules['credit_card_number'] = 'bail|required';
-        }
-
         return $rules;
     }
 

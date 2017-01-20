@@ -286,13 +286,12 @@
                                                             v-bind:required="payment.method === 'cash'"
                                                     />
                                                     <input
-                                                            type="text"
+                                                            type="hidden"
                                                             name="credit_card_number"
                                                             class="form-control text-right"
                                                             placeholder="Enter credit card num."
                                                             v-model="payment.cardNumber"
                                                             v-show="payment.method === 'credit_card'"
-                                                            v-bind:required="payment.method === 'credit_card'"
                                                     />
                                                 </div>
                                             </div>
