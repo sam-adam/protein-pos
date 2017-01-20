@@ -78,20 +78,10 @@
                                             <td colspan="5">
                                                 <table class="table table-condensed">
                                                     <tr>
-                                                        <td style="width: 25%;"><strong>Barcode</strong></td>
-                                                        <td style="width: 25%;">@{{ productItem.product.barcode || "-" }}</td>
-                                                        <td style="width: 25%;"><strong>Category</strong></td>
-                                                        <td style="width: 25%;">@{{ productItem.product.category ? productItem.product.category.name : "-" }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Available Stock</strong></td>
-                                                        <td>@{{ productItem.product.availableQuantity }}</td>
-                                                        <td><strong>Brand</strong></td>
-                                                        <td>@{{ productItem.product.brand ? productItem.product.brand.name : "-" }}</td>
-                                                    </tr>
-                                                    <tr v-if="productItem.product.inPackages">
+                                                        <td><strong>Barcode</strong></td>
+                                                        <td>@{{ productItem.product.barcode || "-" }}</td>
                                                         <td><strong>Available Sets</strong></td>
-                                                        <td colspan="3">
+                                                        <td>
                                                             <template v-for="package in productItem.product.inPackages">
                                                                 <button v-on:click="viewPackage($event, package.id)" class="btn btn-primary btn-xs" style="margin-right: 5px;" data-placement="top" v-tooltip="'Click to view detail'">
                                                                     <i class="fa fa-eye"></i>
