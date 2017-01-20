@@ -41,7 +41,6 @@
                                     <th>Item Name</th>
                                     <th class="text-center">Price</th>
                                     <th class="text-center">Qty.</th>
-                                    <th class="text-center">Disc %</th>
                                     <th class="text-center">Total</th>
                                 </tr>
                                 </thead>
@@ -55,10 +54,6 @@
                                                 <input v-bind:name="'products[' + product.id + '][id]'" type="hidden" v-model="product.id"/>
                                                 <input v-bind:name="'products[' + product.id + '][quantity]'" type="hidden" class="form-control" value="1" />
                                                 <p class="form-control-static">1</p>
-                                            </td>
-                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                                <input v-bind:name="'products[' + product.id + '][discount]'" type="hidden" class="form-control" value="0" />
-                                                <p class="form-control-static">0</p>
                                             </td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice({"product": product, "quantity": 1, "discount": 0}) }}</td>
                                         </tr>
@@ -75,9 +70,6 @@
                                             <td class="text-center" style="width: 80px; vertical-align: middle;">
                                                 <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
                                                 <input v-bind:name="'products[' + productItem.product.id + '][quantity]'" type="number" class="form-control" v-model="productItem.quantity" min="0" v-bind:max="productItem.availableQuantity"/>
-                                            </td>
-                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                                <input v-bind:name="'products[' + productItem.product.id + '][discount]'" type="number" class="form-control" v-model="productItem.discount" min="0"/>
                                             </td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(productItem) }}</td>
                                         </tr>
@@ -114,9 +106,6 @@
                                             <td class="text-center" style="width: 80px; vertical-align: middle;">
                                                 <input v-bind:name="'packages[' + packageItem.package.id + '][id]'" type="hidden" v-model="packageItem.package.id"/>
                                                 <input v-bind:name="'packages[' + packageItem.package.id + '][quantity]'" type="number" class="form-control" v-model="packageItem.quantity" min="0"/>
-                                            </td>
-                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
-                                                <input v-bind:name="'packages[' + packageItem.package.id + '][discount]'" type="number" class="form-control" v-model="packageItem.discount" min="0"/>
                                             </td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(packageItem) }}</td>
                                         </tr>
@@ -268,7 +257,7 @@
                                             <h5 class="sales-info">Payment</h5>
                                             <br/>
                                             <div class="row">
-                                                <div class="col-xs-offset-1 col-xs-5">
+                                                <div class="col-xs-5 text-left">
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
                                                 </div>
