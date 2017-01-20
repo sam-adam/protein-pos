@@ -38,12 +38,20 @@ class CustomGuard extends SessionGuard
 
     protected function checkLoginSession(User $user)
     {
+        $branch = $user->branch;
+
+        if (!$branch->isActivated() || !$branch->isLicensed()) {
+            Session::flush();
+            Session::flash('flashes.error', "Cannot login to branch '{$branch->name}'");
+
+            return false;
+        }
+
         if ($user->role === 'cashier') {
-            $branch                    = $user->branch;
             $currentlyLoggedInSessions = $branch->currentlyLoggedInSessions()->get();
             $isCurrentlyLoggedIn       = $currentlyLoggedInSessions->filter(function (LoginSession $session) use ($user) {
-                return (int) $session->user_id === (int) $user->id;
-            })->count() > 0;
+                    return (int) $session->user_id === (int) $user->id;
+                })->count() > 0;
 
             if ($isCurrentlyLoggedIn) {
                 Session::flush();
