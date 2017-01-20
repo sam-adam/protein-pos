@@ -21,7 +21,7 @@ class UsersController extends AuthenticatedController
 
     public function create()
     {
-        return view('users.create', ['branches' => Branch::all()]);
+        return view('users.create', ['branches' => Branch::licensed()->active()->get()]);
     }
 
     public function store(StoreUser $request)
@@ -51,7 +51,7 @@ class UsersController extends AuthenticatedController
 
         return view('users.edit', [
             'user'     => $user,
-            'branches' => Branch::all()
+            'branches' => Branch::licensed()->active()->get()
         ]);
     }
 

@@ -219,7 +219,7 @@ class ProductsController extends AuthenticatedController
 
         $movementLabels = [];
 
-        $branches    = Branch::licensed()->get()->keyBy('id');
+        $branches    = Branch::licensed()->active()->get()->keyBy('id');
         $inventories = Inventory::with('branchItems')
             ->where('product_id', '=', $product->id)
             ->orderBy('priority', 'asc')
