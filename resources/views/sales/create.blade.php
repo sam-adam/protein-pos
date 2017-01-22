@@ -469,15 +469,7 @@
                         ? this.applyDiscount(preSaleTotal, this.salesDiscount)
                         : preSaleTotal - this.salesDiscount;
                 },
-                grandTotal: function () {
-                    var total = this.subTotal;
-
-                    if (this.payment.method === 'credit_card') {
-                        total = this.applyTax(this.subTotal, this.creditCardTax)
-                    }
-
-                    return total;
-                },
+                grandTotal: function () { return this.subTotal; },
                 change: function () {
                     return this.payment.method === 'cash'
                         ? Math.max(this.payment.amount - this.grandTotal, 0)
