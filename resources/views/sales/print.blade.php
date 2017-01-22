@@ -110,7 +110,7 @@
                                         <td>{{ $salePackage->package->name }}</td>
                                         <td class="text-center">{{ number_format($salePackage->price) }}</td>
                                         <td class="text-center">{{ number_format($salePackage->quantity) }}</td>
-                                        <td class="text-right">{{ number_format($salePackage->calculateSubTotal()) }}</td>
+                                        <td class="text-right">{{ number_format($salePackage->calculateSubTotal(), 1) }}</td>
                                     </tr>
                                 @endforeach
                                 @foreach($sale->items as $item)
@@ -118,14 +118,14 @@
                                         <td>{{ $item->product->name }}</td>
                                         <td class="text-center">{{ number_format($item->price) }}</td>
                                         <td class="text-center">{{ number_format($item->quantity) }}</td>
-                                        <td class="text-right">{{ number_format($item->calculateSubTotal()) }}</td>
+                                        <td class="text-right">{{ number_format($item->calculateSubTotal(), 1) }}</td>
                                     </tr>
                                 @endforeach
                                 <tr>
                                     <td class="thick-line"></td>
                                     <td class="thick-line"></td>
                                     <td class="thick-line text-right"><strong>Subtotal</strong></td>
-                                    <td class="thick-line text-right">{{ number_format($sale->calculateSubTotal()) }}</td>
+                                    <td class="thick-line text-right">{{ number_format($sale->calculateSubTotal(), 1) }}</td>
                                 </tr>
                                 @if($sale->customer_discount)
                                     <tr>
@@ -134,7 +134,7 @@
                                         <td class="text-right">
                                             <strong>Customer Discount ({{ number_format($sale->customer_discount).'%' }})</strong>
                                         </td>
-                                        <td class="text-right">{{  number_format($sale->calculateAfterCustomerDiscount()) }}</td>
+                                        <td class="text-right">{{  number_format($sale->calculateAfterCustomerDiscount(), 1) }}</td>
                                     </tr>
                                 @endif
                                 @if($sale->sales_discount)
@@ -142,16 +142,16 @@
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="text-right">
-                                            <strong>Sale Discount ({{ number_format($sale->sales_discount).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED') }})</strong>
+                                            <strong>Sale Discount ({{ number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED') }})</strong>
                                         </td>
-                                        <td class="text-right">{{  number_format($sale->calculateAfterSalesDiscount()) }}</td>
+                                        <td class="text-right">{{  number_format($sale->calculateAfterSalesDiscount(), 1) }}</td>
                                     </tr>
                                 @endif
                                 <tr>
                                     <td class="no-line"></td>
                                     <td class="no-line"></td>
                                     <td class="text-right"><strong>Total</strong></td>
-                                    <td class="text-right">{{ number_format($sale->calculateTotal()) }}</td>
+                                    <td class="text-right">{{ number_format($sale->calculateTotal(), 1) }}</td>
                                 </tr>
                             </tbody>
                         </table>
