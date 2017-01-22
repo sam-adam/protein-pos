@@ -211,7 +211,7 @@
                                         @{{ isCustomerInGroup ? customer.group.discount + "%" : "-" }}
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr v-show="discountSetting.isEnabled">
                                     <td>
                                         Sales Discount:
                                         <div class="btn-group" style="margin-left: 5px;">
@@ -388,11 +388,15 @@
             },
             computed: {
                 maxSaleDiscount: function () {
-                    if (this.salesDiscountType === 'PERCENTAGE') {
-                        return 100;
-                    } else {
-                        return this.preSaleTotal;
+                    if (this.discountSetting.isUnlimited) {
+                        return (this.salesDiscountType === 'PERCENTAGE')
+                            ? 100
+                            : this.preSaleTotal;
                     }
+
+                    return (this.salesDiscountType === 'PERCENTAGE')
+                        ? this.discountSetting.maxPercentage
+                        : this.discountSetting.maxPrice;
                 },
                 isCustomerInGroup: function () {
                     return this.customer

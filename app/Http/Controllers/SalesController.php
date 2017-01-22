@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\Shift;
+use App\Models\User;
 use App\Repository\InventoryRepository;
 use App\Services\SaleService;
 use Carbon\Carbon;
@@ -52,7 +53,7 @@ class SalesController extends AuthenticatedController
         $existingData    = [];
         $persistentItems = [];
         $sales           = Sale::find($salesId);
-        $user            = Auth::user();
+        $user            = User::find(Auth::user()->id);
         $walkInCustomer  = Customer::find(Setting::getValueByKey(Setting::KEY_WALK_IN_CUSTOMER_ID));
         $shift           = Shift::inBranch($user->branch)->open()
             ->where('opened_by_user_id', $user->id)

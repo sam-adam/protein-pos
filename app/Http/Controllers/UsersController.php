@@ -69,10 +69,10 @@ class UsersController extends AuthenticatedController
 
         $user->branch_id                   = $request->get('branch_id');
         $user->role                        = $request->get('role');
-        $user->max_price_discount          = $request->get('max_price_discount') ?: $user->max_price_discount;
-        $user->max_percentage_discount     = $request->get('max_percentage_discount') ?: $user->max_percentage_discount;
-        $user->can_give_discount           = $request->get('can_give_discount') ?: $user->can_give_discount;
-        $user->can_give_unlimited_discount = $request->get('can_give_unlimited_discount') ?: $user->can_give_unlimited_discount;
+        $user->max_price_discount          = $request->get('max_price_discount', 0);
+        $user->max_percentage_discount     = $request->get('max_percentage_discount', 0);
+        $user->can_give_discount           = $request->get('can_give_discount', false);
+        $user->can_give_unlimited_discount = $request->get('can_give_unlimited_discount', false);
         $user->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User edited');
