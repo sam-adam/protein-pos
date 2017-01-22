@@ -70,7 +70,7 @@
                             @if($payment->payment_method === 'CASH')
                                 Cash
                             @else
-                                Credit Card ending **** {{ substr($payment->card_number, -4) }}<br>
+                                Credit Card
                             @endif
                         @else
                             Cash on delivery
