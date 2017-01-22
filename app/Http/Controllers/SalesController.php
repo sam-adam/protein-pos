@@ -3,15 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\Customer as CustomerDataObjects;
-use App\DataObjects\Decorators\Product\PackageDecorator;
 use App\DataObjects\Product as ProductDataObject;
 use App\Http\Requests\StoreSale;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
-use App\Models\SaleRefund;
-use App\Models\SaleRefundItem;
-use App\Models\SaleRefundPackage;
 use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\User;
@@ -331,34 +327,7 @@ class SalesController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($sale, $request) {
-            $beforeRefundTotal  = $sale->calculateTotal();
-            $newRefund          = new SaleRefund();
-            $newRefund->sale_id = $sale->id;
-            $newRefund->total   = 0;
-            $newRefund->saveOrFail();
-
-            foreach ($request->get('products') as $saleItemId => $data) {
-                if ($data['quantity'] > 0) {
-                    $newRefundItem                 = new SaleRefundItem();
-                    $newRefundItem->sale_refund_id = $newRefund->id;
-                    $newRefundItem->sale_item_id   = $saleItemId;
-                    $newRefundItem->quantity       = $data['quantity'];
-                    $newRefundItem->saveOrFail();
-                }
-            }
-
-            foreach ($request->get('packages') as $salePackageId => $data) {
-                if ($data['quantity'] > 0) {
-                    $newRefundPackage                  = new SaleRefundPackage();
-                    $newRefundPackage->sale_refund_id  = $newRefund->id;
-                    $newRefundPackage->sale_package_id = $salePackageId;
-                    $newRefundPackage->quantity        = $data['quantity'];
-                    $newRefundPackage->saveOrFail();
-                }
-            }
-
-            $newRefund->total = $beforeRefundTotal - $sale->load('refunds')->calculateTotal();
-            $newRefund->saveOrFail();
+            $this->saleService->makeRefund($sale, $request->all());
         });
 
         return redirect(route('sales.print', $sale->id))->with([

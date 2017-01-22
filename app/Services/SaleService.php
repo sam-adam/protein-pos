@@ -13,6 +13,9 @@ use App\Models\SaleItem;
 use App\Models\SalePackage;
 use App\Models\SalePackageItem;
 use App\Models\SalePayment;
+use App\Models\SaleRefund;
+use App\Models\SaleRefundItem;
+use App\Models\SaleRefundPackage;
 use App\Models\Setting;
 use App\Models\User;
 use App\Repository\InventoryRepository;
@@ -333,5 +336,67 @@ class SaleService
         $sale->saveOrFail();
 
         return $sale;
+    }
+
+    /**
+     * Create a refund
+     *
+     * @param Sale  $sale
+     * @param array $refundedItems
+     *
+     * @return SaleRefund
+     */
+    public function makeRefund(Sale $sale, array $refundedItems)
+    {
+        $beforeRefundTotal  = $sale->calculateTotal();
+        $newRefund          = new SaleRefund();
+        $newRefund->sale_id = $sale->id;
+        $newRefund->total   = 0;
+        $newRefund->saveOrFail();
+
+        foreach (data_get($refundedItems, 'products') as $saleItemId => $data) {
+            $saleItem = SaleItem::findOrFail($saleItemId);
+
+            if ($data['quantity'] > 0) {
+                $newRefundItem                 = new SaleRefundItem();
+                $newRefundItem->sale_refund_id = $newRefund->id;
+                $newRefundItem->sale_item_id   = $saleItemId;
+                $newRefundItem->quantity       = $data['quantity'];
+                $newRefundItem->saveOrFail();
+            }
+
+            if (!$saleItem->product->is_service) {
+                $branchInventory = BranchInventory::findOrFail($saleItem->branch_inventory_id);
+                $branchInventory->quantity += $saleItem->quantity;
+                $branchInventory->saveOrFail();
+
+                $this->inventoryService->adjustContainerStock($branchInventory, $saleItem->quantity, InventoryService::MOVEMENT_TYPE_ADDITION);
+            }
+        }
+
+        foreach (data_get($refundedItems, 'packages') as $salePackageId => $data) {
+            $salePackage = SalePackage::findOrFail($salePackageId);
+
+            if ($data['quantity'] > 0) {
+                $newRefundPackage                  = new SaleRefundPackage();
+                $newRefundPackage->sale_refund_id  = $newRefund->id;
+                $newRefundPackage->sale_package_id = $salePackageId;
+                $newRefundPackage->quantity        = $data['quantity'];
+                $newRefundPackage->saveOrFail();
+            }
+
+            foreach ($salePackage->items as $packageItem) {
+                $branchInventory = BranchInventory::findOrFail($packageItem->branch_inventory_id);
+                $branchInventory->quantity += $packageItem->quantity;
+                $branchInventory->saveOrFail();
+
+                $this->inventoryService->adjustContainerStock($branchInventory, $packageItem->quantity, InventoryService::MOVEMENT_TYPE_ADDITION);
+            }
+        }
+
+        $newRefund->total = $beforeRefundTotal - $sale->load('refunds')->calculateTotal();
+        $newRefund->saveOrFail();
+
+        return $newRefund;
     }
 }
