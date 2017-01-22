@@ -17,10 +17,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Readers\LaravelExcelReader;
-use Maatwebsite\Excel\Writers\LaravelExcelWriter;
 
 /**
  * Class SalesController
@@ -104,11 +102,12 @@ class SalesController extends AuthenticatedController
         }
 
         return view('sales.create', array_merge([
-            'walkInCustomer'   => $walkInCustomer,
-            'customerData'     => [],
-            'creditCardTax'    => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
-            'persistentItems'  => $persistentItems,
-            'immediatePayment' => $request->get('type') !== 'delivery'
+            'walkInCustomer'      => $walkInCustomer,
+            'customerData'        => [],
+            'creditCardTax'       => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
+            'persistentItems'     => $persistentItems,
+            'immediatePayment'    => $request->get('type') !== 'delivery',
+            'defaultDiscountType' => Sale::DISCOUNT_TYPE_PERCENTAGE
         ], $existingData));
     }
 
@@ -228,15 +227,17 @@ class SalesController extends AuthenticatedController
             return redirect()->back()->with('flashes.danger', 'Sale not found');
         }
 
-        Excel::load(resource_path('docs/ReceiptTemplate.xls'), function (LaravelExcelReader $reader) use ($sale) {
+        $saleCode = $sale->id.'-'.Carbon::now()->format('YmdHis');
+
+        Excel::load(resource_path('docs/ReceiptTemplate.xls'), function (LaravelExcelReader $reader) use ($sale, $saleCode) {
             $startingRow = 11;
             $discountRow = 14;
             $totalRow    = 15;
 
-            $worksheet   = $reader->sheet('Sheet1');
+            $worksheet = $reader->sheet('Sheet1');
             $worksheet->getCell('B6')->setValue($sale->opened_at->format('d m y'));
             $worksheet->getCell('B7')->setValue($sale->opened_at->format('H:i A'));
-            $worksheet->getCell('B8')->setValue($sale->id);
+            $worksheet->getCell('B8')->setValue($saleCode);
 
             $currentRow = $startingRow + 1;
 
@@ -252,8 +253,10 @@ class SalesController extends AuthenticatedController
                 $currentRow += 1;
             }
 
+            $worksheet->removeRow($startingRow);
+
             $worksheet->getCell('C'.($discountRow + ($currentRow - $startingRow - 1)))->setValue($sale->calculateTotal() - $sale->calculateSubTotal());
             $worksheet->getCell('C'.($totalRow + ($currentRow - $startingRow - 1)))->setValue($sale->calculateTotal());
-        })->setFileName('receipt-'.$sale->id.'-'.Carbon::now()->format('YmdHis'))->export('xls');
+        })->setFileName('receipt-'.$saleCode)->export('xls');
     }
 }
