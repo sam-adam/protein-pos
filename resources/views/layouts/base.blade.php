@@ -86,12 +86,14 @@
                                 </a>
                             </li>
                         @endcan
-                        <li>
-                            <a href="{{ url('branches') }}">
-                                <i class="fa fa-fw fa-building"></i>
-                                Branches
-                            </a>
-                        </li>
+                        @can('access', \App\Models\Branch::class)
+                            <li>
+                                <a href="{{ url('branches') }}">
+                                    <i class="fa fa-fw fa-building"></i>
+                                    Branches
+                                </a>
+                            </li>
+                        @endcan
                         <li>
                             <a href="#">
                                 <i class="fa fa-cube fa-fw"></i>

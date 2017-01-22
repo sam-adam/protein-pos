@@ -13,6 +13,13 @@ use Carbon\Carbon;
  */
 class BranchesController extends AuthenticatedController
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('can:access,'.Branch::class);
+    }
+
     public function index()
     {
         return view('branches.index', ['branches' => Branch::paginate()]);
