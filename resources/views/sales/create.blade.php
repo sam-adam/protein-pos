@@ -384,6 +384,9 @@
                             $this.notify('error', 'Max discount is ' + maxSaleDiscount);
                         }
                     }
+                },
+                salesDiscountType: {
+                    handler: function () { this.salesDiscount = 0; }
                 }
             },
             computed: {
