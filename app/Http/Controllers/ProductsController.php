@@ -416,11 +416,16 @@ class ProductsController extends AuthenticatedController
                 throw new ModelNotFoundException(BranchInventory::class);
             }
 
-            $newRemoval                      = new InventoryRemoval();
-            $newRemoval->branch_inventory_id = $branchInventory->id;
-            $newRemoval->quantity            = $request->get('quantity');
-            $newRemoval->pre_adjusted_stock  = $branchInventory->stock;
-            $newRemoval->remark              = $request->get('remark');
+            $newRemoval                                  = new InventoryRemoval();
+            $newRemoval->product_id                      = $product->id;
+            $newRemoval->product_item_id                 = $product->isBulkContainer() ? $product->product_item_id : null;
+            $newRemoval->product_item_quantity           = $product->isBulkContainer() ? $product->product_item_quantity : 0;
+            $newRemoval->product_pre_adjusted_stock      = BranchInventory::inBranch($branchInventory->branch)->product($product)->sum('stock');
+            $newRemoval->product_item_pre_adjusted_stock = $product->isBulkContainer() ? BranchInventory::inBranch($branchInventory->branch)->product($product->item)->sum('stock') : null;
+            $newRemoval->branch_inventory_id             = $branchInventory->id;
+            $newRemoval->quantity                        = $request->get('quantity');
+            $newRemoval->pre_adjusted_stock              = $branchInventory->stock;
+            $newRemoval->remark                          = $request->get('remark');
             $newRemoval->saveOrFail();
 
             $branchInventory->stock -= $newRemoval->quantity;

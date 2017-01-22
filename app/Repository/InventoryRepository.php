@@ -101,7 +101,10 @@ class InventoryRepository
             ->select('inventory_removals.*')
             ->join('branch_inventories', 'branch_inventories.id', '=', 'inventory_removals.branch_inventory_id')
             ->join('inventories', 'branch_inventories.inventory_id', '=', 'inventories.id')
-            ->where('inventories.product_id', '=', $product->id)
+            ->where(function ($query) use ($product) {
+                return $query->where('inventory_removals.product_id', '=', $product->id)
+                    ->orWhere('inventory_removals.product_item_id', '=', $product->id);
+            })
             ->orderBy('inventory_removals.created_at', 'desc')
             ->get();
 
@@ -125,26 +128,36 @@ class InventoryRepository
                 }
 
                 $movementLabels[] = [
-                    'id'         => $movement->id,
-                    'label'      => $movementLabel,
-                    'quantity'   => $isContainerMatched ? $movementItem->quantity : $movementItem->quantity * $movementItem->product_item_quantity,
-                    'date'       => $movement->created_at,
-                    'dateString' => $movement->movement_effective_at->toDayDateTimeString(),
-                    'actor'      => $movement->creator->name,
-                    'remark'     => $movement->remark
+                    'id'          => $movement->id,
+                    'label'       => $movementLabel,
+                    'isContainer' => $isContainerMatched,
+                    'quantity'    => $isContainerMatched ? $movementItem->quantity : $movementItem->quantity * $movementItem->product_item_quantity,
+                    'date'        => $movement->created_at,
+                    'dateString'  => $movement->movement_effective_at->toDayDateTimeString(),
+                    'actor'       => $movement->creator->name,
+                    'remark'      => $movement->remark
                 ];
             }
         }
 
         foreach ($removals as $inventoryRemoval) {
+            $isContainerMatched = $inventoryRemoval->product_id == $product->id;
+
+            if ($isContainerMatched) {
+                $removalLabel = 'Removed from '.$inventoryRemoval->branchInventory->branch->name;
+            } else {
+                $removalLabel = 'Container removed ('.$inventoryRemoval->quantity.' x '.$inventoryRemoval->product_item_quantity.' pcs) from '.$inventoryRemoval->branchInventory->branch->name;
+            }
+
             $movementLabels[] = [
-                'id'         => $inventoryRemoval->id,
-                'label'      => 'Removed from '.$inventoryRemoval->branchInventory->branch->name,
-                'quantity'   => $inventoryRemoval->quantity,
-                'date'       => $inventoryRemoval->created_at,
-                'dateString' => $inventoryRemoval->created_at->toDayDateTimeString(),
-                'actor'      => $inventoryRemoval->creator->name,
-                'remark'     => $inventoryRemoval->remark
+                'id'          => $inventoryRemoval->id,
+                'label'       => $removalLabel,
+                'isContainer' => $isContainerMatched,
+                'quantity'    => -($isContainerMatched ? $inventoryRemoval->quantity : $inventoryRemoval->quantity * $inventoryRemoval->product_item_quantity),
+                'date'        => $inventoryRemoval->created_at,
+                'dateString'  => $inventoryRemoval->created_at->toDayDateTimeString(),
+                'actor'       => $inventoryRemoval->creator->name,
+                'remark'      => $inventoryRemoval->remark
             ];
         }
 
