@@ -154,7 +154,7 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('access', 'report')
+                        @can('access', \App\DataObjects\Report::class)
                             <li>
                                 <a href="#">
                                     <i class="fa fa-fw fa-book"></i>

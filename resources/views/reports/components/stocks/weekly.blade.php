@@ -38,5 +38,5 @@
         </tbody>
     </table>
 @else
-    <span class="label label-primary">No sales found</span>
+    <span class="label label-primary">No movement found</span>
 @endif

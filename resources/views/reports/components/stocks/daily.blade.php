@@ -35,5 +35,5 @@
         </tbody>
     </table>
 @else
-    <span class="label label-primary">No $movements found</span>
+    <span class="label label-primary">No movement found</span>
 @endif

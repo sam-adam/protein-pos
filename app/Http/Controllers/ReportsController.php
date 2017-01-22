@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DataObjects\Report;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Sale;
@@ -23,7 +24,7 @@ class ReportsController extends AuthenticatedController
     {
         parent::__construct();
 
-        $this->middleware('can:access,report');
+        $this->middleware('can:access,'.Report::class);
 
         $this->inventoryRepo = $inventoryRepo;
     }

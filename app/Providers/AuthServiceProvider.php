@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Auth\CustomGuard;
+use App\DataObjects\Report;
 use App\Models\Branch;
 use App\Models\Sale;
 use App\Models\Setting;
@@ -27,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         User::class    => UserPolicy::class,
         Branch::class  => BranchPolicy::class,
         Setting::class => SettingPolicy::class,
-        'report'       => ReportPolicy::class
+        Report::class  => ReportPolicy::class
     ];
 
     /**
