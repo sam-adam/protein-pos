@@ -227,7 +227,7 @@
                                         <div class="input-group">
                                             <input type="number" name="sales_discount" class="form-control text-right" v-model="salesDiscount" min="0" v-bind:max="maxSaleDiscount"/>
                                             <span class="input-group-addon">
-                                                @{{ this.salesDiscountType === 'PERCENTAGE' ? '%' : '$' }}
+                                                @{{ this.salesDiscountType === 'PERCENTAGE' ? '%' : 'AED' }}
                                             </span>
                                         </div>
                                     </td>

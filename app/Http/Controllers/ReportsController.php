@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Sale;
+use App\Repository\InventoryRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -15,6 +16,15 @@ use Illuminate\Support\Collection;
  */
 class ReportsController extends AuthenticatedController
 {
+    protected $inventoryRepo;
+
+    public function __construct(InventoryRepository $inventoryRepo)
+    {
+        parent::__construct();
+
+        $this->inventoryRepo = $inventoryRepo;
+    }
+
     public function sales(Request $request)
     {
         $branch = Branch::find($request->get('branch'));
