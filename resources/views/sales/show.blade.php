@@ -77,6 +77,12 @@
                                 <p class="form-control-static">{{ $sale->isFinished() ? $sale->closed_at->toDayDateTimeString() : '-' }}</p>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="email" class="col-sm-4 control-label">Discount</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static">{{ $sale->sales_discount }} ({{ $sale->sales_discount_type }})</p>
+                            </div>
+                        </div>
                     @endif
                     <div class="form-group">
                         <label for="address" class="col-sm-4 control-label">Branch</label>
