@@ -8,6 +8,7 @@ use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\User;
 use App\Policies\BranchPolicy;
+use App\Policies\ReportPolicy;
 use App\Policies\SalePolicy;
 use App\Policies\SettingPolicy;
 use App\Policies\UserPolicy;
@@ -26,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         User::class    => UserPolicy::class,
         Branch::class  => BranchPolicy::class,
         Setting::class => SettingPolicy::class,
+        'report'       => ReportPolicy::class
     ];
 
     /**

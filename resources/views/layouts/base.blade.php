@@ -154,30 +154,32 @@
                                 </a>
                             </li>
                         @endcan
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-fw fa-book"></i>
-                                Reports
-                                <span class="fa arrow"></span>
-                            </a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="{{ url('reports/sales') }}">
-                                        Sales
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('reports/stock') }}">
-                                        Stock
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('reports/product') }}">
-                                        Product
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @can('access', 'report')
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-fw fa-book"></i>
+                                    Reports
+                                    <span class="fa arrow"></span>
+                                </a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="{{ url('reports/sales') }}">
+                                            Sales
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('reports/stock') }}">
+                                            Stock
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('reports/product') }}">
+                                            Product
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
                     </ul>
                 </div>
             </div>

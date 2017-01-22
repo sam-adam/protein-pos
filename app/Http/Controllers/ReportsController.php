@@ -23,6 +23,8 @@ class ReportsController extends AuthenticatedController
     {
         parent::__construct();
 
+        $this->middleware('can:access,report');
+
         $this->inventoryRepo = $inventoryRepo;
     }
 
