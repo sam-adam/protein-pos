@@ -25,7 +25,7 @@
                     @endforeach
                 </td>
                 <td class="text-right">{{ number_format($sale->calculateSubTotal()) }}</td>
-                <td class="text-right">{{ number_format($sale->calculateTotal()) }}</td>
+                <td class="text-right">{{ number_format($sale->payments->first()->calculateTotal()) }}</td>
             </tr>
         @endforeach
         <tr>

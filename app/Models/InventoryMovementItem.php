@@ -17,4 +17,9 @@ class InventoryMovementItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function productItem()
+    {
+        return $this->belongsTo(Product::class, 'product_item_id');
+    }
 }

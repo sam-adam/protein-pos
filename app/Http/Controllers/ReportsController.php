@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\Product;
 use App\Models\Sale;
 use App\Repository\InventoryRepository;
 use Carbon\Carbon;
@@ -66,20 +67,26 @@ class ReportsController extends AuthenticatedController
 
     public function stock(Request $request)
     {
-        $branch = Branch::find($request->get('branch'));
-        $from   = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
-        $to     = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
-        $mode   = $request->get('mode') ?: 'daily';
+        $branch  = Branch::find($request->get('branch'));
+        $product = Product::find($request->get('product'));
+        $from    = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
+        $to      = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
+        $mode    = $request->get('mode') ?: 'daily';
 
-        if (!$branch) {
+        if (!$branch || !$product) {
             $movements = new Collection();
         } else {
-
+            $movements = (new Collection($this->inventoryRepo->getMovements($product, $branch)))->map(function ($movement) {
+                return (object) $movement;
+            });
         }
 
         return view('reports.stock', [
             'branchId'  => $request->get('branch'),
+            'productId' => $request->get('product'),
+            'product'   => $product,
             'branches'  => Branch::orderBy('name', 'asc')->get(),
+            'products'  => Product::orderBy('name', 'asc')->get(),
             'movements' => $movements,
             'from'      => $from,
             'to'        => $to,

@@ -4,7 +4,7 @@
             <tr>
                 <th>Time & Date</th>
                 <th>Cashier / User</th>
-                <th class="text-right">Product</th>
+                <th>Product</th>
                 <th class="text-right">Movement Quantity</th>
                 <th>Container</th>
                 <th class="text-right">Container Quantity</th>
@@ -14,26 +14,22 @@
         <tbody>
             @foreach($movements as $movement)
                 <tr>
-                    <td>{{ $movement->opened_at->toDayDateTimeString() }}</td>
-                    <td>{{ $movement->openedBy->name }}</td>
-                    <td>{{ $movement->customer->name }}</td>
-                    <td>
-                        @foreach($movement->packages as $package)
-                            <div>{{ number_format($package->quantity) }} x {{ $package->package->name }}</div>
-                        @endforeach
-                        @foreach($movement->items as $item)
-                            <div>{{ number_format($item->quantity) }} x {{ $item->product->name }}</div>
-                        @endforeach
-                    </td>
-                    <td class="text-right">{{ number_format($movement->calculateSubTotal()) }}</td>
-                    <td class="text-right">{{ number_format($movement->calculateTotal()) }}</td>
+                    <td>{{ $movement->date->toDayDateTimeString() }}</td>
+                    <td>{{ $movement->actor }}</td>
+                    <td>{{ $product->name }}</td>
+                    <td class="text-right">{{ number_format($movement->quantity) }}</td>
+                    <td>{{ $movement->container ? $movement->container->name : '-' }}</td>
+                    <td class="text-right">{{ $movement->container ? number_format($movement->containerQuantity).' ('.number_format($movement->containerItemQuantity).' pcs per container)' : '-' }}</td>
+                    <td>{{ $movement->remark }}</td>
                 </tr>
             @endforeach
         <tr>
-            <td colspan="4"></td>
-            <td class="text-right"><strong>Total</strong></td>
+            <td colspan="5"></td>
             <td class="text-right">
-                <strong>{{ number_format($movements->map(function ($movement) { return $movement->calculateTotal(); })->sum()) }}</strong>
+                <strong>Total In: {{ number_format($movements->map(function ($movement) { return $movement->direction === 'add' ? $movement->quantity : 0; })->sum()) }}</strong>
+            </td>
+            <td class="text-right">
+                <strong>Total Out: {{ number_format($movements->map(function ($movement) { return $movement->direction === 'sub' ? $movement->quantity : 0; })->sum()) }}</strong>
             </td>
         </tr>
         </tbody>

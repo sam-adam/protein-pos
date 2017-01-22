@@ -13,4 +13,14 @@ class InventoryRemoval extends BaseModel
     {
         return $this->belongsTo(BranchInventory::class);
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function productItem()
+    {
+        return $this->belongsTo(Product::class, 'product_item_id');
+    }
 }

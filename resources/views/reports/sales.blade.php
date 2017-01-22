@@ -34,15 +34,11 @@
                 </select>
             </div>
             <div class="col-sm-3">
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="daily" @if($mode == 'daily') checked @endif> Daily
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="weekly" @if($mode == 'weekly') checked @endif> Weekly
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="monthly" @if($mode == 'monthly') checked @endif> Monthly
-                </label>
+                <select name="mode" class="form-control">
+                    <option @if($mode == 'daily') selected @endif value="daily">Daily</option>
+                    <option @if($mode == 'weekly') selected @endif value="weekly">Weekly</option>
+                    <option @if($mode == 'monthly') selected @endif value="monthly">Monthly</option>
+                </select>
             </div>
             <div class="col-sm-2">
                 <button type="submit" class="btn btn-block btn-primary">Submit</button>
@@ -67,7 +63,9 @@
 @section('scripts')
     @parent
     <script type="text/javascript">
-        $('.daterange').daterangepicker({
+        var $date = $('.daterange');
+
+        $date.daterangepicker({
             format: 'YYYY-MM-DD',
             startDate: '{{ $from->toDateString() }}',
             endDate: '{{ $to->toDateString() }}',
@@ -80,6 +78,10 @@
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
+        });
+        $date.on('apply.daterangepicker', function(ev, picker) {
+            $("input[name='from']").val(picker.startDate.unix());
+            $("input[name='to']").val(picker.endDate.unix();
         });
     </script>
 @endsection
