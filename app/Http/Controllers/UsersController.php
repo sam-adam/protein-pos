@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Auth;
  */
 class UsersController extends AuthenticatedController
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('can:access,'.User::class);
+    }
+
     public function index()
     {
         return view('users.index', ['users' => User::paginate()]);

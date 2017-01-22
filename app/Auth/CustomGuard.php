@@ -48,7 +48,7 @@ class CustomGuard extends SessionGuard
         }
 
         if ($user->role === 'cashier') {
-            $currentlyLoggedInSessions = $branch->currentlyLoggedInSessions()->get();
+            $currentlyLoggedInSessions = $branch->currentlyLoggedInSessions()->get()->filter(function (LoginSession $session) { return $session->user->role === 'cashier'; });
             $isCurrentlyLoggedIn       = $currentlyLoggedInSessions->filter(function (LoginSession $session) use ($user) {
                     return (int) $session->user_id === (int) $user->id;
                 })->count() > 0;

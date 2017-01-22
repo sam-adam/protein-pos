@@ -59,29 +59,33 @@
                                         List
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{{ url('sales/create') }}">
-                                        Create - Walk In
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('sales/create?type=delivery') }}">
-                                        Create - Delivery
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('sales/create?type=wholesale') }}">
-                                        Create - Wholesale
-                                    </a>
-                                </li>
+                                @can('create', \App\Models\Sale::class)
+                                    <li>
+                                        <a href="{{ url('sales/create') }}">
+                                            Create - Walk In
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('sales/create?type=delivery') }}">
+                                            Create - Delivery
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('sales/create?type=wholesale') }}">
+                                            Create - Wholesale
+                                        </a>
+                                    </li>
+                                @endcan
                             </ul>
                         </li>
-                        <li>
-                            <a href="{{ url('users') }}">
-                                <i class="fa fa-fw fa-user-circle"></i>
-                                Users
-                            </a>
-                        </li>
+                        @can('access', \App\Models\User::class)
+                            <li>
+                                <a href="{{ url('users') }}">
+                                    <i class="fa fa-fw fa-user-circle"></i>
+                                    Users
+                                </a>
+                            </li>
+                        @endcan
                         <li>
                             <a href="{{ url('branches') }}">
                                 <i class="fa fa-fw fa-building"></i>

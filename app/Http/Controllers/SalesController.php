@@ -50,6 +50,8 @@ class SalesController extends AuthenticatedController
 
     public function create(Request $request, $salesId = null)
     {
+        $this->authorize('create', Sale::class);
+
         $existingData    = [];
         $persistentItems = [];
         $sales           = Sale::find($salesId);

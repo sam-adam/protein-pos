@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Auth\CustomGuard;
 use App\Models\Sale;
+use App\Models\User;
 use App\Policies\SalePolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -17,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Sale::class => SalePolicy::class,
+        User::class => UserPolicy::class,
     ];
 
     /**
