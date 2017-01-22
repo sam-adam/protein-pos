@@ -26,13 +26,6 @@
                     <input name="to" value="{{ $to->timestamp }}" type="hidden" />
                 </div>
             </div>
-            <div class="col-sm-2">
-                <select name="type" class="form-control">
-                    <option value>All Type</option>
-                    <option value="walkin" @if($type === 'walkin') selected @endif>Walk In</option>
-                    <option value="delivery" @if($type === 'delivery') selected @endif>Delivery</option>
-                </select>
-            </div>
             <div class="col-sm-3">
                 <label class="radio-inline">
                     <input type="radio" name="mode" value="daily" @if($mode == 'daily') checked @endif> Daily

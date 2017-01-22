@@ -65,15 +65,19 @@ class MovementService
                 throw new InsufficientStockException($sourceInventory->inventory->product, data_get($item, 'quantity'));
             }
 
-            $movementItem                             = new InventoryMovementItem();
-            $movementItem->product_id                 = $product->id;
-            $movementItem->expired_at                 = $sourceInventory ? $sourceInventory->inventory->expired_at : Carbon::createFromFormat('Y-m-d', data_get($item, 'expire_date'));
-            $movementItem->expiry_reminder_date       = $sourceInventory ? $sourceInventory->inventory->expiry_reminder_date : Carbon::createFromFormat('Y-m-d', data_get($item, 'expiry_reminder_date'));
-            $movementItem->cost                       = $sourceInventory ? $sourceInventory->inventory->cost : data_get($item, 'cost');
-            $movementItem->quantity                   = data_get($item, 'quantity');
-            $movementItem->source_current_stock       = $sourceInventory ? BranchInventory::inBranch($fromBranch)->product($product)->sum('stock') : null;
-            $movementItem->source_branch_inventory_id = $sourceInventory ? $sourceInventory->id : null;
-            $movementItem->destination_current_stock  = BranchInventory::inBranch($toBranch)->product($product)->sum('stock');
+            $movementItem                                 = new InventoryMovementItem();
+            $movementItem->product_id                     = $product->id;
+            $movementItem->product_item_id                = $product->isBulkContainer() ? $product->product_item_id : null;
+            $movementItem->product_item_quantity          = $product->isBulkContainer() ? $product->product_item_quantity : 0;
+            $movementItem->expired_at                     = $sourceInventory ? $sourceInventory->inventory->expired_at : Carbon::createFromFormat('Y-m-d', data_get($item, 'expire_date'));
+            $movementItem->expiry_reminder_date           = $sourceInventory ? $sourceInventory->inventory->expiry_reminder_date : Carbon::createFromFormat('Y-m-d', data_get($item, 'expiry_reminder_date'));
+            $movementItem->cost                           = $sourceInventory ? $sourceInventory->inventory->cost : data_get($item, 'cost');
+            $movementItem->quantity                       = data_get($item, 'quantity');
+            $movementItem->source_current_stock           = $sourceInventory ? BranchInventory::inBranch($fromBranch)->product($product)->sum('stock') : null;
+            $movementItem->source_branch_inventory_id     = $sourceInventory ? $sourceInventory->id : null;
+            $movementItem->destination_current_stock      = BranchInventory::inBranch($toBranch)->product($product)->sum('stock');
+            $movementItem->source_item_current_stock      = $sourceInventory && $product->isBulkContainer() ? BranchInventory::inBranch($fromBranch)->product($product->item)->sum('stock') : null;
+            $movementItem->destination_item_current_stock = $product->isBulkContainer() ? BranchInventory::inBranch($toBranch)->product($product->item)->sum('stock') : null;
 
             $movementItem = $movement->items()->save($movementItem);
 
