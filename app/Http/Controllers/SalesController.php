@@ -125,11 +125,12 @@ class SalesController extends AuthenticatedController
                 $customer = Customer::findOrFail($request->get('customer_id'));
                 $cashier  = Auth::user();
                 $newSale  = $this->saleService->createSale($customer, $cashier, [
-                    'items'          => $request->get('products'),
-                    'packages'       => $request->get('packages'),
-                    'sales_discount' => $request->get('sales_discount'),
-                    'remark'         => $request->get('remark'),
-                    'is_delivery'    => !$request->get('immediate_payment')
+                    'items'               => $request->get('products'),
+                    'packages'            => $request->get('packages'),
+                    'sales_discount'      => $request->get('sales_discount'),
+                    'sales_discount_type' => $request->get('sales_discount_type'),
+                    'remark'              => $request->get('remark'),
+                    'is_delivery'         => !$request->get('immediate_payment')
                 ]);
 
                 if ($request->get('immediate_payment')) {

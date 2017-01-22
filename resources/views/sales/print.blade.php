@@ -142,7 +142,7 @@
                                         <td class="no-line"></td>
                                         <td class="no-line"></td>
                                         <td class="text-right">
-                                            <strong>Sale Discount ({{ number_format($sale->sales_discount).'%' }})</strong>
+                                            <strong>Sale Discount ({{ number_format($sale->sales_discount).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED') }})</strong>
                                         </td>
                                         <td class="text-right">{{  number_format($sale->calculateAfterSalesDiscount()) }}</td>
                                     </tr>
