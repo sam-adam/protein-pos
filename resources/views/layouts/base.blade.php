@@ -69,6 +69,11 @@
                                         Create - Delivery
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ url('sales/create?type=wholesale') }}">
+                                        Create - Wholesale
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li>
