@@ -262,8 +262,8 @@ class SalesController extends AuthenticatedController
 
             $worksheet->removeRow($startingRow);
 
-            $worksheet->getCell('C'.($discountRow + ($currentRow - $startingRow - 1)))->setValue($sale->calculateTotal() - $sale->calculateSubTotal());
-            $worksheet->getCell('C'.($totalRow + ($currentRow - $startingRow - 1)))->setValue($sale->calculateTotal());
+            $worksheet->getCell('C'.($discountRow + ($currentRow - $startingRow - 2)))->setValue($sale->calculateTotal() - $sale->calculateSubTotal());
+            $worksheet->getCell('C'.($totalRow + ($currentRow - $startingRow - 2)))->setValue($sale->calculateTotal());
         })->setFileName('receipt-'.$saleCode)->export('xls');
     }
 }
