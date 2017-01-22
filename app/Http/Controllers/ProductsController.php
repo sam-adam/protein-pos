@@ -14,8 +14,6 @@ use App\Models\Branch;
 use App\Models\BranchInventory;
 use App\Models\Brand;
 use App\Models\Inventory;
-use App\Models\InventoryMovement;
-use App\Models\InventoryMovementItem;
 use App\Models\InventoryRemoval;
 use App\Models\Product;
 use App\Models\ProductCategory;

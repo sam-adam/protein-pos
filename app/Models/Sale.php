@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 class Sale extends BaseModel
 {
     const DISCOUNT_TYPE_PERCENTAGE = 'PERCENTAGE';
-    const DISCOUNT_TYPE_PRICE = 'PRICE';
+    const DISCOUNT_TYPE_PRICE      = 'PRICE';
 
     protected $casts = [
         'is_delivery' => 'boolean'
@@ -143,7 +143,7 @@ class Sale extends BaseModel
             return $this->packages;
         }
 
-        $refundablePackages = new Collection($this->items->all());
+        $refundablePackages = new Collection($this->packages->all());
 
         foreach ($refundablePackages as $refundablePackage) {
             foreach ($refunds as $refund) {
@@ -168,12 +168,12 @@ class Sale extends BaseModel
         $subTotal = 0;
 
         /** @var SaleItem $item */
-        foreach ($this->items as $item) {
+        foreach ($this->getRefundableItems() as $item) {
             $subTotal += $item->calculateSubTotal();
         }
 
         /** @var SalePackage $package */
-        foreach ($this->packages as $package) {
+        foreach ($this->getRefundablePackages() as $package) {
             $subTotal += $package->calculateSubTotal();
         }
 

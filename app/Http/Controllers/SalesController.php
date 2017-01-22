@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\Customer as CustomerDataObjects;
+use App\DataObjects\Decorators\Product\PackageDecorator;
 use App\DataObjects\Product as ProductDataObject;
 use App\Http\Requests\StoreSale;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleRefund;
+use App\Models\SaleRefundItem;
+use App\Models\SaleRefundPackage;
 use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\User;
@@ -253,13 +257,13 @@ class SalesController extends AuthenticatedController
 
             $currentRow = $startingRow + 1;
 
-            foreach ($sale->items as $saleItem) {
+            foreach ($sale->getRefundableItems() as $saleItem) {
                 $worksheet->prependRow($currentRow, [$saleItem->quantity, $saleItem->product->name, $saleItem->calculateSubTotal()]);
 
                 $currentRow += 1;
             }
 
-            foreach ($sale->packages as $salePackage) {
+            foreach ($sale->getRefundablePackages() as $salePackage) {
                 $worksheet->prependRow($currentRow, [$salePackage->quantity, $salePackage->package->name, $salePackage->calculateSubTotal()]);
 
                 $currentRow += 1;
@@ -270,5 +274,96 @@ class SalesController extends AuthenticatedController
             $worksheet->getCell('C'.($discountRow + ($currentRow - $startingRow - 2)))->setValue($sale->calculateTotal() - $sale->calculateSubTotal());
             $worksheet->getCell('C'.($totalRow + ($currentRow - $startingRow - 2)))->setValue($sale->calculateTotal());
         })->setFileName('receipt-'.$saleCode)->export('xls');
+    }
+
+    public function viewRefund($saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        $products = [];
+        $packages = [];
+
+        foreach ($sale->getRefundableItems() as $saleItem) {
+            $dataObject = new \App\DataObjects\Product($saleItem->product);
+
+            array_push($products, [
+                'id'               => $saleItem->id,
+                'product'          => $dataObject,
+                'refundedQuantity' => 0,
+                'quantity'         => $saleItem->quantity
+            ]);
+        }
+
+        foreach ($sale->getRefundablePackages() as $salePackage) {
+            $dataObject = new \App\DataObjects\Package($salePackage->package);
+
+            array_push($packages, [
+                'id'               => $salePackage->id,
+                'package'          => $dataObject,
+                'refundedQuantity' => 0,
+                'quantity'         => $salePackage->quantity
+            ]);
+        }
+
+        return view('sales.refund', [
+            'sale'          => $sale,
+            'products'      => $products,
+            'packages'      => $packages,
+            'creditCardTax' => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
+            'customerData'  => (new CustomerDataObjects($sale->customer))->toArray()
+        ]);
+    }
+
+    public function doRefund(Request $request, $saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (!$sale) {
+            return redirect()->back()->with('flashes.danger', 'Sale not found');
+        }
+
+        if (!$sale->isRefundable()) {
+            return redirect()->back()->with('flashes.danger', 'Sale can not be refunded');
+        }
+
+        DB::transaction(function () use ($sale, $request) {
+            $beforeRefundTotal  = $sale->calculateTotal();
+            $newRefund          = new SaleRefund();
+            $newRefund->sale_id = $sale->id;
+            $newRefund->total   = 0;
+            $newRefund->saveOrFail();
+
+            foreach ($request->get('products') as $saleItemId => $data) {
+                if ($data['quantity'] > 0) {
+                    $newRefundItem                 = new SaleRefundItem();
+                    $newRefundItem->sale_refund_id = $newRefund->id;
+                    $newRefundItem->sale_item_id   = $saleItemId;
+                    $newRefundItem->quantity       = $data['quantity'];
+                    $newRefundItem->saveOrFail();
+                }
+            }
+
+            foreach ($request->get('packages') as $salePackageId => $data) {
+                if ($data['quantity'] > 0) {
+                    $newRefundPackage                  = new SaleRefundPackage();
+                    $newRefundPackage->sale_refund_id  = $newRefund->id;
+                    $newRefundPackage->sale_package_id = $salePackageId;
+                    $newRefundPackage->quantity        = $data['quantity'];
+                    $newRefundPackage->saveOrFail();
+                }
+            }
+
+            $newRefund->total = $beforeRefundTotal - $sale->load('refunds')->calculateTotal();
+            $newRefund->saveOrFail();
+        });
+
+        return redirect(route('sales.print', $sale->id))->with([
+            'flashes.success' => 'Refund completed',
+            'doPrint'         => true
+        ]);
     }
 }

@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SaleRefundItem extends Model
 {
+    public $timestamps = false;
+
     public function saleItem()
     {
         return $this->hasOne(SaleItem::class);

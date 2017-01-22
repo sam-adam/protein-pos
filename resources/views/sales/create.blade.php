@@ -153,6 +153,25 @@
                 </div>
                 <div class="col-md-5">
                     <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="text-center">
+                                <div class="btn-group">
+                                    <button class="btn btn-default" data-toggle="dropdown" style="padding-left: 20px; padding-right: 20px; border-bottom-right-radius: 4px; border-top-right-radius: 4px;">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </button>
+                                    <ul class="dropdown-menu sales-dropdown" role="menu">
+                                        <li>
+                                            <a href="#look-up-receipt" class="look-up-receipt" data-toggle="modal">
+                                                <i class="fa fa-file-o"></i>
+                                                &nbsp;&nbsp;&nbsp;
+                                                Lookup Receipt
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="margin: 0;" />
                         <div class="panel-body" id="search-customer-panel">
                             <search-customer src="{{ route('customers.xhr.search') }}" v-on:customer-selected="setCustomer($event)" v-show="!isCustomerSelected"></search-customer>
                             <div class="customer-info" v-show="isCustomerSelected">

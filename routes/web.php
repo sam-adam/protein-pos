@@ -33,6 +33,7 @@ Route::get('/shifts/out', 'ShiftsController@viewClockOut')->name('shifts.viewOut
 Route::post('/shifts/{shift}/out', 'ShiftsController@clockOut')->name('shifts.out');
 Route::resource('/shifts', 'ShiftsController');
 Route::get('/sales/{sales}/refund', 'SalesController@viewRefund')->name('sales.refund');
+Route::post('/sales/{sales}/do-refund', 'SalesController@doRefund')->name('sales.do_refund');
 Route::get('/sales/{sales}/print', 'SalesController@viewPrint')->name('sales.print');
 Route::get('/sales/{sales}/do-print', 'SalesController@doPrint')->name('sales.do_print');
 Route::post('/sales/{sales}/complete', 'SalesController@complete')->name('sales.complete');
