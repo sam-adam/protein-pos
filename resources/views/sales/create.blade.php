@@ -212,11 +212,23 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Sales Discount:</td>
+                                    <td>
+                                        Sales Discount:
+                                        <div class="btn-group" style="margin-left: 5px;">
+                                            <label class="btn btn-primary" v-bind:class="{'active': salesDiscountType === 'PERCENTAGE'}">
+                                                <input type="radio" name="sales_discount_type" autocomplete="off" value="PERCENTAGE" v-model="salesDiscountType" /> Percent
+                                            </label>
+                                            <label class="btn btn-primary" v-bind:class="{'active': salesDiscountType === 'PRICE'}">
+                                                <input type="radio" name="sales_discount_type" autocomplete="off" value="PRICE" v-model="salesDiscountType" /> Price
+                                            </label>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="input-group">
-                                            <input type="number" name="sales_discount" class="form-control" v-model="salesDiscount" min="0" max="100"/>
-                                            <span class="input-group-addon">%</span>
+                                            <input type="number" name="sales_discount" class="form-control text-right" v-model="salesDiscount" min="0" v-bind:max="maxSaleDiscount"/>
+                                            <span class="input-group-addon">
+                                                @{{ this.salesDiscountType === 'PERCENTAGE' ? '%' : '$' }}
+                                            </span>
                                         </div>
                                     </td>
                                 </tr>
@@ -325,6 +337,8 @@
             data: {
                 query: "",
                 salesDiscount: 0,
+                salesDiscountType: '{{ $defaultDiscountType }}',
+                discountSetting: {!! json_encode($discount) !!},
                 cart: {
                     products: [],
                     packages: [],
@@ -354,9 +368,32 @@
                             }
                         });
                     }
+                },
+                salesDiscount: {
+                    handler: function (oldDiscount, newDiscount) {
+                        var $this = this,
+                            maxSaleDiscount = $this.maxSaleDiscount;
+
+                        if (oldDiscount < 0 || oldDiscount === '') {
+                            $this.salesDiscount = 0;
+                        }
+
+                        if (oldDiscount > maxSaleDiscount) {
+                            $this.salesDiscount = maxSaleDiscount;
+
+                            $this.notify('error', 'Max discount is ' + maxSaleDiscount);
+                        }
+                    }
                 }
             },
             computed: {
+                maxSaleDiscount: function () {
+                    if (this.salesDiscountType === 'PERCENTAGE') {
+                        return 100;
+                    } else {
+                        return this.preSaleTotal;
+                    }
+                },
                 isCustomerInGroup: function () {
                     return this.customer
                             && this.customer.hasOwnProperty('group')
@@ -381,7 +418,7 @@
                     if (this.payment.method === 'cash') {
                         return this.payment.amount >= this.grandTotal;
                     } else if (this.payment.method === 'credit_card') {
-                        return this.payment.cardNumber;
+                        return true;
                     }
 
                     return false;
@@ -391,7 +428,7 @@
                             && this.isCustomerSelected
                             && this.isPaymentCompleted;
                 },
-                subTotal: function () {
+                itemsTotal: function () {
                     var itemsTotal = 0,
                         $this = this;
 
@@ -411,13 +448,19 @@
                         });
                     });
 
-                    if ($this.isCustomerInGroup) {
-                        itemsTotal = $this.applyDiscount(itemsTotal, this.customer.group.discount);
-                    }
-
-                    itemsTotal = $this.applyDiscount(itemsTotal, this.salesDiscount);
-
                     return itemsTotal;
+                },
+                preSaleTotal: function () {
+                    return this.isCustomerInGroup
+                        ? this.applyDiscount(this.itemsTotal, this.customer.group.discount)
+                        : this.itemsTotal;
+                },
+                subTotal: function () {
+                    var preSaleTotal = this.preSaleTotal;
+
+                    return this.salesDiscountType === 'PERCENTAGE'
+                        ? this.applyDiscount(preSaleTotal, this.salesDiscount)
+                        : preSaleTotal - this.salesDiscount;
                 },
                 grandTotal: function () {
                     var total = this.subTotal;
@@ -429,7 +472,9 @@
                     return total;
                 },
                 change: function () {
-                    return Math.max(this.payment.amount - this.grandTotal, 0);
+                    return this.payment.method === 'cash'
+                        ? Math.max(this.payment.amount - this.grandTotal, 0)
+                        : 0;
                 }
             },
             methods: {

@@ -80,6 +80,23 @@ $(function() {
         autoclose: true
     });
 
+    // $("input[type='number']").each(function () {
+    //     var $this = $(this);
+    //
+    //     $this.on("keydown", function (e) {
+    //         var min = $this.attr("min"),
+    //             max = $this.attr("max");
+    //
+    //         if (!isNaN(min) && e.target.value < min) {
+    //             e.preventDefault();
+    //         }
+    //
+    //         if (!isNaN(max) && e.target.value > max) {
+    //             e.preventDefault();
+    //         }
+    //     });
+    // });
+
     var url = window.location;
     // var element = $('ul.nav a').filter(function() {
     //     return this.href == url;

@@ -107,7 +107,13 @@ class SalesController extends AuthenticatedController
             'creditCardTax'       => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0),
             'persistentItems'     => $persistentItems,
             'immediatePayment'    => $request->get('type') !== 'delivery',
-            'defaultDiscountType' => Sale::DISCOUNT_TYPE_PERCENTAGE
+            'defaultDiscountType' => Sale::DISCOUNT_TYPE_PERCENTAGE,
+            'discount'            => [
+                'isEnabled'     => $user->can_give_discount,
+                'isUnlimited'   => $user->can_give_unlimited_discount,
+                'maxPrice'      => $user->max_price_discount ?: 0,
+                'maxPercentage' => $user->max_percentage_discount ?: 0
+            ]
         ], $existingData));
     }
 

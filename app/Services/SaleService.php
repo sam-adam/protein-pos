@@ -49,16 +49,17 @@ class SaleService
      */
     public function createSale(Customer $customer, User $openedBy, array $saleData)
     {
-        $newSale                    = new Sale();
-        $newSale->opened_at         = Carbon::now();
-        $newSale->opened_by_user_id = $openedBy->id;
-        $newSale->branch_id         = $openedBy->branch_id;
-        $newSale->customer_id       = $customer->id;
-        $newSale->customer_discount = $customer->group ? $customer->group->discount : 0;
-        $newSale->sales_discount    = data_get($saleData, 'sales_discount', 0);
-        $newSale->is_delivery       = data_get($saleData, 'is_delivery', false);
-        $newSale->remark            = data_get($saleData, 'remark');
-        $newSale->total             = 0;
+        $newSale                      = new Sale();
+        $newSale->opened_at           = Carbon::now();
+        $newSale->opened_by_user_id   = $openedBy->id;
+        $newSale->branch_id           = $openedBy->branch_id;
+        $newSale->customer_id         = $customer->id;
+        $newSale->customer_discount   = $customer->group ? $customer->group->discount : 0;
+        $newSale->sales_discount      = data_get($saleData, 'sales_discount', 0);
+        $newSale->sales_discount_type = data_get($saleData, 'sales_discount_type', Sale::DISCOUNT_TYPE_PERCENTAGE);
+        $newSale->is_delivery         = data_get($saleData, 'is_delivery', false);
+        $newSale->remark              = data_get($saleData, 'remark');
+        $newSale->total               = 0;
         $newSale->saveOrFail();
 
         $newSale->items()->initRelation([], 'items');

@@ -12,6 +12,9 @@ use Illuminate\Support\Collection;
  */
 class Sale extends BaseModel
 {
+    const DISCOUNT_TYPE_PERCENTAGE = 'PERCENTAGE';
+    const DISCOUNT_TYPE_PRICE = 'PRICE';
+
     protected $casts = [
         'is_delivery' => 'boolean'
     ];
@@ -191,7 +194,9 @@ class Sale extends BaseModel
     public function calculateAfterSalesDiscount()
     {
         $subTotal = $this->calculateAfterCustomerDiscount();
-        $subTotal = $subTotal * (100 - $this->sales_discount) / 100;
+        $subTotal = $this->sales_discount_type === self::DISCOUNT_TYPE_PERCENTAGE
+            ? $subTotal * (100 - $this->sales_discount) / 100
+            : $subTotal - $this->sales_discount;
 
         return $subTotal;
     }

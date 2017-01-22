@@ -10,6 +10,10 @@ class User extends Authenticatable
 {
     use Notifiable, SoftDeletes;
 
+    protected $casts = [
+        'can_give_discount'           => 'boolean',
+        'can_give_unlimited_discount' => 'boolean'
+    ];
     protected $hidden = [
         'password', 'remember_token',
     ];
