@@ -146,12 +146,14 @@
                                 Shifts
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ url('settings') }}">
-                                <i class="fa fa-fw fa-gear"></i>
-                                Settings
-                            </a>
-                        </li>
+                        @can('access', \App\Models\Setting::class)
+                            <li>
+                                <a href="{{ url('settings') }}">
+                                    <i class="fa fa-fw fa-gear"></i>
+                                    Settings
+                                </a>
+                            </li>
+                        @endcan
                         <li>
                             <a href="#">
                                 <i class="fa fa-fw fa-book"></i>

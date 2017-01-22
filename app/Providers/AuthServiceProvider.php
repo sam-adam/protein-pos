@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Auth\CustomGuard;
 use App\Models\Branch;
 use App\Models\Sale;
+use App\Models\Setting;
 use App\Models\User;
 use App\Policies\BranchPolicy;
 use App\Policies\SalePolicy;
+use App\Policies\SettingPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -20,9 +22,10 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        Sale::class   => SalePolicy::class,
-        User::class   => UserPolicy::class,
-        Branch::class => BranchPolicy::class,
+        Sale::class    => SalePolicy::class,
+        User::class    => UserPolicy::class,
+        Branch::class  => BranchPolicy::class,
+        Setting::class => SettingPolicy::class,
     ];
 
     /**

@@ -15,6 +15,13 @@ use Illuminate\Http\Request;
  */
 class SettingsController extends AuthenticatedController
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('can:access,'.Setting::class);
+    }
+
     public function index(Request $request)
     {
         if ($redirectTo = $request->get('redirect-to')) {

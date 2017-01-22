@@ -52,14 +52,14 @@ class SalesController extends AuthenticatedController
     {
         $this->authorize('create', Sale::class);
 
-        $existingData    = [];
-        $persistentItems = [];
-        $sales           = Sale::find($salesId);
-        $user            = User::find(Auth::user()->id);
-        $walkInCustomer  = Customer::find(Setting::getValueByKey(Setting::KEY_WALK_IN_CUSTOMER_ID));
-        $shift           = Shift::inBranch($user->branch)->open()
-            ->where('opened_by_user_id', $user->id)
-            ->first();
+        $canAccessSetting       = Auth::user()->can('access', Setting::class);
+        $incompleteSettingRoute = $canAccessSetting ? route('settings.index', ['redirect-to' => $request->fullUrl()]) : url('/');
+        $existingData           = [];
+        $persistentItems        = [];
+        $sales                  = Sale::find($salesId);
+        $user                   = User::find(Auth::user()->id);
+        $walkInCustomer         = Customer::find(Setting::getValueByKey(Setting::KEY_WALK_IN_CUSTOMER_ID));
+        $shift                  = Shift::inBranch($user->branch)->open()->where('opened_by_user_id', $user->id)->first();
 
         if (!$shift) {
             return redirect()->route('shifts.viewIn', ['redirect' => $request->fullUrl()])->with('flashes.error', 'Please clock in before making sales');
@@ -69,18 +69,18 @@ class SalesController extends AuthenticatedController
             $deliveryProductId = Setting::getValueByKey(Setting::KEY_DELIVERY_PRODUCT_ID);
 
             if (!$deliveryProductId) {
-                return redirect(route('settings.index', ['redirect-to' => $request->fullUrl()]))->with('flashes.danger', 'Please create a delivery service item');
+                return redirect($incompleteSettingRoute)->with('flashes.danger', $canAccessSetting ? 'Please create a delivery service item' : 'Please ask your admin to create a delivery service item');
             }
 
             $deliveryProduct = Product::find($deliveryProductId);
 
             if (!$deliveryProduct || !$deliveryProduct->is_service) {
-                return redirect(route('settings.index'))->with('flashes.danger', 'Please create a delivery service item');
+                return redirect($incompleteSettingRoute)->with('flashes.danger', $canAccessSetting ? 'Please create a delivery service item' : 'Please ask your admin to create a delivery service item');
             }
 
             $persistentItems[] = new ProductDataObject($deliveryProduct);
         } elseif (!$walkInCustomer) {
-            return redirect(route('settings.index', ['redirect-to' => $request->fullUrl()]))->with('flashes.danger', 'Please choose the default walk in customer');
+            return redirect($incompleteSettingRoute)->with('flashes.danger', $canAccessSetting ? 'Please choose the default walk in customer' : 'Please ask your admin to choose the default walk in customer');
         }
 
         if ($sales) {
