@@ -89,6 +89,18 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="form-group {{ $errors->has('can_do_refund') ? 'has-error' : '' }}">
+                            <div class="col-sm-offset-2 col-sm-5">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="can_do_refund" value="1" @if(old('can_do_refund') ?: $user->can_do_refund) checked @endif> Can do refund?
+                                    </label>
+                                </div>
+                                @foreach($errors->get('can_do_refund') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group {{ $errors->has('max_price_discount') || $errors->has('max_percentage_discount') ? 'has-error' : '' }}">
                             <label for="max_price_discount" class="col-sm-2 control-label">Max Discount (Price)</label>
                             <div class="col-sm-2">

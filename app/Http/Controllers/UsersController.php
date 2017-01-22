@@ -36,6 +36,7 @@ class UsersController extends AuthenticatedController
         $newUser->max_percentage_discount     = $request->get('max_percentage_discount') ?: null;
         $newUser->can_give_discount           = $request->get('can_give_discount') ?: false;
         $newUser->can_give_unlimited_discount = $request->get('can_give_unlimited_discount') ?: false;
+        $newUser->can_do_refund               = $request->get('can_do_refund', false);
         $newUser->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User added');
@@ -73,6 +74,7 @@ class UsersController extends AuthenticatedController
         $user->max_percentage_discount     = $request->get('max_percentage_discount', 0);
         $user->can_give_discount           = $request->get('can_give_discount', false);
         $user->can_give_unlimited_discount = $request->get('can_give_unlimited_discount', false);
+        $user->can_do_refund               = $request->get('can_do_refund', false);
         $user->saveOrFail();
 
         return redirect(route('users.index'))->with('flashes.success', 'User edited');
