@@ -238,16 +238,16 @@ class SalesController extends AuthenticatedController
             $worksheet->getCell('B7')->setValue($sale->opened_at->format('H:i A'));
             $worksheet->getCell('B8')->setValue($sale->id);
 
-            $currentRow = $startingRow;
+            $currentRow = $startingRow + 1;
 
             foreach ($sale->items as $saleItem) {
-                $worksheet->appendRow($currentRow, [$saleItem->quantity, $saleItem->product->name, $saleItem->calculateSubTotal()]);
+                $worksheet->prependRow($currentRow, [$saleItem->quantity, $saleItem->product->name, $saleItem->calculateSubTotal()]);
 
                 $currentRow += 1;
             }
 
             foreach ($sale->packages as $salePackage) {
-                $worksheet->appendRow($currentRow, [$salePackage->quantity, $salePackage->package->name, $salePackage->calculateSubTotal()]);
+                $worksheet->prependRow($currentRow, [$salePackage->quantity, $salePackage->package->name, $salePackage->calculateSubTotal()]);
 
                 $currentRow += 1;
             }
