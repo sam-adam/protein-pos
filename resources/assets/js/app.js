@@ -120,6 +120,7 @@ require("./directives/tooltip.js");
 
 Vue.component('SearchProduct', require('./components/SearchProduct.vue'));
 Vue.component('SearchCustomer', require('./components/SearchCustomer.vue'));
+Vue.component('ProductPerformanceChart', require('./components/ProductPerformanceChart.vue'));
 
 // const app = new Vue({
 //     el: '#app'

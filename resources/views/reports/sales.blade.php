@@ -81,7 +81,7 @@
         });
         $date.on('apply.daterangepicker', function(ev, picker) {
             $("input[name='from']").val(picker.startDate.unix());
-            $("input[name='to']").val(picker.endDate.unix();
+            $("input[name='to']").val(picker.endDate.unix());
         });
     </script>
 @endsection

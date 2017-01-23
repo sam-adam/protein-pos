@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <form>
+    <form id="app" v-cloak>
         <div class="row">
             <div class="col-sm-2">
                 <select name="branch" class="form-control">
@@ -19,8 +19,8 @@
             <div class="col-sm-2">
                 <select name="product" class="form-control">
                     <option value>Select Product</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}" @if($productId == $product->id) selected @endif>{{ $product->name }}</option>
+                    @foreach($products as $productOpt)
+                        <option value="{{ $productOpt->id }}" @if($productId == $productOpt->id) selected @endif>{{ $productOpt->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -50,11 +50,33 @@
             <div class="col-sm-12">
                 <div class="panel">
                     <div class="panel-body">
-                        @if($mode === 'weekly' || $mode === 'monthly')
-                            @include('reports.components.products.weekly')
-                        @else
-                            @include('reports.components.products.daily')
-                        @endif
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-xs-4 control-label">Name</label>
+                                        <div class="col-xs-8">
+                                            <p class="form-control-static">{{ $product->name }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-4 control-label">Created At</label>
+                                        <div class="col-xs-8">
+                                            <p class="form-control-static">{{ $product->created_at->toFormattedDateString() }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-xs-4 control-label">Quantity Sold</label>
+                                        <div class="col-xs-8">
+                                            <p class="form-control-static">{{ number_format($totalSold) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <product-performance-chart :data="this.performance" :options="{maintainAspectRatio: false, responsive: true, showLines: true, borderColor: 'black'}"></product-performance-chart>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,7 +86,13 @@
 @section('scripts')
     @parent
     <script type="text/javascript">
-        var $date = $('.daterange');
+        var app = new Vue({
+                el: "#app",
+                data: {
+                    performance: {!! json_encode($chart) !!}
+                }
+            }),
+            $date = $('.daterange');
 
         $date.daterangepicker({
             format: 'YYYY-MM-DD',
