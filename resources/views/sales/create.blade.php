@@ -370,6 +370,34 @@
             </div>
         </form>
     </div>
+    <div class="modal fade" id="look-up-receipt" tabindex="-1" role="dialog" aria-labelledby="look-up-receipt-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="look-up-receipt-label">Find Receipt</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Enter receipt number</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary">
+                        <i class="fa fa-fw fa-search-plus"></i>
+                        View Receipt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
