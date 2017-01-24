@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
@@ -56,5 +54,16 @@ class LoginController extends Controller
         }
 
         return redirect()->back()->withInput($request->only($this->username(), 'remember'));
+    }
+
+    /** {@inheritDoc} */
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+
+        $request->session()->flush();
+        $request->session()->regenerate();
+
+        return redirect('/login')->with('flashes.success', 'Logged out');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ abstract class AuthenticatedController extends Controller
             return $next($request);
         });
 
-        if (!$this instanceof ShiftsController) {
+        if (!$this instanceof ShiftsController && !$this instanceof LoginController) {
             $this->middleware(function (Request $request, $next) {
                 $user = Auth::user();
 

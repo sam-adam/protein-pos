@@ -10,7 +10,7 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <form method="post" action="{{ route('shifts.out', $shift->id) }}" class="form-horizontal">
+                    <form method="post" action="{{ route('shifts.out', [$shift->id, 'redirect-to' => $redirectTo]) }}" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Opened at</label>

@@ -9,8 +9,8 @@ namespace App\Models;
  */
 class SalePayment extends BaseModel
 {
-    const PAYMENT_METHOD_CASH = 'cash';
-    const PAYMENT_METHOD_CREDIT_CARD = 'credit_card';
+    const PAYMENT_METHOD_CASH = 'CASH';
+    const PAYMENT_METHOD_CREDIT_CARD = 'CREDIT_CARD';
 
     public function sale()
     {

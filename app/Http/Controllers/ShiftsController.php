@@ -58,9 +58,9 @@ class ShiftsController extends AuthenticatedController
         return view('shifts.in', [
             'user'       => $user,
             'canClockIn' => Shift::inBranch(Auth::user()->branch)
-                ->where('opened_by_user_id', '=', $user->id)
-                ->suspended()
-                ->exists() === false
+                    ->where('opened_by_user_id', '=', $user->id)
+                    ->suspended()
+                    ->exists() === false
         ]);
     }
 
@@ -75,7 +75,7 @@ class ShiftsController extends AuthenticatedController
         return redirect()->intended()->with('flashes.success', 'Clocked in');
     }
 
-    public function viewClockOut()
+    public function viewClockOut(Request $request)
     {
         $user  = Auth::user();
         $shift = Shift::inBranch($user->branch)->open()
@@ -87,8 +87,9 @@ class ShiftsController extends AuthenticatedController
         }
 
         return view('shifts.out', [
-            'user'  => Auth::user(),
-            'shift' => $shift
+            'user'        => Auth::user(),
+            'shift'       => $shift,
+            'redirectTo' => $request->get('redirect-to')
         ]);
     }
 
@@ -100,8 +101,10 @@ class ShiftsController extends AuthenticatedController
             return redirect()->with('flashes.error', 'Shift not found');
         }
 
+        $redirectTo = $request->get('redirect-to') ?: '/';
+
         $this->shiftService->closeShift($shift, Auth::user(), $request->get('closing_balance'), $request->get('remark') ?: null);
 
-        return redirect()->to('/')->with('flashes.success', 'Shift closed');
+        return redirect()->to($redirectTo)->with('flashes.success', 'Shift closed');
     }
 }
