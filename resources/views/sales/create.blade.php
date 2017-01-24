@@ -184,7 +184,20 @@
                         </div>
                         <hr style="margin: 0;" />
                         <div class="panel-body" id="search-customer-panel">
-                            <search-customer src="{{ route('customers.xhr.search') }}" v-on:customer-selected="setCustomer($event)" v-show="!isCustomerSelected"></search-customer>
+                            <div class="row" v-show="!isCustomerSelected">
+                                <div class="col-sm-8">
+                                    <search-customer src="{{ route('customers.xhr.search') }}" v-on:customer-selected="setCustomer($event)"></search-customer>
+                                </div>
+                                <div class="col-sm-1">
+                                    <p class="form-control-static">Or</p>
+                                </div>
+                                <div class="col-sm-3">
+                                    <button class="btn btn-block btn-primary" v-on:click="findCustomer()">
+                                        <i class="fa fa-fw fa-search"></i>
+                                        Find Customer
+                                    </button>
+                                </div>
+                            </div>
                             <div class="customer-info" v-show="isCustomerSelected">
                                 <div class="row">
                                     <div class="col-xs-12">
@@ -362,6 +375,7 @@
 @section('scripts')
     @parent
     <script type="text/javascript">
+        const childWindowFeature = "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
         const app = new Vue({
             el: "#app",
             data: {
@@ -590,19 +604,39 @@
                 },
                 findProduct: function () {
                     var $this = this,
-                        features = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes',
                         lastUrl = "{!! route('products.index', ['external' => 1, 'intent' => 'select']) !!}",
-                        productWindow =  window.open(lastUrl, "choose_product_window", features),
+                        productWindow =  window.open(lastUrl, "choose_product_window", childWindowFeature),
                         attachListener = function () {
+                            productWindow.addEventListener("product-selected", function (event) { $this.addProductToCart(event.detail.product, 1, event.detail.product.availableQuantity); });
                             productWindow.addEventListener('should-rebind', function () {
                                 var timeout = setTimeout(function () {
                                     if (lastUrl !== window.location.href) {
                                         lastUrl = window.location.href;
 
-                                        productWindow.addEventListener("product-selected", function (event) {
-                                            console.log(event);
-                                            $this.addProductToCart(event.detail.product, 1, event.detail.product.availableQuantity);
-                                        });
+                                        productWindow.addEventListener("product-selected", function (event) { $this.addProductToCart(event.detail.product, 1, event.detail.product.availableQuantity); });
+
+                                        attachListener();
+                                    }
+
+                                    clearTimeout(timeout);
+                                }, 500);
+                            });
+                        };
+
+                    attachListener();
+                },
+                findCustomer: function () {
+                    var $this = this,
+                        lastUrl = "{!! route('customers.index', ['external' => 1, 'intent' => 'select']) !!}",
+                        customerWindow =  window.open(lastUrl, "choose_customer_window", childWindowFeature),
+                        attachListener = function () {
+                            customerWindow.addEventListener("customer-selected", function (event) { $this.setCustomer(event.detail.customer); });
+                            customerWindow.addEventListener('should-rebind', function () {
+                                var timeout = setTimeout(function () {
+                                    if (lastUrl !== window.location.href) {
+                                        lastUrl = window.location.href;
+
+                                        customerWindow.addEventListener("customer-selected", function (event) { $this.setCustomer(event.detail.customer); });
 
                                         attachListener();
                                     }
@@ -617,8 +651,7 @@
                 viewPackage: function ($event, packageId) {
                     if ($event.x !== 0) {
                         var $this = this,
-                            features = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes',
-                            packageWindow =  window.open("/packages/" + packageId + "?external=1&intent=getPackage", "choose_package_window", features);
+                            packageWindow =  window.open("/packages/" + packageId + "?external=1&intent=getPackage", "choose_package_window", childWindowFeature);
 
                         packageWindow.addEventListener("package-selected", function (event) {
                             $this.addPackageToCart(event.detail.package, 1, event.detail.availableQuantity);

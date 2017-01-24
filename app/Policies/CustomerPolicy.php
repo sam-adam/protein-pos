@@ -13,6 +13,6 @@ class ProductPolicy extends BasePolicy
 {
     public function update(User $user)
     {
-        return in_array($user->role, ['admin', 'tech_admin']);
+        return in_array($user->role, ['manager', 'admin', 'tech_admin']);
     }
 }

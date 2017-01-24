@@ -9,6 +9,7 @@ use App\Models\CustomerGroup;
 use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
@@ -67,17 +68,24 @@ class CustomersController extends AuthenticatedController
 
         $customerQuery = $this->getCustomersQuery($request);
         $customers     = $customerQuery['query']->paginate();
+        $customersJson = new Collection();
         $perPage       = $customerQuery['perPage'];
         $orderBy       = $customerQuery['orderBy'];
         $orderDir      = $customerQuery['orderDir'];
 
+        foreach ($customers as $customer) {
+            $customersJson[$customer->id] = new \App\DataObjects\Customer($customer);
+        }
+
         return view('customers.index', [
-            'customers' => $customers->appends(Input::except('page')),
-            'groups'    => CustomerGroup::all(),
-            'orderBy'   => $orderBy,
-            'orderDir'  => $orderDir,
-            'perPage'   => $perPage,
-            'headers'   => [
+            'customers'     => $customers->appends(Input::except('page')),
+            'customersJson' => $customersJson,
+            'groups'        => CustomerGroup::all(),
+            'orderBy'       => $orderBy,
+            'orderDir'      => $orderDir,
+            'perPage'       => $perPage,
+            'intent'        => $request->get('intent', 'display'),
+            'headers'       => [
                 'name'    => [
                     'label' => 'Name',
                     'url'   => $request->fullUrlWithQuery(['order-by' => 'name', 'order-dir' => $orderBy !== 'name' || $orderDir === 'desc' ? 'asc' : 'desc'])

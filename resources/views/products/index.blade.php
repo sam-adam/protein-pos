@@ -129,7 +129,7 @@
                 @endif
             </div>
             <div class="row">
-                @can('create', \App\Models\Product::class)
+                @can('update', \App\Models\Product::class)
                     <div class="col-xs-6">
                         <a href="{{ url('products/create') }}" class="btn btn-primary">
                             <i class="fa fa-plus"></i>
