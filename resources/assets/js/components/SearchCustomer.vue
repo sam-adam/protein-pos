@@ -11,7 +11,7 @@
                 </div>
                 <input type="text"
                         id="query"
-                        placeholder="Input customer name or email"
+                        placeholder="Input customer name, number or email"
                         class="form-control"
                         v-model="query"
                         autocomplete="off"
