@@ -4,6 +4,7 @@ namespace App\Auth;
 
 use App\Models\LoginSession;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Facades\Session;
 
@@ -49,15 +50,11 @@ class CustomGuard extends SessionGuard
 
         if ($user->role === 'cashier') {
             $currentlyLoggedInSessions = $branch->currentlyLoggedInSessions()->get()->filter(function (LoginSession $session) { return $session->user->role === 'cashier'; });
-            $isCurrentlyLoggedIn       = $currentlyLoggedInSessions->filter(function (LoginSession $session) use ($user) {
-                    return (int) $session->user_id === (int) $user->id;
-                })->count() > 0;
+            $currentlyLoggedInSession  = $currentlyLoggedInSessions->filter(function (LoginSession $session) use ($user) { return (int) $session->user_id === (int) $user->id; })->first();
 
-            if ($isCurrentlyLoggedIn) {
-                Session::flush();
-                Session::flash('flashes.error', 'Already logged in this branch');
-
-                return false;
+            if ($currentlyLoggedInSession) {
+                $currentlyLoggedInSession->logged_out_at = Carbon::now();
+                $currentlyLoggedInSession->saveOrFail();
             } elseif ($currentlyLoggedInSessions->count() >= $branch->cash_counters_count) {
                 Session::flush();
                 Session::flash('flashes.error', 'Branch has reached max logged in cashier');
