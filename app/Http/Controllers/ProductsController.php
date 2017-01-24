@@ -67,6 +67,7 @@ class ProductsController extends AuthenticatedController
         $query         = $request->get('query');
         $perPage       = 24;
         $products      = null;
+        $productsJson  = new Collection();
         $productsQuery = Product::with('category', 'brand', 'item')->select('products.*');
         $categoryTree  = [];
         $categories    = ProductCategory::with('parent')
@@ -139,21 +140,33 @@ class ProductsController extends AuthenticatedController
             $products = $productsQuery->paginate($perPage);
         }
 
+        $stocks   = $this->inventoryRepo->getProductStocks($products, Auth::user()->branch);
+        $packages = $this->packageRepo->findAvailablePackages($products);
+
         foreach ($products as $product) {
             $product->stock       = BranchInventory::product($product)->sum('stock');
             $product->branchStock = BranchInventory::inBranch(Auth::user()->branch)
                 ->product($product)
                 ->sum('stock');
+
+            $dataObject = new \App\DataObjects\Product($product);
+            $dataObject->addDecorator(new BulkContainerDecorator($product));
+            $dataObject->addDecorator(new StockDecorator($product, $stocks->get($product->id)));
+            $dataObject->addDecorator(new PackageDecorator($product, $packages->get($product->id)));
+
+            $productsJson[$product->id] = $dataObject;
         }
 
         Session::put('last_product_page', $request->fullUrl());
 
         return view('products.index', [
             'products'     => $products->appends(Input::except('page')),
+            'productsJson' => $productsJson,
             'categories'   => $categories,
             'categoryTree' => $categoryTree,
             'brands'       => Brand::orderBy('name', 'asc')->get(),
-            'showMode'     => count($request->all()) === 0 ? 'category' : 'product'
+            'showMode'     => count($request->except(['intent', 'external'])) === 0 ? 'category' : 'product',
+            'intent'       => $request->get('intent', 'display')
         ]);
     }
 

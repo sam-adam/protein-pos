@@ -10908,7 +10908,7 @@ table#sales-summary-table tr.dashed > td:last-child {
   .fullscreen #page-wrapper {
     margin-left: 0;
   }
-  .fullscreen nav.navbar {
+  .fullscreen .sidebar {
     display: none;
   }
   .navbar-right {

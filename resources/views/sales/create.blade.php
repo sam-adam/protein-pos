@@ -21,12 +21,23 @@
                 <div class="col-md-7">
                     <div class="panel panel-default">
                         <div class="panel-body" id="search-product-panel">
-                            <search-product
-                                    src="{{ route('products.xhr.search') }}"
-                                    :existing-items="cart.products"
-                                    v-on:product-selected="addProductToCart($event.product, 1, $event.availableQuantity)"
-                                    v-on:insufficient-stock="notify('error', $event.remark)"
-                            ></search-product>
+                            <div class="col-sm-8">
+                                <search-product
+                                        src="{{ route('products.xhr.search') }}"
+                                        :existing-items="cart.products"
+                                        v-on:product-selected="addProductToCart($event.product, 1, $event.availableQuantity)"
+                                        v-on:insufficient-stock="notify('error', $event.remark)"
+                                ></search-product>
+                            </div>
+                            <div class="col-sm-1">
+                                <p class="form-control-static">Or</p>
+                            </div>
+                            <div class="col-sm-3">
+                                <button class="btn btn-block btn-primary" v-on:click="findProduct()">
+                                    <i class="fa fa-fw fa-search"></i>
+                                    Find Product
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="panel panel-default">
@@ -288,11 +299,11 @@
                                             <h5 class="sales-info">Payment</h5>
                                             <br/>
                                             <div class="row">
-                                                <div class="col-xs-5">
+                                                <div class="col-xs-8 text-left">
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
                                                 </div>
-                                                <div class="col-xs-6">
+                                                <div class="col-xs-4">
                                                     <input
                                                             type="number"
                                                             name="payment_amount"
@@ -576,6 +587,32 @@
                     var fn = window.toastr[type];
 
                     fn(message);
+                },
+                findProduct: function () {
+                    var $this = this,
+                        features = 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes',
+                        lastUrl = "{!! route('products.index', ['external' => 1, 'intent' => 'select']) !!}",
+                        productWindow =  window.open(lastUrl, "choose_product_window", features),
+                        attachListener = function () {
+                            productWindow.addEventListener('should-rebind', function () {
+                                var timeout = setTimeout(function () {
+                                    if (lastUrl !== window.location.href) {
+                                        lastUrl = window.location.href;
+
+                                        productWindow.addEventListener("product-selected", function (event) {
+                                            console.log(event);
+                                            $this.addProductToCart(event.detail.product, 1, event.detail.product.availableQuantity);
+                                        });
+
+                                        attachListener();
+                                    }
+
+                                    clearTimeout(timeout);
+                                }, 500);
+                            });
+                        };
+
+                    attachListener();
                 },
                 viewPackage: function ($event, packageId) {
                     if ($event.x !== 0) {

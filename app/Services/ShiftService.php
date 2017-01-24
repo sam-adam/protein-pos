@@ -16,7 +16,7 @@ class ShiftService
 {
     public function openShift(User $user, $openingBalance)
     {
-        if ($suspendedShift = Shift::inBranch($user->branch)->suspended()->first()) {
+        if ($suspendedShift = Shift::inBranch($user->branch)->where('opened_by_user_id', $user->id)->suspended()->first()) {
             throw new SuspendedShiftException($suspendedShift);
         }
 

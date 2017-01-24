@@ -34,7 +34,7 @@
                     @else
                         <div class="alert alert-danger">
                             <strong>Unable to clock in!</strong>
-                            There's a suspending shift, please contact your admin
+                            Your previous shift is suspended, please contact your admin
                         </div>
                     @endif
                 </div>

@@ -48,7 +48,7 @@ class ShiftsController extends AuthenticatedController
             ->first();
 
         if ($shift) {
-            return redirect($intended ?: '/')->with('flashes.error', 'Already clocked in');
+            return redirect('/')->with('flashes.error', 'Already clocked in');
         }
 
         if ($intended) {
@@ -56,8 +56,11 @@ class ShiftsController extends AuthenticatedController
         }
 
         return view('shifts.in', [
-            'user'       => Auth::user(),
-            'canClockIn' => Shift::inBranch(Auth::user()->branch)->suspended()->exists() === false
+            'user'       => $user,
+            'canClockIn' => Shift::inBranch(Auth::user()->branch)
+                ->where('opened_by_user_id', '=', $user->id)
+                ->suspended()
+                ->exists() === false
         ]);
     }
 
