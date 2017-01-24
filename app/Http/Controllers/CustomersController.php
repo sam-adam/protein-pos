@@ -240,6 +240,7 @@ class CustomersController extends AuthenticatedController
         $collection = new CollectionDataObject();
         $customers  = Customer::where('name', 'like', "%{$query}%")
             ->orWhere('email', 'like', "%{$query}%")
+            ->orWhere('phone', 'like', "%{$query}%")
             ->limit(5)
             ->get();
 
