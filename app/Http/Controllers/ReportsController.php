@@ -60,7 +60,7 @@ class ReportsController extends AuthenticatedController
 
         return view('reports.sales', [
             'branchId' => $request->get('branch'),
-            'branches' => Branch::orderBy('name', 'asc')->get(),
+            'branches' => Branch::active()->licensed()->orderBy('name', 'asc')->get(),
             'sales'    => $sales,
             'from'     => $from,
             'to'       => $to,
@@ -89,7 +89,7 @@ class ReportsController extends AuthenticatedController
             'branchId'  => $request->get('branch'),
             'productId' => $request->get('product'),
             'product'   => $product,
-            'branches'  => Branch::orderBy('name', 'asc')->get(),
+            'branches'  => Branch::active()->licensed()->orderBy('name', 'asc')->get(),
             'products'  => Product::orderBy('name', 'asc')->get(),
             'movements' => $movements,
             'from'      => $from,
@@ -202,7 +202,7 @@ class ReportsController extends AuthenticatedController
             'product'   => $product,
             'totalSold' => array_sum(array_column($grouped, 'quantity')),
             'chart'     => $chart,
-            'branches'  => Branch::orderBy('name', 'asc')->get(),
+            'branches'  => Branch::active()->licensed()->orderBy('name', 'asc')->get(),
             'products'  => Product::orderBy('name', 'asc')->get(),
             'movements' => $sales,
             'from'      => $from,
