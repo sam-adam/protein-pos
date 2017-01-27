@@ -242,14 +242,17 @@ class SalesController extends AuthenticatedController
         $saleCode = $sale->id.'-'.Carbon::now()->format('YmdHis');
 
         Excel::load(resource_path('docs/ReceiptTemplate.xls'), function (LaravelExcelReader $reader) use ($sale, $saleCode) {
-            $startingRow = 11;
-            $discountRow = 14;
-            $totalRow    = 15;
+            $startingRow = 14;
+            $discountRow = 17;
+            $totalRow    = 18;
 
             $worksheet = $reader->sheet('Sheet1');
             $worksheet->getCell('B6')->setValue($sale->opened_at->format('d m y'));
             $worksheet->getCell('B7')->setValue($sale->opened_at->format('H:i A'));
             $worksheet->getCell('B8')->setValue($saleCode);
+            $worksheet->getCell('B9')->setValue($sale->customer->name);
+            $worksheet->getCell('B10')->setValue($sale->customer->phone);
+            $worksheet->getCell('B11')->setValue($sale->customer->address);
 
             $currentRow = $startingRow + 1;
 
