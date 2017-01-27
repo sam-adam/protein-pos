@@ -12018,7 +12018,7 @@ table#sales-summary-table tr td .sales-info {
 }
 
 table#sales-summary-table tr td:first-child {
-  width: 75%;
+  width: 65%;
 }
 
 table#sales-summary-table tr td:last-child {

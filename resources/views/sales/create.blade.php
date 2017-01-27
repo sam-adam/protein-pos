@@ -9,6 +9,14 @@
         .cart-table {
             margin-bottom: 0;
         }
+        input[type=number] {
+            text-align: right;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 @endsection
 
@@ -69,9 +77,21 @@
                                             </td>
                                             <td style="vertical-align: middle;">@{{ productItem.product.name }}</td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ productItem.product.price }}</td>
-                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                            <td class="text-center" style="width: 130px; vertical-align: middle;">
                                                 <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
-                                                <input v-bind:name="'products[' + productItem.product.id + '][quantity]'" type="number" class="form-control" v-model="productItem.quantity" min="0" v-bind:max="productItem.availableQuantity"/>
+                                                <div class="input-group">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary" type="button" v-on:click="productItem.quantity--">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </span>
+                                                    <input v-bind:name="'products[' + productItem.product.id + '][quantity]'" type="number" class="form-control" v-model="productItem.quantity" min="0" v-bind:max="productItem.availableQuantity"/>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary" type="button" v-on:click="productItem.quantity++">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(productItem) }}</td>
                                         </tr>
@@ -107,7 +127,19 @@
                                             <td style="vertical-align: middle;" class="text-center">@{{ packageItem.package.price }}</td>
                                             <td class="text-center" style="width: 80px; vertical-align: middle;">
                                                 <input v-bind:name="'packages[' + packageItem.package.id + '][id]'" type="hidden" v-model="packageItem.package.id"/>
-                                                <input v-bind:name="'packages[' + packageItem.package.id + '][quantity]'" type="number" class="form-control" v-model="packageItem.quantity" min="0"/>
+                                                <div class="input-group">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary" type="button" v-on:click="packageItem.quantity--">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </span>
+                                                    <input v-bind:name="'packages[' + packageItem.package.id + '][quantity]'" type="number" class="form-control" v-model="packageItem.quantity" min="0"/>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary" type="button" v-on:click="packageItem.quantity++">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ calculateItemPrice(packageItem) }}</td>
                                         </tr>
@@ -249,19 +281,29 @@
                                     <td>
                                         Sales Discount:
                                         <div class="btn-group" style="margin-left: 5px;">
-                                            <label class="btn btn-primary" v-bind:class="{'active': salesDiscountType === 'PERCENTAGE'}">
+                                            <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PERCENTAGE'}">
                                                 <input type="radio" name="sales_discount_type" autocomplete="off" value="PERCENTAGE" v-model="salesDiscountType" /> Percent
                                             </label>
-                                            <label class="btn btn-primary" v-bind:class="{'active': salesDiscountType === 'PRICE'}">
+                                            <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PRICE'}">
                                                 <input type="radio" name="sales_discount_type" autocomplete="off" value="PRICE" v-model="salesDiscountType" /> Price
                                             </label>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-primary" type="button" v-on:click="salesDiscount--">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                            </span>
                                             <input type="number" name="sales_discount" class="form-control text-right" v-model="salesDiscount" min="0" v-bind:max="maxSaleDiscount"/>
                                             <span class="input-group-addon">
                                                 @{{ this.salesDiscountType === 'PERCENTAGE' ? '%' : 'AED' }}
+                                            </span>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-primary" type="button" v-on:click="salesDiscount++">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </td>
@@ -308,16 +350,27 @@
                                                     <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
                                                 </div>
                                                 <div class="col-xs-4">
-                                                    <input
+                                                    <div class="input-group" v-show="payment.method === 'cash'">
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-primary" type="button" v-on:click="payment.amount--">
+                                                                <i class="fa fa-minus"></i>
+                                                            </button>
+                                                        </span>
+                                                        <input
                                                             type="number"
                                                             name="payment_amount"
                                                             v-model="payment.amount"
                                                             class="form-control text-right"
                                                             placeholder="Enter payment amount"
                                                             min="0"
-                                                            v-show="payment.method === 'cash'"
                                                             v-bind:required="payment.method === 'cash'"
-                                                    />
+                                                        />
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-primary" type="button" v-on:click="payment.amount++">
+                                                                <i class="fa fa-plus"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
                                                     <input
                                                             type="hidden"
                                                             name="credit_card_number"
@@ -428,6 +481,16 @@
                                 $this.notify("error", "Insufficient stock");
 
                                 item.quantity = item.product.stock;
+                            }
+                        });
+
+                        newItems.packages.forEach(function (item, index) {
+                            if (item.quantity === 0) {
+                                $this.removePackageFromCart(index);
+                            } else if (item.quantity > item.package.stock) {
+                                $this.notify("error", "Insufficient stock");
+
+                                item.quantity = item.package.stock;
                             }
                         });
                     }
