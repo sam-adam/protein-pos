@@ -239,7 +239,7 @@ class SalesController extends AuthenticatedController
             return redirect()->back()->with('flashes.danger', 'Sale not found');
         }
 
-        $saleCode = $sale->id.'-'.Carbon::now()->format('YmdHis');
+        $saleCode = $sale->getCode();
 
         Excel::load(resource_path('docs/ReceiptTemplate.xls'), function (LaravelExcelReader $reader) use ($sale, $saleCode) {
             $startingRow = 14;

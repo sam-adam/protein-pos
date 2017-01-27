@@ -6,6 +6,7 @@ use App\DataObjects\Report;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SalePayment;
 use App\Repository\InventoryRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\JoinClause;
@@ -32,26 +33,39 @@ class ReportsController extends AuthenticatedController
 
     public function sales(Request $request)
     {
-        $branch = Branch::find($request->get('branch'));
-        $from   = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
-        $to     = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
-        $mode   = $request->get('mode') ?: 'daily';
-        $type   = $request->get('type') ?: 'all';
+        $branch      = Branch::find($request->get('branch'));
+        $from        = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
+        $to          = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
+        $mode        = $request->get('mode') ?: 'daily';
+        $type        = $request->get('type') ?: 'all';
+        $paymentType = $request->get('payment_type') ?: 'all';
 
         if (!$branch) {
             $sales = new Collection();
         } else {
-            $salesQuery = Sale::where('branch_id', '=', $branch->id)
-                ->finished()
+            $salesQuery = Sale::finished()
                 ->paid()
-                ->whereBetween('opened_at', [$from, $to]);
+                ->select('sales.*')
+                ->join('sale_payments', 'sales.id', '=', 'sale_payments.sale_id')
+                ->where('sales.branch_id', '=', $branch->id)
+                ->whereBetween('sales.opened_at', [$from, $to])
+                ->groupBy('sales.id');
 
             switch ($type) {
                 case 'walkin':
-                    $salesQuery = $salesQuery->where('is_delivery', '=', false);
+                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', false);
                     break;
                 case 'delivery':
-                    $salesQuery = $salesQuery->where('is_delivery', '=', true);
+                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', true);
+                    break;
+            }
+
+            switch ($paymentType) {
+                case 'cash':
+                    $salesQuery = $salesQuery->where('sale_payments.payment_method', '=', SalePayment::PAYMENT_METHOD_CASH);
+                    break;
+                case 'credit_card':
+                    $salesQuery = $salesQuery->where('sale_payments.payment_method', '=', SalePayment::PAYMENT_METHOD_CREDIT_CARD);
                     break;
             }
 
@@ -59,13 +73,14 @@ class ReportsController extends AuthenticatedController
         }
 
         return view('reports.sales', [
-            'branchId' => $request->get('branch'),
-            'branches' => Branch::active()->licensed()->orderBy('name', 'asc')->get(),
-            'sales'    => $sales,
-            'from'     => $from,
-            'to'       => $to,
-            'mode'     => $mode,
-            'type'     => $type
+            'branchId'    => $request->get('branch'),
+            'branches'    => Branch::active()->licensed()->orderBy('name', 'asc')->get(),
+            'sales'       => $sales,
+            'from'        => $from,
+            'to'          => $to,
+            'mode'        => $mode,
+            'type'        => $type,
+            'paymentType' => $paymentType
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -110,6 +111,11 @@ class Sale extends BaseModel
     public function isPaid()
     {
         return $this->paid_at !== null;
+    }
+
+    public function getCode()
+    {
+        return $this->id.'-'.Carbon::now()->format('YmdHis');
     }
 
     public function getRefundableItems()

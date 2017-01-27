@@ -26,19 +26,30 @@
                     <input name="to" value="{{ $to->timestamp }}" type="hidden" />
                 </div>
             </div>
-            <div class="col-sm-2">
-                <select name="type" class="form-control">
-                    <option value>All Type</option>
-                    <option value="walkin" @if($type === 'walkin') selected @endif>Walk In</option>
-                    <option value="delivery" @if($type === 'delivery') selected @endif>Delivery</option>
-                </select>
-            </div>
-            <div class="col-sm-3">
-                <select name="mode" class="form-control">
-                    <option @if($mode == 'daily') selected @endif value="daily">Daily</option>
-                    <option @if($mode == 'weekly') selected @endif value="weekly">Weekly</option>
-                    <option @if($mode == 'monthly') selected @endif value="monthly">Monthly</option>
-                </select>
+            <div class="col-sm-5">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <select name="type" class="form-control">
+                            <option value>All Type</option>
+                            <option value="walkin" @if($type === 'walkin') selected @endif>Walk In</option>
+                            <option value="delivery" @if($type === 'delivery') selected @endif>Delivery</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <select name="payment_type" class="form-control">
+                            <option value>All Payments</option>
+                            <option @if($paymentType == 'cash') selected @endif value="cash">Cash</option>
+                            <option @if($paymentType == 'credit_card') selected @endif value="credit_card">Credit Card</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <select name="mode" class="form-control">
+                            <option @if($mode == 'daily') selected @endif value="daily">Daily</option>
+                            <option @if($mode == 'weekly') selected @endif value="weekly">Weekly</option>
+                            <option @if($mode == 'monthly') selected @endif value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <div class="col-sm-2">
                 <button type="submit" class="btn btn-block btn-primary">Submit</button>

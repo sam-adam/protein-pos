@@ -3,33 +3,43 @@
         <thead>
         <tr>
             <th>Date</th>
+            <th>Receipt SN</th>
             <th>Cashier / User</th>
+            <th>Payment</th>
             <th>Client</th>
-            <th>Products</th>
             <th class="text-right">Price</th>
+            <th class="text-right">Discount</th>
             <th class="text-right">After Discount Price</th>
+            <th class="text-right">Paid Amount</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         @foreach($sales as $sale)
             <tr>
                 <td>{{ $sale->opened_at->toDayDateTimeString() }}</td>
+                <td>{{ $sale->getCode() }}</td>
                 <td>{{ $sale->openedBy->name }}</td>
+                <td>{{ $sale->payments->first()->payment_method }}</td>
                 <td>{{ $sale->customer->name }}</td>
-                <td>
-                    @foreach($sale->packages as $package)
-                        <div>{{ number_format($package->quantity) }} x {{ $package->package->name }}</div>
-                    @endforeach
-                    @foreach($sale->items as $item)
-                        <div>{{ number_format($item->quantity) }} x {{ $item->product->name }}</div>
-                    @endforeach
-                </td>
                 <td class="text-right">{{ number_format($sale->calculateSubTotal()) }}</td>
-                <td class="text-right">{{ number_format($sale->payments->first()->calculateTotal()) }}</td>
+                <td class="text-right">{{ number_format($sale->calculateAfterSalesDiscount() - $sale->calculateSubTotal()) }}</td>
+                <td class="text-right">{{ number_format($sale->calculateTotal()) }}</td>
+                <td class="text-right">{{ number_format($sale->payments->first()->amount) }}</td>
+                <td class="text-right">
+                    <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-primary btn-sm" target="_blank">
+                        <i class="fa fa-search-plus"></i>
+                        View
+                    </a>
+                    <a href="{{ route('sales.print', $sale->id) }}" class="btn btn-default btn-sm" target="_blank">
+                        <i class="fa fa-print"></i>
+                        Print
+                    </a>
+                </td>
             </tr>
         @endforeach
         <tr>
-            <td colspan="4"></td>
+            <td colspan="8"></td>
             <td class="text-right"><strong>Total</strong></td>
             <td class="text-right">
                 <strong>{{ number_format($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum()) }}</strong>

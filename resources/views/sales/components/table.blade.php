@@ -26,8 +26,8 @@
                             {{ $sale->payments->first()->payment_method }}
                         @else
                             <span class="label label-danger">
-                                                            Unpaid
-                                                        </span>
+                                Unpaid
+                            </span>
                         @endif
                     </td>
                     <td class="text-right">
