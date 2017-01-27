@@ -172,7 +172,7 @@ class ProductsController extends AuthenticatedController
 
     public function create()
     {
-        $this->authorize('create', Product::class);
+        $this->authorize('update', Product::class);
 
         return view('products.create', [
             'brands'     => Brand::orderBy('name', 'asc')->get(),
@@ -189,7 +189,7 @@ class ProductsController extends AuthenticatedController
 
     public function store(StoreProduct $request)
     {
-        $this->authorize('create', Product::class);
+        $this->authorize('update', Product::class);
 
         $newProduct                        = new Product();
         $newProduct->is_service            = $request->get('is_service') ?: false;
@@ -305,7 +305,7 @@ class ProductsController extends AuthenticatedController
 
     public function edit($productId)
     {
-        $this->authorize('create', Product::class);
+        $this->authorize('update', Product::class);
 
         $product = Product::find($productId);
 
@@ -372,7 +372,7 @@ class ProductsController extends AuthenticatedController
 
     public function addInventory(AddProductMovement $request, $productId)
     {
-        $this->authorize('create', Product::class);
+        $this->authorize('update', Product::class);
 
         $product = Product::find($productId);
 
@@ -398,7 +398,7 @@ class ProductsController extends AuthenticatedController
 
     public function moveInventory(MoveInventoryToOtherBranch $request, $productId)
     {
-        $this->authorize('create', Product::class);
+        $this->authorize('update', Product::class);
 
         $product = Product::find($productId);
 

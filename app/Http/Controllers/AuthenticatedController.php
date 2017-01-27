@@ -20,9 +20,7 @@ abstract class AuthenticatedController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function (Request $request, $next) {
-            $user = Auth::user();
-
-            View::share('fullScreen', RequestFacade::get('external') || RequestFacade::get('fullscreen') || ($user && $user->role === 'cashier'));
+            View::share('fullScreen', RequestFacade::get('external') || RequestFacade::get('fullscreen'));
 
             return $next($request);
         });

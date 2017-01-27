@@ -87,64 +87,70 @@
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
-                            <tr>
-                                @can('update', \App\Models\Customer::class)
-                                    <th>
-                                        <input type="checkbox" id="mass-selector" />
-                                    </th>
-                                @endcan
-                                @foreach($headers as $name => $header)
-                                    <th>
-                                        {{ $header['label'] }}
-                                        @if($orderBy === $name)
-                                            <a href="{{ $header['url'] }}"><i class="fa fa-fw fa-sort-{{ $orderDir === 'asc' ? 'desc' : 'asc' }}"></i></a>
-                                        @else
-                                            <a href="{{ $header['url'] }}"><i class="fa fa-fw fa-sort"></i></a>
-                                        @endif
-                                    </th>
-                                @endforeach
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($customers as $customer)
                                 <tr>
                                     @can('update', \App\Models\Customer::class)
-                                        <td>
-                                            <input type="checkbox" value="{{ $customer->id }}" class="customer-checkbox" />
-                                        </td>
+                                        <th>
+                                            <input type="checkbox" id="mass-selector" />
+                                        </th>
                                     @endcan
-                                    <td>
-                                        <a href="{{ route('customers.show', $customer->id) }}">{{ $customer->name }}</a>
-                                    </td>
-                                    <td>{{ $customer->email }}</td>
-                                    <td>{{ $customer->phone }}</td>
-                                    <td>{{ $customer->address }}</td>
-                                    <td>{{ $customer->group ? $customer->group->name.' ('.$customer->group->discount.'%)' : '' }}</td>
-                                    <td>
-                                        @can('update', \App\Models\Customer::class)
-                                            <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-primary btn-sm btn-block">
-                                                <i class="fa fa-pencil"></i>
-                                                Edit
-                                            </a>
-                                            <form method="post" action="{{ route('customers.destroy', $customer->id) }}" style="display: inline;" onsubmit="return confirm('Deleting group! Are you sure?');">
-                                                {{ csrf_field() }}
-                                                {{ method_field('DELETE') }}
-                                                <button type="submit" class="btn btn-danger btn-sm btn-block">
-                                                    <i class="fa fa-trash"></i>
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        @endcan
-                                        @if($intent === 'select')
-                                            <button class="btn btn-sm btn-block btn-primary" onclick="selectCustomer({{ json_encode($customersJson[$customer->id]) }})">
-                                                <i class="fa fa-check"></i>
-                                                Select
-                                            </button>
-                                        @endif
-                                    </td>
+                                    @foreach($headers as $name => $header)
+                                        <th>
+                                            {{ $header['label'] }}
+                                            @if($orderBy === $name)
+                                                <a href="{{ $header['url'] }}"><i class="fa fa-fw fa-sort-{{ $orderDir === 'asc' ? 'desc' : 'asc' }}"></i></a>
+                                            @else
+                                                <a href="{{ $header['url'] }}"><i class="fa fa-fw fa-sort"></i></a>
+                                            @endif
+                                        </th>
+                                    @endforeach
+                                    <th></th>
                                 </tr>
-                            @endforeach
+                            </thead>
+                            <tbody>
+                                @foreach($customers as $customer)
+                                    <tr>
+                                        @can('update', \App\Models\Customer::class)
+                                            <td>
+                                                <input type="checkbox" value="{{ $customer->id }}" class="customer-checkbox" />
+                                            </td>
+                                        @endcan
+                                        <td>
+                                            <a href="{{ route('customers.show', $customer->id) }}">{{ $customer->name }}</a>
+                                        </td>
+                                        <td>{{ $customer->email }}</td>
+                                        <td>{{ $customer->phone }}</td>
+                                        <td>{{ $customer->address }}</td>
+                                        <td>{{ $customer->group ? $customer->group->name.' ('.$customer->group->discount.'%)' : '' }}</td>
+                                        <td>
+                                            @can('update', \App\Models\Customer::class)
+                                                <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-primary btn-sm btn-block">
+                                                    <i class="fa fa-pencil"></i>
+                                                    Edit
+                                                </a>
+                                                <form method="post" action="{{ route('customers.destroy', $customer->id) }}" style="display: inline;" onsubmit="return confirm('Deleting group! Are you sure?');">
+                                                    {{ csrf_field() }}
+                                                    {{ method_field('DELETE') }}
+                                                    <button type="submit" class="btn btn-danger btn-sm btn-block">
+                                                        <i class="fa fa-trash"></i>
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @endcan
+                                            @if($intent === 'select')
+                                                <button class="btn btn-sm btn-block btn-primary" onclick="selectCustomer({{ json_encode($customersJson[$customer->id]) }})">
+                                                    <i class="fa fa-check"></i>
+                                                    Select
+                                                </button>
+                                            @endif
+                                            @can('create', \App\Models\Sale::class)
+                                                <a href="{{ route('sales.create', ['customer' => $customer->id]) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-cart-plus"></i>
+                                                    New sale
+                                                </a>
+                                            @endcan
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

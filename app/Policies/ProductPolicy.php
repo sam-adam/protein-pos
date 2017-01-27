@@ -15,4 +15,9 @@ class ProductPolicy extends BasePolicy
     {
         return in_array($user->role, ['admin', 'tech_admin']);
     }
+
+    public function seeAllBranch(User $user)
+    {
+        return in_array($user->role, ['admin', 'tech_admin']);
+    }
 }

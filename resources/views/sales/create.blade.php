@@ -21,22 +21,13 @@
                 <div class="col-md-7">
                     <div class="panel panel-default">
                         <div class="panel-body" id="search-product-panel">
-                            <div class="col-sm-8">
+                            <div class="col-sm-12">
                                 <search-product
                                         src="{{ route('products.xhr.search') }}"
                                         :existing-items="cart.products"
                                         v-on:product-selected="addProductToCart($event.product, 1, $event.availableQuantity)"
                                         v-on:insufficient-stock="notify('error', $event.remark)"
                                 ></search-product>
-                            </div>
-                            <div class="col-sm-1">
-                                <p class="form-control-static">Or</p>
-                            </div>
-                            <div class="col-sm-3">
-                                <button class="btn btn-block btn-primary" v-on:click="findProduct()">
-                                    <i class="fa fa-fw fa-search"></i>
-                                    Find Product
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -185,13 +176,13 @@
                         <hr style="margin: 0;" />
                         <div class="panel-body" id="search-customer-panel">
                             <div class="row" v-show="!isCustomerSelected">
-                                <div class="col-sm-8">
+                                <div class="col-sm-7">
                                     <search-customer src="{{ route('customers.xhr.search') }}" v-on:customer-selected="setCustomer($event)"></search-customer>
                                 </div>
                                 <div class="col-sm-1">
                                     <p class="form-control-static">Or</p>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <button class="btn btn-block btn-primary" v-on:click="findCustomer()">
                                         <i class="fa fa-fw fa-search"></i>
                                         Find Customer

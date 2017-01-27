@@ -104,18 +104,26 @@
                                 <li>
                                     <a href="{{ url('products') }}">Products</a>
                                 </li>
-                                <li>
-                                    <a href="{{ url('categories') }}">Categories</a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('brands') }}">Brands</a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('product-variants') }}">Product Variants</a>
-                                </li>
-                                <li>
-                                    <a href="{{ url('packages') }}">Packages</a>
-                                </li>
+                                @can('access', \App\Models\ProductCategory::class)
+                                    <li>
+                                        <a href="{{ url('categories') }}">Categories</a>
+                                    </li>
+                                @endcan
+                                @can('access', \App\Models\Brand::class)
+                                    <li>
+                                        <a href="{{ url('brands') }}">Brands</a>
+                                    </li>
+                                @endcan
+                                @can('access', \App\Models\ProductVariantGroup::class)
+                                    <li>
+                                        <a href="{{ url('product-variants') }}">Product Variants</a>
+                                    </li>
+                                @endcan
+                                @can('access', \App\Models\Package::class)
+                                    <li>
+                                        <a href="{{ url('packages') }}">Packages</a>
+                                    </li>
+                                @endcan
                                 {{--<li>--}}
                                     {{--<a href="{{ url('inventory-movements') }}">Inventory Movements</a>--}}
                                 {{--</li>--}}

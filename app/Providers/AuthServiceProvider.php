@@ -3,12 +3,20 @@
 namespace App\Providers;
 
 use App\Auth\CustomGuard;
+use App\DataObjects\Brand;
+use App\DataObjects\Package;
 use App\DataObjects\Report;
 use App\Models\Branch;
+use App\Models\ProductCategory;
+use App\Models\ProductVariantGroup;
 use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\User;
 use App\Policies\BranchPolicy;
+use App\Policies\BrandPolicy;
+use App\Policies\PackagePolicy;
+use App\Policies\ProductCategoryPolicy;
+use App\Policies\ProductVariantGroupPolicy;
 use App\Policies\ReportPolicy;
 use App\Policies\SalePolicy;
 use App\Policies\SettingPolicy;
@@ -24,11 +32,15 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        Sale::class    => SalePolicy::class,
-        User::class    => UserPolicy::class,
-        Branch::class  => BranchPolicy::class,
-        Setting::class => SettingPolicy::class,
-        Report::class  => ReportPolicy::class
+        Sale::class                => SalePolicy::class,
+        User::class                => UserPolicy::class,
+        Branch::class              => BranchPolicy::class,
+        Brand::class               => BrandPolicy::class,
+        Package::class             => PackagePolicy::class,
+        ProductCategory::class     => ProductCategoryPolicy::class,
+        ProductVariantGroup::class => ProductVariantGroupPolicy::class,
+        Setting::class             => SettingPolicy::class,
+        Report::class              => ReportPolicy::class
     ];
 
     /**
