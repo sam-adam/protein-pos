@@ -49,35 +49,45 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel">
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-horizontal">
-                                    <div class="form-group">
-                                        <label class="col-xs-4 control-label">Name</label>
-                                        <div class="col-xs-8">
-                                            <p class="form-control-static">{{ $product->name }}</p>
+                    @if($product)
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Name</label>
+                                            <div class="col-xs-8">
+                                                <p class="form-control-static">{{ $product->name }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-xs-4 control-label">Created At</label>
-                                        <div class="col-xs-8">
-                                            <p class="form-control-static">{{ $product->created_at->toFormattedDateString() }}</p>
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Created At</label>
+                                            <div class="col-xs-8">
+                                                <p class="form-control-static">{{ $product->created_at->toFormattedDateString() }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-xs-4 control-label">Quantity Sold</label>
-                                        <div class="col-xs-8">
-                                            <p class="form-control-static">{{ number_format($totalSold) }}</p>
+                                        <div class="form-group">
+                                            <label class="col-xs-4 control-label">Quantity Sold</label>
+                                            <div class="col-xs-8">
+                                                <p class="form-control-static">{{ number_format($totalSold) }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-8">
-                                <product-performance-chart :data="this.performance" :options="{maintainAspectRatio: false, responsive: true, showLines: true, borderColor: 'black'}"></product-performance-chart>
+                                <div class="col-sm-8">
+                                    <product-performance-chart :data="this.performance" :options="{maintainAspectRatio: false, responsive: true, showLines: true, borderColor: 'black'}"></product-performance-chart>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <span class="label label-primary">No product selected</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

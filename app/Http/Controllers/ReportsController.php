@@ -6,9 +6,6 @@ use App\DataObjects\Report;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Sale;
-use App\Models\SaleItem;
-use App\Models\SalePackage;
-use App\Models\SalePackageItem;
 use App\Repository\InventoryRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\JoinClause;
@@ -183,7 +180,7 @@ class ReportsController extends AuthenticatedController
             'labels'   => [],
             'datasets' => [
                 [
-                    'label'           => $product->name,
+                    'label'           => $product ? $product->name : '',
                     'backgroundColor' => '#f87979',
                     'data'            => []
                 ]

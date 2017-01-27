@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\SalePayment;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -15,7 +16,11 @@ class DashboardController extends AuthenticatedController
 {
     public function index()
     {
-        $todayCompletedSales  = Sale::with('payments')->paid()->where('opened_by_user_id', '=', Auth::user()->id)->get();
+        $todayCompletedSales  = Sale::with('payments')
+            ->paid()
+            ->where('opened_by_user_id', '=', Auth::user()->id)
+            ->whereBetween('paid_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])
+            ->get();
         $incompleteDeliveries = Sale::delivery()
             ->notCancelled()
             ->unPaid()
