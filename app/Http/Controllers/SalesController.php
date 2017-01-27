@@ -111,6 +111,7 @@ class SalesController extends AuthenticatedController
             'persistentItems'     => $persistentItems,
             'immediatePayment'    => $request->get('type') !== 'delivery',
             'defaultDiscountType' => Sale::DISCOUNT_TYPE_PERCENTAGE,
+            'canModifyPrice'      => $user->can('modifyPrice', Sale::class) && $request->get('type') === 'wholesale',
             'discount'            => [
                 'isEnabled'     => $request->get('type') === 'wholesale'
                     ? $user->can('giveWholeSaleDiscount', Sale::class) && $user->can_give_discount

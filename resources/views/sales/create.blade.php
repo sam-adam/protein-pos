@@ -77,7 +77,7 @@
                                             </td>
                                             <td style="vertical-align: middle;">@{{ productItem.product.name }}</td>
                                             <td style="vertical-align: middle;" class="text-center">
-                                                @can('modifyPrice', \App\Models\Sale::class)
+                                                @if($canModifyPrice)
                                                     <div class="input-group">
                                                         <span class="input-group-btn">
                                                             <button class="btn btn-primary" type="button" v-on:click="productItem.product.price--">
@@ -94,7 +94,7 @@
                                                 @else
                                                     <input v-bind:name="'products[' + productItem.product.id + '][price]'" type="hidden" class="form-control" v-model="productItem.product.price" min="0" />
                                                     @{{ productItem.product.price }}
-                                                @endcan
+                                                @endif
                                             </td>
                                             <td class="text-center" style="width: 130px; vertical-align: middle;">
                                                 <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
