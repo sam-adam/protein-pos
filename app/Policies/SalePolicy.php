@@ -33,4 +33,9 @@ class SalePolicy extends BasePolicy
 
         return false;
     }
+
+    public function modifyPrice(User $user)
+    {
+        return in_array($user->role, ['admin', 'manager']);
+    }
 }

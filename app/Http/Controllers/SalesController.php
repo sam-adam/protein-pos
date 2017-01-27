@@ -61,7 +61,7 @@ class SalesController extends AuthenticatedController
         $walkInCustomer         = Customer::find(Setting::getValueByKey(Setting::KEY_WALK_IN_CUSTOMER_ID));
         $shift                  = Shift::inBranch($user->branch)->open()->where('opened_by_user_id', $user->id)->first();
 
-        if (!$shift) {
+        if (!$shift && $user->role === 'cashier') {
             return redirect()->route('shifts.viewIn', ['redirect' => $request->fullUrl()])->with('flashes.error', 'Please clock in before making sales');
         }
 
