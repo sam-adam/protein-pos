@@ -148,12 +148,14 @@
                                 </li>
                             </ul>
                         </li>
-                        <li>
-                            <a href="{{ url('shifts') }}">
-                                <i class="fa fa-fw fa-clock-o"></i>
-                                Shifts
-                            </a>
-                        </li>
+                        @can('access', \App\Models\Shift::class)
+                            <li>
+                                <a href="{{ url('shifts') }}">
+                                    <i class="fa fa-fw fa-clock-o"></i>
+                                    Shifts
+                                </a>
+                            </li>
+                        @endcan
                         @can('access', \App\Models\Setting::class)
                             <li>
                                 <a href="{{ url('settings') }}">

@@ -30,6 +30,8 @@ class ShiftsController extends AuthenticatedController
 
     public function index()
     {
+        $this->authorize('access', Shift::class);
+
         $shifts = Shift::with('openedBy', 'closedBy', 'branch')
             ->orderBy('opened_at', 'desc')
             ->paginate();
