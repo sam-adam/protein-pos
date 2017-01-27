@@ -7,6 +7,10 @@
             <i class="fa fa-fw fa-cart-plus"></i>
             Start New Sale
         </a>
+        <a href="{{ route('sales.create', ['type' => 'delivery']) }}" class="btn btn-block btn-lg btn-primary">
+            <i class="fa fa-fw fa-cart-plus"></i>
+            Book New Delivery
+        </a>
         <a href="{{ route('shifts.viewOut', ['redirect-to' => url('logout')]) }}" class="btn btn-block btn-lg btn-warning">
             <i class="fa fa-fw fa-sign-out"></i>
             Clock Out

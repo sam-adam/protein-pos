@@ -178,7 +178,7 @@
                             {{--Refund--}}
                         {{--</a>--}}
                     {{--@endif--}}
-                    <a href="{{ Session::get('last_sale_page') ?: route('sales.index') }}" class="btn btn-default btn-lg btn-block" style="margin-bottom: 10px;">
+                    <a href="{{ Session::get('last_sale_page') ?: URL::previous() }}" class="btn btn-default btn-lg btn-block" style="margin-bottom: 10px;">
                         <i class="fa fa-arrow-left fa-fw"></i>
                         Back
                     </a>
