@@ -22,10 +22,16 @@
                 <td>{{ $sale->openedBy->name }}</td>
                 <td>{{ $sale->payments->first()->payment_method }}</td>
                 <td>{{ $sale->customer->name }}</td>
-                <td class="text-right">{{ number_format($sale->calculateSubTotal()) }}</td>
-                <td class="text-right">{{ number_format($sale->calculateAfterSalesDiscount() - $sale->calculateSubTotal()) }}</td>
-                <td class="text-right">{{ number_format($sale->calculateTotal()) }}</td>
-                <td class="text-right">{{ number_format($sale->payments->first()->amount) }}</td>
+                <td class="text-right">{{ number_format($sale->calculateSubTotal(), 1) }}</td>
+                <td class="text-right">
+                    @if($sale->sales_discount)
+                        {{ number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED') }}
+                    @else
+                        -
+                    @endif
+                </td>
+                <td class="text-right">{{ number_format($sale->calculateTotal(), 1) }}</td>
+                <td class="text-right">{{ number_format($sale->payments->first()->calculateTotal(), 1) }}</td>
                 <td class="text-right">
                     <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-primary btn-sm" target="_blank">
                         <i class="fa fa-search-plus"></i>
