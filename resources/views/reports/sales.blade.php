@@ -52,7 +52,18 @@
                 </div>
             </div>
             <div class="col-sm-2">
-                <button type="submit" class="btn btn-block btn-primary">Submit</button>
+                <div class="btn-group btn-block">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="{{ Request::fullUrlWithQuery(['print' => 1]) }}">Download</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <br/>

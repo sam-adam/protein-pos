@@ -12,6 +12,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Writers\LaravelExcelWriter;
 
 /**
  * Class ReportsController
@@ -70,6 +73,41 @@ class ReportsController extends AuthenticatedController
             }
 
             $sales = $salesQuery->get();
+        }
+
+        if ($request->get('print')) {
+            Excel::create('report-sales-'.$from->format('Ymd').'-'.$to->format('Ymd'), function (LaravelExcelWriter $excel) use ($mode, $sales) {
+                $excel->sheet('list', function (LaravelExcelWorksheet $sheet) use ($mode, $sales) {
+                    if ($mode === 'daily') {
+                        $sheet->fromArray($sales->map(function (Sale $sale) {
+                            return [
+                                'Date'                 => $sale->opened_at->toDayDateTimeString(),
+                                'Receipt SN'           => $sale->getCode(),
+                                'Cashier / User'       => $sale->openedBy->name,
+                                'Payment'              => $sale->payments->first()->payment_method,
+                                'Client'               => $sale->customer->name,
+                                'Price'                => number_format($sale->calculateSubTotal(), 1),
+                                'Discount'             => $sale->sales_discount
+                                    ? number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED')
+                                    : '-',
+                                'After Discount Price' => number_format($sale->calculateTotal(), 1),
+                                'Paid Amount'          => number_format($sale->payments->first()->calculateTotal(), 1)
+                            ];
+                        })->toArray());
+                    } else {
+                        $sheet->fromArray($sales->groupBy(function ($sale) { return $sale->opened_at->toFormattedDateString(); })->map(function ($groupedSales, $date) {
+                            return [
+                                'Date'  => $date,
+                                'Total' => $groupedSales->map(function ($byDateSales) {
+                                    return $byDateSales->calculateTotal();
+                                })->sum()
+                            ];
+                        })->toArray());
+                    }
+
+                    $sheet->setColumnFormat(['A:Z' => '@']);
+                });
+            })->download('csv');
         }
 
         return view('reports.sales', [
