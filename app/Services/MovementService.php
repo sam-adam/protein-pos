@@ -84,18 +84,20 @@ class MovementService
             if (!$movementItem) {
                 throw new PersistenceException($movementItem);
             }
-
-            $this->inventoryService->reOrderPriority($product, $toBranch);
-
-            if ($fromBranch) {
-                $this->inventoryService->reOrderPriority($product, $fromBranch);
-            }
         }
 
         if ($isImportTransaction) {
             $this->adjustInventoryImportTransaction($movement);
         } else {
             $this->adjustInventoryMovementTransaction($movement);
+        }
+
+        foreach ($movement->items as $movementItem) {
+            $this->inventoryService->reOrderPriority($movementItem->product, $toBranch);
+
+            if ($fromBranch) {
+                $this->inventoryService->reOrderPriority($movementItem->product, $fromBranch);
+            }
         }
 
         return $movement;
