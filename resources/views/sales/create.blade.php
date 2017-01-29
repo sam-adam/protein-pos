@@ -96,7 +96,7 @@
                                                     @{{ productItem.product.price }}
                                                 @endif
                                             </td>
-                                            <td class="text-center" style="width: 130px; vertical-align: middle;">
+                                            <td class="text-center" style="width: 150px; vertical-align: middle;">
                                                 <input v-bind:name="'products[' + productItem.product.id + '][id]'" type="hidden" v-model="productItem.product.id"/>
                                                 <div class="input-group">
                                                     <span class="input-group-btn">
@@ -144,7 +144,7 @@
                                             </td>
                                             <td style="vertical-align: middle;">@{{ packageItem.package.name }}</td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ packageItem.package.price }}</td>
-                                            <td class="text-center" style="width: 80px; vertical-align: middle;">
+                                            <td class="text-center" style="width: 150px; vertical-align: middle;">
                                                 <input v-bind:name="'packages[' + packageItem.package.id + '][id]'" type="hidden" v-model="packageItem.package.id"/>
                                                 <div class="input-group">
                                                     <span class="input-group-btn">
