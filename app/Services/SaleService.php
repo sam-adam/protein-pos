@@ -270,10 +270,6 @@ class SaleService
 
         $newPayment->saveOrFail();
 
-        if ($newPayment->payment_method === SalePayment::PAYMENT_METHOD_CASH) {
-            // @ToDo adjust cash
-        }
-
         if ($sale->is_delivery) {
             $sale->delivered_at = Carbon::now();
         }

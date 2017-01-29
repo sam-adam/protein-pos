@@ -168,6 +168,7 @@ return [
          */
         Barryvdh\Debugbar\ServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Sentry\SentryLaravel\SentryLaravelServiceProvider::class,
         //Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         //
 
@@ -222,12 +223,12 @@ return [
         'Response' => Illuminate\Support\Facades\Response::class,
         'Route' => Illuminate\Support\Facades\Route::class,
         'Schema' => Illuminate\Support\Facades\Schema::class,
+        'Sentry' => Sentry\SentryLaravel\SentryFacade::class,
         'Session' => Illuminate\Support\Facades\Session::class,
         'Storage' => Illuminate\Support\Facades\Storage::class,
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
     ],
 
 ];

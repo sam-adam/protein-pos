@@ -10,7 +10,9 @@
         "barryvdh/laravel-debugbar": "^2.3",
         "recca0120/laravel-tracy": "^1.7",
         "maatwebsite/excel": "^2.1",
-        "doctrine/dbal": "^2.5"
+        "doctrine/dbal": "^2.5",
+        "sentry/sentry": "^1.6",
+        "sentry/sentry-laravel": "^0.6.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
