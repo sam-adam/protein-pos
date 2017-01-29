@@ -168,7 +168,6 @@ return [
          */
         Barryvdh\Debugbar\ServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        Sentry\SentryLaravel\SentryLaravelServiceProvider::class,
         //Recca0120\LaravelTracy\LaravelTracyServiceProvider::class,
         //
 
@@ -180,6 +179,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Sentry\SentryLaravel\SentryLaravelServiceProvider::class,
 
     ],
 
