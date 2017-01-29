@@ -12,6 +12,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductVariantGroup;
 use App\Models\Sale;
 use App\Models\Setting;
+use App\Models\Shift;
 use App\Models\User;
 use App\Policies\BranchPolicy;
 use App\Policies\BrandPolicy;
@@ -22,6 +23,7 @@ use App\Policies\ProductVariantGroupPolicy;
 use App\Policies\ReportPolicy;
 use App\Policies\SalePolicy;
 use App\Policies\SettingPolicy;
+use App\Policies\ShiftPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -43,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         ProductCategory::class     => ProductCategoryPolicy::class,
         ProductVariantGroup::class => ProductVariantGroupPolicy::class,
         Setting::class             => SettingPolicy::class,
+        Shift::class               => ShiftPolicy::class,
         Report::class              => ReportPolicy::class
     ];
 
