@@ -31,14 +31,14 @@
             <td colspan="7"></td>
             <td class="text-right">
                 <strong>Total In: {{
-                    number_format($movements->map(function ($movement) {
+                    number_format($movements->map(function ($movement) use ($branchId) {
                         return $movement->targetBranch && $movement->targetBranch->id === $branchId ? $movement->quantity : 0;
                     })->sum())
                 }}</strong>
             </td>
             <td class="text-right">
                 <strong>Total Out: {{
-                    number_format($movements->map(function ($movement) {
+                    number_format($movements->map(function ($movement) use ($branchId) {
                         return $movement->sourceBranch && $movement->sourceBranch->id === $branchId ? $movement->quantity : 0;
                     })->sum())
                 }}</strong>
