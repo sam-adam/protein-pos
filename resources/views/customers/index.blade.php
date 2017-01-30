@@ -88,10 +88,12 @@
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    @can('update', \App\Models\Customer::class)
-                                        <th>
-                                            <input type="checkbox" id="mass-selector" />
-                                        </th>
+                                    @can('delete', \App\Models\Customer::class)
+                                        @can('assignToGroup', \App\Models\Customer::class)
+                                            <th>
+                                                <input type="checkbox" id="mass-selector" />
+                                            </th>
+                                        @endcan
                                     @endcan
                                     @foreach($headers as $name => $header)
                                         <th>
@@ -109,10 +111,12 @@
                             <tbody>
                                 @foreach($customers as $customer)
                                     <tr>
-                                        @can('update', \App\Models\Customer::class)
-                                            <td>
-                                                <input type="checkbox" value="{{ $customer->id }}" class="customer-checkbox" />
-                                            </td>
+                                        @can('delete', \App\Models\Customer::class)
+                                            @can('assignToGroup', \App\Models\Customer::class)
+                                                <td>
+                                                    <input type="checkbox" value="{{ $customer->id }}" class="customer-checkbox" />
+                                                </td>
+                                            @endcan
                                         @endcan
                                         <td>
                                             <a href="{{ route('customers.show', $customer->id) }}">{{ $customer->name }}</a>
@@ -127,6 +131,8 @@
                                                     <i class="fa fa-pencil"></i>
                                                     Edit
                                                 </a>
+                                            @endcan
+                                            @can('delete', \App\Models\Customer::class)
                                                 <form method="post" action="{{ route('customers.destroy', $customer->id) }}" style="display: inline;" onsubmit="return confirm('Deleting group! Are you sure?');">
                                                     {{ csrf_field() }}
                                                     {{ method_field('DELETE') }}
@@ -143,7 +149,7 @@
                                                 </button>
                                             @endif
                                             @can('create', \App\Models\Sale::class)
-                                                <a href="{{ route('sales.create', ['customer' => $customer->id]) }}" class="btn btn-sm btn-primary">
+                                                <a href="{{ route('sales.create', ['customer' => $customer->id]) }}" class="btn btn-block btn-sm btn-primary">
                                                     <i class="fa fa-cart-plus"></i>
                                                     New sale
                                                 </a>

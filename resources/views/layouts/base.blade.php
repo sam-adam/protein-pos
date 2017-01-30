@@ -141,11 +141,13 @@
                                         List
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{{ url('customer-groups') }}">
-                                        Groups
-                                    </a>
-                                </li>
+                                @can('assignToGroup', \App\Models\Customer::class)
+                                    <li>
+                                        <a href="{{ url('customer-groups') }}">
+                                            Groups
+                                        </a>
+                                    </li>
+                                @endcan
                             </ul>
                         </li>
                         @can('access', \App\Models\Shift::class)
