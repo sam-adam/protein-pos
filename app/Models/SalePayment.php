@@ -22,6 +22,11 @@ class SalePayment extends BaseModel
         return $this->sale->calculateTotal() * (100 - $this->card_tax) / 100;
     }
 
+    public function getNetPaid()
+    {
+        return $this->amount * (100 - $this->card_tax) / 100;
+    }
+
     public function getChange()
     {
         return $this->payment_method === self::PAYMENT_METHOD_CREDIT_CARD

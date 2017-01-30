@@ -263,7 +263,7 @@ class SaleService
             : data_get($paymentData, 'amount');
         $newPayment->amount         = data_get($paymentData, 'amount');
 
-        if ($newPayment->payment_method === SalePayment::PAYMENT_METHOD_CREDIT_CARD) {
+        if (strtoupper($newPayment->payment_method) === SalePayment::PAYMENT_METHOD_CREDIT_CARD) {
             $newPayment->card_number = data_get($paymentData, 'card_number');
             $newPayment->card_tax    = Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 0);
         }
