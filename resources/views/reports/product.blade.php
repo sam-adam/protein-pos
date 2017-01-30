@@ -16,25 +16,30 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-sm-2">
-                <select name="product" class="form-control">
-                    <option value>Select Product</option>
-                    @foreach($products as $productOpt)
-                        <option value="{{ $productOpt->id }}" @if($productId == $productOpt->id) selected @endif>{{ $productOpt->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-sm-3">
-                <div class="input-group">
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <search-product
+                                src="{{ route('products.xhr.search') }}"
+                                :show-last-result="true"
+                                v-on:product-selected="productId = $event.product.id"
+                                v-on:insufficient-stock="productId = $event.product.id"
+                        ></search-product>
+                        <input type="hidden" name="product" v-model="productId" />
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-group">
                     <span class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                     </span>
-                    <input class="form-control daterange" value="{{ $from->toDateString() }} - {{ $to->toDateString() }}" />
-                    <input name="from" value="{{ $from->timestamp }}" type="hidden" />
-                    <input name="to" value="{{ $to->timestamp }}" type="hidden" />
+                            <input class="form-control daterange" value="{{ $from->toDateString() }} - {{ $to->toDateString() }}" />
+                            <input name="from" value="{{ $from->timestamp }}" type="hidden" />
+                            <input name="to" value="{{ $to->timestamp }}" type="hidden" />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-1">
                 <select name="mode" class="form-control">
                     <option value="daily" @if($mode == 'daily') selected @endif>Daily</option>
                     <option value="weekly" @if($mode == 'weekly') selected @endif>Weekly</option>
@@ -97,30 +102,33 @@
     @parent
     <script type="text/javascript">
         var app = new Vue({
-                el: "#app",
-                data: {
-                    performance: {!! json_encode($chart) !!}
-                }
-            }),
-            $date = $('.daterange');
+            el: "#app",
+            data: {
+                performance: {!! json_encode($chart) !!},
+                productId: "{{ $productId }}"
+            },
+            mounted: function () {
+                var $date = $('.daterange');
 
-        $date.daterangepicker({
-            format: 'YYYY-MM-DD',
-            startDate: '{{ $from->toDateString() }}',
-            endDate: '{{ $to->toDateString() }}',
-            maxDate: '{{ \Carbon\Carbon::now()->toDateString() }}',
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                $date.daterangepicker({
+                    format: 'YYYY-MM-DD',
+                    startDate: '{{ $from->toDateString() }}',
+                    endDate: '{{ $to->toDateString() }}',
+                    maxDate: '{{ \Carbon\Carbon::now()->toDateString() }}',
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    }
+                });
+                $date.on('apply.daterangepicker', function(ev, picker) {
+                    $("input[name='from']").val(picker.startDate.unix());
+                    $("input[name='to']").val(picker.endDate.unix());
+                });
             }
-        });
-        $date.on('apply.daterangepicker', function(ev, picker) {
-            $("input[name='from']").val(picker.startDate.unix());
-            $("input[name='to']").val(picker.endDate.unix());
         });
     </script>
 @endsection
