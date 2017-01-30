@@ -8,6 +8,8 @@
                 <th class="text-right">Movement Quantity</th>
                 <th>Container</th>
                 <th class="text-right">Container Quantity</th>
+                <th>Source Branch</th>
+                <th>Target Branch</th>
                 <th>Remark</th>
             </tr>
         </thead>
@@ -20,11 +22,13 @@
                     <td class="text-right">{{ number_format($movement->quantity) }}</td>
                     <td>{{ $movement->container ? $movement->container->name : '-' }}</td>
                     <td class="text-right">{{ $movement->container ? number_format($movement->containerQuantity).' ('.number_format($movement->containerItemQuantity).' pcs per container)' : '-' }}</td>
+                    <td>{{ $movement->sourceBranch ? $movement->sourceBranch->name : '-' }}</td>
+                    <td>{{ $movement->targetBranch ? $movement->targetBranch->name : '-' }}</td>
                     <td>{{ $movement->remark }}</td>
                 </tr>
             @endforeach
         <tr>
-            <td colspan="5"></td>
+            <td colspan="7"></td>
             <td class="text-right">
                 <strong>Total In: {{ number_format($movements->map(function ($movement) { return $movement->direction === 'add' ? $movement->quantity : 0; })->sum()) }}</strong>
             </td>

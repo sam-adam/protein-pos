@@ -140,6 +140,8 @@ class InventoryRepository
                 $movementLabels[] = [
                     'id'                    => $movement->id,
                     'label'                 => $movementLabel,
+                    'sourceBranch'          => $movement->from,
+                    'targetBranch'          => $movement->to,
                     'isContainer'           => $isContainerMatched,
                     'container'             => $isContainerMatched ? null : $movementItem->product,
                     'containerQuantity'     => $isContainerMatched ? 0 : $movementItem->quantity,
@@ -166,6 +168,8 @@ class InventoryRepository
             $movementLabels[] = [
                 'id'                    => $inventoryRemoval->id,
                 'label'                 => $removalLabel,
+                'sourceBranch'          => $inventoryRemoval->branchInventory->branch,
+                'targetBranch'          => null,
                 'isContainer'           => $isContainerMatched,
                 'container'             => $isContainerMatched ? null : $inventoryRemoval->product,
                 'containerQuantity'     => $isContainerMatched ? 0 : $inventoryRemoval->quantity,
