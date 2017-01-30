@@ -196,9 +196,19 @@ class ReportsController extends AuthenticatedController
         if (!$branch || !$product) {
             $sales = new Collection();
         } else {
-            $productIds = [$product->id];
-            $containers = Product::where('product_item_id', '=', $product->id)->get();
-            $sales      = Sale::select('sales.*')
+            $sales = Sale::with([
+                    'customer.group',
+                    'items',
+                    'packages',
+                    'refunds.items',
+                    'refunds.packages',
+                    'openedBy',
+                    'payments.sale.items',
+                    'payments.sale.packages',
+                    'payments.sale.refunds',
+                    'payments.sale.customer.group'
+                ])
+                ->select('sales.*')
                 ->leftJoin('sale_items', function (JoinClause $query) use ($product) {
                     return $query->on('sales.id', '=', 'sale_items.sale_id')
                         ->where('sale_items.product_id', '=', $product->id);
