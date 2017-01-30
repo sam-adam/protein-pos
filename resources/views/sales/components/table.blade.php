@@ -3,6 +3,7 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Code</th>
                 <th>Date</th>
                 <th>Customer</th>
                 <th>Branch</th>
@@ -16,6 +17,7 @@
             @foreach($sales as $sale)
                 <tr class="{{ $sale->isCancelled() ? 'warning' : (!$sale->isFinished() ? 'danger' : '') }}">
                     <td>{{ $sale->id }}</td>
+                    <td>{{ $sale->getCode() }}</td>
                     <td>{{ $sale->opened_at->toDayDateTimeString() }}</td>
                     <td>{{ $sale->customer->name }}</td>
                     <td>{{ $sale->branch->name }}</td>

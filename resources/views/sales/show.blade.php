@@ -46,6 +46,12 @@
                 </div>
                 <div class="panel-body form-horizontal">
                     <div class="form-group">
+                        <label for="name" class="col-sm-4 control-label">S/N</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static">{{ $sale->getCode() }}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="name" class="col-sm-4 control-label">Date</label>
                         <div class="col-sm-8">
                             <p class="form-control-static">{{ $sale->opened_at->toDayDateTimeString() }}</p>
@@ -90,6 +96,12 @@
                             <p class="form-control-static">{{ $sale->branch->name }}</p>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="address" class="col-sm-4 control-label">Remark</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static">{{ $sale->remark }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="panel panel-default">
@@ -112,6 +124,12 @@
                             <label for="address" class="col-sm-4 control-label">Amount</label>
                             <div class="col-sm-8">
                                 <p class="form-control-static">{{ number_format($sale->payments->first()->amount) }}</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address" class="col-sm-4 control-label">Change</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static">{{ number_format($sale->payments->first()->getChange()) }}</p>
                             </div>
                         </div>
                     @else
