@@ -156,7 +156,7 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-4">
-                            @can('update', \App\Models\Customer::class)
+                            @can('create', \App\Models\Customer::class)
                                 <a href="{{ route('customers.create') }}" class="btn btn-primary">
                                     <i class="fa fa-plus"></i>
                                     Add new customer

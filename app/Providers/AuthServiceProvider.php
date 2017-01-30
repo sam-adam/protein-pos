@@ -7,6 +7,7 @@ use App\DataObjects\Brand;
 use App\DataObjects\Package;
 use App\DataObjects\Report;
 use App\Models\Branch;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductVariantGroup;
@@ -16,6 +17,7 @@ use App\Models\Shift;
 use App\Models\User;
 use App\Policies\BranchPolicy;
 use App\Policies\BrandPolicy;
+use App\Policies\CustomerPolicy;
 use App\Policies\PackagePolicy;
 use App\Policies\ProductCategoryPolicy;
 use App\Policies\ProductPolicy;
@@ -40,6 +42,7 @@ class AuthServiceProvider extends ServiceProvider
         User::class                => UserPolicy::class,
         Branch::class              => BranchPolicy::class,
         Brand::class               => BrandPolicy::class,
+        Customer::class            => CustomerPolicy::class,
         Package::class             => PackagePolicy::class,
         Product::class             => ProductPolicy::class,
         ProductCategory::class     => ProductCategoryPolicy::class,

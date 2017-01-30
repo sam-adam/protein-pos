@@ -52,20 +52,22 @@
                                 @endforeach
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('customer_group_id') ? 'has-error' : '' }}">
-                            <label for="customer-group-id" class="col-sm-2 control-label">Group</label>
-                            <div class="col-sm-5">
-                                <select id="customer-group-id" name="customer_group_id" class="form-control">
-                                    <option value>Select Customer Group</option>
-                                    @foreach($groups as $group)
-                                        <option value="{{ $group->id }}" @if((old('customer_group_id') ?: $customer->customer_group_id) == $group->id) selected @endif>{{ $group->name.' ('.$group->discount.'% discount)' }}</option>
+                        @can('assignToGroup', \App\Models\Customer::class)
+                            <div class="form-group {{ $errors->has('customer_group_id') ? 'has-error' : '' }}">
+                                <label for="customer-group-id" class="col-sm-2 control-label">Group</label>
+                                <div class="col-sm-5">
+                                    <select id="customer-group-id" name="customer_group_id" class="form-control">
+                                        <option value>Select Customer Group</option>
+                                        @foreach($groups as $group)
+                                            <option value="{{ $group->id }}" @if((old('customer_group_id') ?: $customer->customer_group_id) == $group->id) selected @endif>{{ $group->name.' ('.$group->discount.'% discount)' }}</option>
+                                        @endforeach
+                                    </select>
+                                    @foreach($errors->get('customer_group_id') as $error)
+                                        <span class="label label-danger">{{ $error }}</span>
                                     @endforeach
-                                </select>
-                                @foreach($errors->get('customer_group_id') as $error)
-                                    <span class="label label-danger">{{ $error }}</span>
-                                @endforeach
+                                </div>
                             </div>
-                        </div>
+                        @endcan
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-3">
                                 <button type="submit" class="btn btn-success btn-block">Update</button>

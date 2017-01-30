@@ -5,7 +5,9 @@
                 <th>Priority</th>
                 <th>Global Priority</th>
                 <th>Stock</th>
-                <th>Cost</th>
+                @can('seeCost', \App\Models\Product::class)
+                    <th>Cost</th>
+                @endcan
                 <th>Expired At</th>
                 <th>Reminder Expired At</th>
                 <th>Imported Date</th>
@@ -20,7 +22,9 @@
                             <td>{{ number_format($branchItem->priority) }}</td>
                             <td>{{ number_format($inventory->priority) }}</td>
                             <td>{{ number_format($branchItem->stock) }}</td>
-                            <td>{{ number_format($inventory->cost, 1) }}</td>
+                            @can('seeCost', \App\Models\Product::class)
+                                <td>{{ number_format($inventory->cost, 1) }}</td>
+                            @endcan
                             <td>{{ $inventory->expired_at->toFormattedDateString() }}</td>
                             <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toFormattedDateString() : '-' }}</td>
                             <td>{{ $inventory->created_at->toDayDateTimeString() }}</td>

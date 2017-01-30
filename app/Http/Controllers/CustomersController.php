@@ -128,11 +128,15 @@ class CustomersController extends AuthenticatedController
 
     public function create()
     {
+        $this->authorize('create', Customer::class);
+
         return view('customers.create', ['groups' => CustomerGroup::all()]);
     }
 
     public function store(StoreCustomer $request)
     {
+        $this->authorize('create', Customer::class);
+
         $newCustomer                       = new Customer();
         $newCustomer->name                 = $request->get('name');
         $newCustomer->phone                = $request->get('phone');
@@ -148,6 +152,8 @@ class CustomersController extends AuthenticatedController
 
     public function edit($customerId)
     {
+        $this->authorize('update', Customer::class);
+
         $customer = Customer::find($customerId);
 
         if (!$customer) {
@@ -162,6 +168,8 @@ class CustomersController extends AuthenticatedController
 
     public function update(StoreCustomer $request, $customerId)
     {
+        $this->authorize('update', Customer::class);
+
         $customer = Customer::find($customerId);
 
         if (!$customer) {
@@ -180,6 +188,8 @@ class CustomersController extends AuthenticatedController
 
     public function destroy($customerId)
     {
+        $this->authorize('update', Customer::class);
+
         $customer = Customer::find($customerId);
 
         if (!$customer) {
@@ -193,6 +203,8 @@ class CustomersController extends AuthenticatedController
 
     public function bulkChangeGroup(Request $request)
     {
+        $this->authorize('assignToGroup', Customer::class);
+
         if ($request->get('customer_group_id')) {
             $group = CustomerGroup::find($request->get('customer_group_id'));
 
@@ -213,6 +225,8 @@ class CustomersController extends AuthenticatedController
 
     public function bulkDelete(Request $request)
     {
+        $this->authorize('update', Customer::class);
+
         foreach ($request->get('customer_ids') as $customerId) {
             if ($customer = Customer::find($customerId)) {
                 $customer->delete();
