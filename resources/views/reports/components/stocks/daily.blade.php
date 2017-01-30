@@ -30,10 +30,18 @@
         <tr>
             <td colspan="7"></td>
             <td class="text-right">
-                <strong>Total In: {{ number_format($movements->map(function ($movement) { return $movement->direction === 'add' ? $movement->quantity : 0; })->sum()) }}</strong>
+                <strong>Total In: {{
+                    number_format($movements->map(function ($movement) {
+                        return $movement->targetBranch && $movement->targetBranch->id === $branchId ? $movement->quantity : 0;
+                    })->sum())
+                }}</strong>
             </td>
             <td class="text-right">
-                <strong>Total Out: {{ number_format($movements->map(function ($movement) { return $movement->direction === 'sub' ? $movement->quantity : 0; })->sum()) }}</strong>
+                <strong>Total Out: {{
+                    number_format($movements->map(function ($movement) {
+                        return $movement->sourceBranch && $movement->sourceBranch->id === $branchId ? $movement->quantity : 0;
+                    })->sum())
+                }}</strong>
             </td>
         </tr>
         </tbody>
