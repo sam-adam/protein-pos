@@ -19,7 +19,9 @@
                     <td>{{ $movement->date->toDayDateTimeString() }}</td>
                     <td>{{ $movement->actor }}</td>
                     <td>{{ $product->name }}</td>
-                    <td class="text-right">{{ number_format($movement->quantity) }}</td>
+                    <td class="text-right">
+                        {{ number_format($movement->targetBranch && $movement->targetBranch->id ? abs($movement->quantity) : abs($movement->quantity) * -1) }}
+                    </td>
                     <td>{{ $movement->container ? $movement->container->name : '-' }}</td>
                     <td class="text-right">{{ $movement->container ? number_format($movement->containerQuantity).' ('.number_format($movement->containerItemQuantity).' pcs per container)' : '-' }}</td>
                     <td>{{ $movement->sourceBranch ? $movement->sourceBranch->name : '-' }}</td>
@@ -32,14 +34,14 @@
             <td class="text-right">
                 <strong>Total In: {{
                     number_format($movements->map(function ($movement) use ($branchId) {
-                        return $movement->targetBranch && $movement->targetBranch->id == $branchId ? $movement->quantity : 0;
+                        return $movement->targetBranch && $movement->targetBranch->id == $branchId ? abs($movement->quantity) : 0;
                     })->sum())
                 }}</strong>
             </td>
             <td class="text-right">
                 <strong>Total Out: {{
                     number_format($movements->map(function ($movement) use ($branchId) {
-                        return $movement->sourceBranch && $movement->sourceBranch->id == $branchId ? $movement->quantity : 0;
+                        return $movement->sourceBranch && $movement->sourceBranch->id == $branchId ? abs($movement->quantity) * -1 : 0;
                     })->sum())
                 }}</strong>
             </td>
