@@ -17,7 +17,7 @@
         <tbody>
         @foreach($sales as $sale)
             <tr>
-                <td>{{ $sale->opened_at->toDayDateTimeString() }}</td>
+                <td>{{ $sale->paid_at->toDayDateTimeString() }}</td>
                 <td>{{ $sale->getCode() }}</td>
                 <td>{{ $sale->openedBy->name }}</td>
                 <td>{{ $sale->payments->first()->payment_method }}</td>
@@ -48,7 +48,7 @@
             <td colspan="8"></td>
             <td class="text-right"><strong>Total</strong></td>
             <td class="text-right">
-                <strong>@money($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum())</strong>
+                <strong>@money($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum()) }}</strong>
             </td>
         </tr>
         </tbody>

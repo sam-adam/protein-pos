@@ -46,12 +46,24 @@ class ReportsController extends AuthenticatedController
         if (!$branch) {
             $sales = new Collection();
         } else {
-            $salesQuery = Sale::finished()
+            $salesQuery = Sale::with([
+                    'customer.group',
+                    'items',
+                    'packages',
+                    'refunds',
+                    'openedBy',
+                    'payments.sale.items',
+                    'payments.sale.packages',
+                    'payments.sale.refunds',
+                    'payments.sale.customer.group'
+                ])
+                ->finished()
                 ->paid()
                 ->select('sales.*')
                 ->join('sale_payments', 'sales.id', '=', 'sale_payments.sale_id')
                 ->where('sales.branch_id', '=', $branch->id)
-                ->whereBetween('sales.opened_at', [$from, $to])
+                ->whereBetween('sales.paid_at', [$from, $to])
+                ->orderBy('sales.paid_at', 'desc')
                 ->groupBy('sales.id');
 
             switch ($type) {
