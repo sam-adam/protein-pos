@@ -58,7 +58,7 @@
                         @if($mode === 'weekly' || $mode === 'monthly')
                             @include('reports.components.stocks.weekly')
                         @else
-                            @include('reports.components.stocks.daily')
+                            @include('reports.components.stocks.daily', ['branchId' => $branchId, 'movements' => $movements])
                         @endif
                     </div>
                 </div>
