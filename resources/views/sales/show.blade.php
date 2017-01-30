@@ -123,7 +123,7 @@
                         <div class="form-group">
                             <label for="address" class="col-sm-4 control-label">Amount</label>
                             <div class="col-sm-8">
-                                <p class="form-control-static">@money($sale->payments->first()->amount)</p>
+                                <p class="form-control-static">@money($sale->payments->first()->calculateTotal())</p>
                             </div>
                         </div>
                         <div class="form-group">
