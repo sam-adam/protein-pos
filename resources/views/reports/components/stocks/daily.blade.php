@@ -20,7 +20,7 @@
                     <td>{{ $movement->actor }}</td>
                     <td>{{ $product->name }}</td>
                     <td class="text-right">
-                        {{ number_format($movement->targetBranch && $movement->targetBranch->id ? abs($movement->quantity) : abs($movement->quantity) * -1) }}
+                        {{ number_format($movement->targetBranch && $movement->targetBranch->id == $branchId ? abs($movement->quantity) : abs($movement->quantity) * -1) }}
                     </td>
                     <td>{{ $movement->container ? $movement->container->name : '-' }}</td>
                     <td class="text-right">{{ $movement->container ? number_format($movement->containerQuantity).' ('.number_format($movement->containerItemQuantity).' pcs per container)' : '-' }}</td>
