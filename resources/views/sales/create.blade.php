@@ -33,6 +33,7 @@
                                 <search-product
                                         src="{{ route('products.xhr.search') }}"
                                         :existing-items="cart.products"
+                                        :show-last-result="false"
                                         v-on:product-selected="addProductToCart($event.product, 1, $event.availableQuantity)"
                                         v-on:insufficient-stock="notify('error', $event.remark)"
                                 ></search-product>

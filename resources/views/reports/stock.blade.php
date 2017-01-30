@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <form>
+    <form id="app" v-cloak>
         <div class="row">
             <div class="col-sm-2">
                 <select name="branch" class="form-control">
@@ -16,13 +16,14 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-sm-2">
-                <select name="product" class="form-control">
-                    <option value>Select Product</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}" @if($productId == $product->id) selected @endif>{{ $product->name }}</option>
-                    @endforeach
-                </select>
+            <div class="col-sm-4">
+                <search-product
+                        src="{{ route('products.xhr.search') }}"
+                        :show-last-result="true"
+                        v-on:product-selected="productId = $event.product.id"
+                        v-on:insufficient-stock="productId = $event.product.id"
+                ></search-product>
+                <input type="hidden" name="product" v-model="productId" />
             </div>
             <div class="col-sm-3">
                 <div class="input-group">
@@ -34,7 +35,7 @@
                     <input name="to" value="{{ $to->timestamp }}" type="hidden" />
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-1">
                 <select name="mode" class="form-control">
                     <option value="daily" @if($mode == 'daily') selected @endif>Daily</option>
                     <option value="weekly" @if($mode == 'weekly') selected @endif>Weekly</option>
@@ -64,7 +65,13 @@
 @section('scripts')
     @parent
     <script type="text/javascript">
-        var $date = $('.daterange');
+        var $date = $('.daterange'),
+            app = new Vue({
+                el: "#app",
+                data: {
+                    productId: "{{ $productId }}"
+                }
+            });
 
         $date.daterangepicker({
             format: 'YYYY-MM-DD',

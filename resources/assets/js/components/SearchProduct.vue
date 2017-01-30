@@ -21,6 +21,7 @@
                         @keydown.enter="hit"
                         @keydown.esc="reset"
                         @blur="reset"
+                        @focus="prepareInput"
                         @input="update" />
             </div>
         </div>
@@ -57,13 +58,14 @@
 
     export default {
         extends: VueTypeahead,
-        props: ['src', 'existingItems'],
+        props: ['src', 'existingItems', 'showLastResult'],
         data () {
             return {
                 queryParamName: 'query',
                 selectFirst: true,
                 limit: 5,
-                minChars: 3
+                minChars: 3,
+                lastSelectedResult: null
             }
         },
         methods: {
@@ -81,6 +83,8 @@
                 return product.stock - inCartQuantity;
             },
             onHit (product) {
+                this.lastSelectedResult = product;
+
                 if (product.stock > 0) {
                     this.$emit('product-selected', {
                         product: product,
@@ -92,8 +96,6 @@
                         remark: "Out of stock"
                     })
                 }
-
-                this.reset();
             },
             prepareResponseData (response) {
                 if (response.method === 'barcode') {
@@ -101,15 +103,24 @@
                 } else {
                     return response.products;
                 }
+            },
+            reset () {
+                if (this.lastSelectedResult && this.showLastResult) {
+                    this.query = this.lastSelectedResult.name;
+                } else {
+                    this.query = "";
+                }
+
+                this.items = [];
+                this.loading = false;
+            },
+            prepareInput () {
+                this.query = "";
             }
         }
     }
 </script>
 <style scoped>
-    .typeahead {
-        position: relative;
-    }
-
     ul {
         position: absolute;
         padding: 0;
