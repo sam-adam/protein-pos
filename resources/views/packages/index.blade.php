@@ -49,7 +49,7 @@
                                             </tbody>
                                         </table>
                                     </td>
-                                    <td>{{ number_format($package->price) }}</td>
+                                    <td>@money($package->price)</td>
                                     <td class="text-{{ $package->is_customizable ? 'success' : 'danger' }}"><i class="fa fa-{{ $package->is_customizable ? 'check' : 'times' }}"></i></td>
                                     <td>
                                         <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-primary btn-sm">

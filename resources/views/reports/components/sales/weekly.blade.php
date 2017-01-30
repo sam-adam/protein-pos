@@ -29,7 +29,7 @@
         <tr>
             <td colspan="2" class="text-right"><strong>Total</strong></td>
             <td class="text-right">
-                <strong>{{ number_format($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum()) }}</strong>
+                <strong>@money($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum())</strong>
             </td>
         </tr>
         </tbody>

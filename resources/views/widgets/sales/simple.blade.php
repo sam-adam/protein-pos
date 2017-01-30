@@ -5,13 +5,13 @@
             <div class="col-sm-6">
                 <h4 class="text-center">Cash</h4>
                 <h3 class="text-center">
-                    <span class="text-primary">{{ number_format($salesSummary['cash']) }}</span> AED
+                    <span class="text-primary">@money($salesSummary['cash'])</span> AED
                 </h3>
             </div>
             <div class="col-sm-6">
                 <h4 class="text-center">Credit</h4>
                 <h3 class="text-center">
-                    <span class="text-primary">{{ number_format($salesSummary['credit']) }}</span> AED
+                    <span class="text-primary">@money($salesSummary['credit'])</span> AED
                 </h3>
             </div>
         </div>

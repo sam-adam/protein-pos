@@ -86,12 +86,12 @@ class ReportsController extends AuthenticatedController
                                 'Cashier / User'       => $sale->openedBy->name,
                                 'Payment'              => $sale->payments->first()->payment_method,
                                 'Client'               => $sale->customer->name,
-                                'Price'                => number_format($sale->calculateSubTotal(), 1),
+                                'Price'                => money_format('%.2n', $sale->calculateSubTotal()),
                                 'Discount'             => $sale->sales_discount
                                     ? number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED')
                                     : '-',
-                                'After Discount Price' => number_format($sale->calculateTotal(), 1),
-                                'Paid Amount'          => number_format($sale->payments->first()->calculateTotal(), 1)
+                                'After Discount Price' => money_format('%.2n', $sale->calculateTotal()),
+                                'Paid Amount'          => money_format('%.2n', $sale->payments->first()->calculateTotal())
                             ];
                         })->toArray());
                     } else {

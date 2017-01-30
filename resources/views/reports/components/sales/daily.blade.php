@@ -22,7 +22,7 @@
                 <td>{{ $sale->openedBy->name }}</td>
                 <td>{{ $sale->payments->first()->payment_method }}</td>
                 <td>{{ $sale->customer->name }}</td>
-                <td class="text-right">{{ number_format($sale->calculateSubTotal(), 1) }}</td>
+                <td class="text-right">@money($sale->calculateSubTotal())</td>
                 <td class="text-right">
                     @if($sale->sales_discount)
                         {{ number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED') }}
@@ -30,8 +30,8 @@
                         -
                     @endif
                 </td>
-                <td class="text-right">{{ number_format($sale->calculateTotal(), 1) }}</td>
-                <td class="text-right">{{ number_format($sale->payments->first()->calculateTotal(), 1) }}</td>
+                <td class="text-right">@money($sale->calculateTotal())</td>
+                <td class="text-right">@money($sale->payments->first()->calculateTotal())</td>
                 <td class="text-right">
                     <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-primary btn-sm" target="_blank">
                         <i class="fa fa-search-plus"></i>
@@ -48,7 +48,7 @@
             <td colspan="8"></td>
             <td class="text-right"><strong>Total</strong></td>
             <td class="text-right">
-                <strong>{{ number_format($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum()) }}</strong>
+                <strong>@money($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum())</strong>
             </td>
         </tr>
         </tbody>

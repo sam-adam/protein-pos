@@ -123,13 +123,13 @@
                         <div class="form-group">
                             <label for="address" class="col-sm-4 control-label">Amount</label>
                             <div class="col-sm-8">
-                                <p class="form-control-static">{{ number_format($sale->payments->first()->amount) }}</p>
+                                <p class="form-control-static">@money($sale->payments->first()->amount)</p>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="address" class="col-sm-4 control-label">Change</label>
                             <div class="col-sm-8">
-                                <p class="form-control-static">{{ number_format($sale->payments->first()->getChange()) }}</p>
+                                <p class="form-control-static">@money($sale->payments->first()->getChange())</p>
                             </div>
                         </div>
                     @else
@@ -219,8 +219,8 @@
                             <tr>
                                 <td>{{ $package->package->name }}</td>
                                 <td class="text-right">{{ number_format($package->quantity) }}</td>
-                                <td class="text-right">{{ number_format($package->price) }}</td>
-                                <td class="text-right">{{ number_format($package->calculateSubtotal()) }}</td>
+                                <td class="text-right">@money($package->price)</td>
+                                <td class="text-right">@money($package->calculateSubtotal())</td>
                             </tr>
                             <tr>
                                 <td>
@@ -236,7 +236,7 @@
                                             <tr>
                                                 <td>{{ $packageItem->product->name }}</td>
                                                 <td class="text-right">{{ number_format($packageItem->quantity) }}</td>
-                                                <td class="text-right">{{ number_format($packageItem->original_price) }}</td>
+                                                <td class="text-right">@money($packageItem->original_price)</td>
                                             </tr>
                                         @endforeach
                                     </table>
@@ -248,8 +248,8 @@
                             <tr>
                                 <td>{{ $item->product->name }}</td>
                                 <td class="text-right">{{ number_format($item->quantity) }}</td>
-                                <td class="text-right">{{ number_format($item->price) }}</td>
-                                <td class="text-right">{{ number_format($item->calculateSubtotal()) }}</td>
+                                <td class="text-right">@money($item->price)</td>
+                                <td class="text-right">@money($item->calculateSubtotal())</td>
                             </tr>
                         @endforeach
                         </tbody>

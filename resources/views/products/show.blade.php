@@ -30,7 +30,7 @@
                         <div class="row">
                             <label for="price" class="col-sm-2 control-label">Price</label>
                             <div class="col-sm-10">
-                                <p class="form-control-static">{{ number_format($product->price, 1) }}</p>
+                                <p class="form-control-static">@money($product->price)</p>
                             </div>
                         </div>
                         <div class="row">

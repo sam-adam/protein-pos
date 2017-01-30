@@ -54,10 +54,10 @@
                                                 -
                                             @endif
                                         </td>
-                                        <td>{{ number_format($shift->opened_cash_balance) }}</td>
+                                        <td>@money($shift->opened_cash_balance)</td>
                                         <td>
                                             @if($shift->isClosed())
-                                                {{ number_format($shift->closed_cash_balance) }}
+                                                @money($shift->closed_cash_balance)
                                             @else
                                                 -
                                             @endif
@@ -65,7 +65,7 @@
                                         <td>{{ $shift->remark }}</td>
                                         <td>
                                             @if(!$shift->isClosed())
-                                                <a href="#clock-out-modal" class="btn btn-danger btn-sm" data-toggle="modal" data-shift-id="{{ $shift->id }}" data-opened-at="{{ $shift->opened_at->toDayDateTimeString() }}" data-opened-cash="{{ number_format($shift->opened_cash_balance) }}">
+                                                <a href="#clock-out-modal" class="btn btn-danger btn-sm" data-toggle="modal" data-shift-id="{{ $shift->id }}" data-opened-at="{{ $shift->opened_at->toDayDateTimeString() }}" data-opened-cash="@money($shift->opened_cash_balance)">
                                                     <i class="fa fa-fw fa-exclamation-circle"></i>
                                                     Clock out
                                                 </a>

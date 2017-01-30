@@ -30,13 +30,13 @@
                         <div class="form-group">
                             <label for="phone" class="col-sm-2 control-label">Price</label>
                             <div class="col-sm-5">
-                                <p class="form-control-static">{{ number_format($package->price) }}</p>
+                                <p class="form-control-static">@money($package->price)</p>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="phone" class="col-sm-2 control-label">Actual Price</label>
                             <div class="col-sm-5">
-                                <p class="form-control-static">{{ number_format($package->getActualPrice()) }}</p>
+                                <p class="form-control-static">@money($package->getActualPrice())</p>
                             </div>
                         </div>
                         <div class="form-group">
@@ -83,7 +83,7 @@
                                                                     @if($variant->id !== $item->product_id)
                                                                         <tr>
                                                                             <td>{{ $variant->name }}</td>
-                                                                            <td>{{ number_format($variant->price) }}</td>
+                                                                            <td>@money($variant->price)</td>
                                                                             <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
                                                                             <td>{{ number_format($stocks[$variant->id]) }}</td>
                                                                         </tr>
@@ -93,7 +93,7 @@
                                                         </table>
                                                     @endif
                                                 </td>
-                                                <td>{{ number_format($item->product->price) }}</td>
+                                                <td>@money($item->product->price)</td>
                                                 <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
                                                 <td>{{ number_format($stocks[$item->product->id]) }}</td>
                                             </tr>

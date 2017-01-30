@@ -24,7 +24,7 @@
                             <label class="col-sm-2 control-label">Opened cash</label>
                             <div class="col-sm-5">
                                 <p class="form-control-static">
-                                    {{ number_format($shift->opened_cash_balance) }}
+                                    @money($shift->opened_cash_balance)
                                 </p>
                             </div>
                         </div>

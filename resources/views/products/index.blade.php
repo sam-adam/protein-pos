@@ -79,7 +79,7 @@
                                 <br/>
                                 <div class="product-price">
                                     <i class="fa fa-fw fa-money"></i>
-                                    {{ number_format($product->price) }}
+                                    @money($product->price)
                                 </div>
                                 @if($product->is_service)
                                     <div>

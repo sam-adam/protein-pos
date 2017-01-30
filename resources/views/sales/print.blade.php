@@ -120,24 +120,24 @@
                             @foreach($sale->getRefundablePackages() as $salePackage)
                                 <tr>
                                     <td>{{ $salePackage->package->name }}</td>
-                                    <td class="text-center">{{ number_format($salePackage->price) }}</td>
+                                    <td class="text-center">@money($salePackage->price)</td>
                                     <td class="text-center">{{ number_format($salePackage->quantity) }}</td>
-                                    <td class="text-right">{{ number_format($salePackage->calculateSubTotal(), 1) }}</td>
+                                    <td class="text-right">@money($salePackage->calculateSubTotal())</td>
                                 </tr>
                             @endforeach
                             @foreach($sale->getRefundableItems() as $item)
                                 <tr>
                                     <td>{{ $item->product->name }}</td>
-                                    <td class="text-center">{{ number_format($item->price) }}</td>
+                                    <td class="text-center">@money($item->price)</td>
                                     <td class="text-center">{{ number_format($item->quantity) }}</td>
-                                    <td class="text-right">{{ number_format($item->calculateSubTotal(), 1) }}</td>
+                                    <td class="text-right">@money($item->calculateSubTotal())</td>
                                 </tr>
                             @endforeach
                             <tr>
                                 <td class="thick-line"></td>
                                 <td class="thick-line"></td>
                                 <td class="thick-line text-right"><strong>Subtotal</strong></td>
-                                <td class="thick-line text-right">{{ number_format($sale->calculateSubTotal(), 1) }}</td>
+                                <td class="thick-line text-right">@money($sale->calculateSubTotal())</td>
                             </tr>
                             @if($sale->customer_discount)
                                 <tr>
@@ -146,7 +146,7 @@
                                     <td class="text-right">
                                         <strong>Customer Discount ({{ number_format($sale->customer_discount).'%' }})</strong>
                                     </td>
-                                    <td class="text-right">{{  number_format($sale->calculateAfterCustomerDiscount(), 1) }}</td>
+                                    <td class="text-right">@money($sale->calculateAfterCustomerDiscount())</td>
                                 </tr>
                             @endif
                             @if($sale->sales_discount)
@@ -156,14 +156,14 @@
                                     <td class="text-right">
                                         <strong>Sale Discount ({{ number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED') }})</strong>
                                     </td>
-                                    <td class="text-right">{{  number_format($sale->calculateAfterSalesDiscount(), 1) }}</td>
+                                    <td class="text-right">@money($sale->calculateAfterSalesDiscount())</td>
                                 </tr>
                             @endif
                             <tr>
                                 <td class="no-line"></td>
                                 <td class="no-line"></td>
                                 <td class="text-right"><strong>Total</strong></td>
-                                <td class="text-right">{{ number_format($sale->calculateTotal(), 1) }}</td>
+                                <td class="text-right">@money($sale->calculateTotal())</td>
                             </tr>
                             </tbody>
                         </table>

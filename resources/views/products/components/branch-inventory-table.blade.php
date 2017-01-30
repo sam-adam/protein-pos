@@ -23,7 +23,7 @@
                             <td>{{ number_format($inventory->priority) }}</td>
                             <td>{{ number_format($branchItem->stock) }}</td>
                             @can('seeCost', \App\Models\Product::class)
-                                <td>{{ number_format($inventory->cost, 1) }}</td>
+                                <td>@money($inventory->cost)</td>
                             @endcan
                             <td>{{ $inventory->expired_at->toFormattedDateString() }}</td>
                             <td>{{ $inventory->expiry_reminder_date ? $inventory->expiry_reminder_date->toFormattedDateString() : '-' }}</td>
