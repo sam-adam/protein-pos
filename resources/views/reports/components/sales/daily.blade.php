@@ -11,6 +11,7 @@
             <th class="text-right">Discount</th>
             <th class="text-right">After Discount Price</th>
             <th class="text-right">Paid Amount</th>
+            <th class="text-right">Post Tax</th>
             <th></th>
         </tr>
         </thead>
@@ -31,6 +32,7 @@
                     @endif
                 </td>
                 <td class="text-right">@money($sale->calculateTotal())</td>
+                <td class="text-right">@money($sale->payments->first()->amount)</td>
                 <td class="text-right">@money($sale->payments->first()->getNetPaid())</td>
                 <td class="text-right">
                     <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-primary btn-sm" target="_blank">

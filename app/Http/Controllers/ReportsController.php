@@ -103,7 +103,8 @@ class ReportsController extends AuthenticatedController
                                     ? number_format($sale->sales_discount, 1).($sale->sales_discount_type === 'PERCENTAGE' ? '%' : ' AED')
                                     : '-',
                                 'After Discount Price' => money_format('%.2n', $sale->calculateTotal()),
-                                'Paid Amount'          => money_format('%.2n', $sale->payments->first()->calculateTotal())
+                                'Paid Amount'          => money_format('%.2n', $sale->payments->first()->amount),
+                                'Post Tax'             => money_format('%.2n', $sale->payments->first()->getNetPaid())
                             ];
                         })->toArray());
                     } else {

@@ -123,6 +123,12 @@
                         <div class="form-group">
                             <label for="address" class="col-sm-4 control-label">Amount</label>
                             <div class="col-sm-8">
+                                <p class="form-control-static">@money($sale->payments->first()->amount)</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address" class="col-sm-4 control-label">Post Tax</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static">@money($sale->payments->first()->getNetPaid())</p>
                             </div>
                         </div>
