@@ -25,10 +25,7 @@ class ClockOut extends FormRequest
      */
     public function rules()
     {
-        $shift = Shift::find(Route::input('shift'));
-        $rules = [
-            'closing_balance' => 'bail|required|numeric|min:1'
-        ];
+        $rules = [];
 
         return $rules;
     }

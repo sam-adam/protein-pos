@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Exceptions\SuspendedShiftException;
 use App\Http\Requests\ClockIn;
 use App\Http\Requests\ClockOut;
+use App\Models\Sale;
+use App\Models\SalePayment;
 use App\Models\Shift;
 use App\Services\ShiftService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -79,19 +82,28 @@ class ShiftsController extends AuthenticatedController
 
     public function viewClockOut(Request $request)
     {
-        $user  = Auth::user();
-        $shift = Shift::inBranch($user->branch)->open()
+        $user                = Auth::user();
+        $shift               = Shift::inBranch($user->branch)->open()
             ->where('opened_by_user_id', $user->id)
             ->first();
+        $todayCompletedSales = Sale::with('payments')
+            ->paid()
+            ->where('opened_by_user_id', '=', Auth::user()->id)
+            ->whereBetween('paid_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])
+            ->get();
 
         if (!$shift) {
             return redirect()->back()->with('flashes.error', 'You\'re not clocked in');
         }
 
         return view('shifts.out', [
-            'user'        => Auth::user(),
-            'shift'       => $shift,
-            'redirectTo' => $request->get('redirect-to')
+            'user'         => Auth::user(),
+            'shift'        => $shift,
+            'redirectTo'   => $request->get('redirect-to'),
+            'salesSummary' => [
+                'cash'   => $todayCompletedSales->filter(function (Sale $sale) { return $sale->payments->first()->payment_method === SalePayment::PAYMENT_METHOD_CASH; })->sum(function (Sale $sale) { return $sale->calculateTotal(); }),
+                'credit' => $todayCompletedSales->filter(function (Sale $sale) { return $sale->payments->first()->payment_method === SalePayment::PAYMENT_METHOD_CREDIT_CARD; })->sum(function (Sale $sale) { return $sale->calculateTotal(); })
+            ]
         ]);
     }
 
@@ -105,7 +117,7 @@ class ShiftsController extends AuthenticatedController
 
         $redirectTo = $request->get('redirect-to') ?: '/';
 
-        $this->shiftService->closeShift($shift, Auth::user(), $request->get('closing_balance'), $request->get('remark') ?: null);
+        $this->shiftService->closeShift($shift, Auth::user(), 0, $request->get('remark') ?: null);
 
         return redirect()->to($redirectTo)->with('flashes.success', 'Shift closed');
     }
