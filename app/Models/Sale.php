@@ -115,7 +115,7 @@ class Sale extends BaseModel
 
     public function getCode()
     {
-        return $this->id.'-'.Carbon::now()->format('YmdHis');
+        return $this->id.'-'.$this->opened_at->format('YmdHis');
     }
 
     public function getRefundableItems()

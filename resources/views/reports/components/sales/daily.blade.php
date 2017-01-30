@@ -48,7 +48,7 @@
             <td colspan="8"></td>
             <td class="text-right"><strong>Total</strong></td>
             <td class="text-right">
-                <strong>@money($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum()) }}</strong>
+                <strong>@money($sales->map(function ($sale) { return $sale->calculateTotal(); })->sum())</strong>
             </td>
         </tr>
         </tbody>
