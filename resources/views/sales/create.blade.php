@@ -23,7 +23,7 @@
 @section('content')
     @parent
     <div id="app" v-cloak>
-        <form method="post" action="{{ route('sales.store') }}" onsubmit="return app.isCompletable && confirm('Completing sales! Continue?');">
+        <form method="post" action="{{ route('sales.store') }}" v-on:submit="confirm($event)">
             {{ csrf_field() }}
             <div class="row">
                 <div class="col-md-7">
@@ -758,6 +758,11 @@
                         packageWindow.addEventListener("package-selected", function (event) {
                             $this.addPackageToCart(event.detail.package, 1, event.detail.availableQuantity);
                         });
+                    }
+                },
+                confirm: function (event) {
+                    if (!this.isCompletable || !confirm('Completing sales! Continue?')) {
+                        event.preventDefault();
                     }
                 }
             }

@@ -17,7 +17,7 @@
                         autocomplete="off"
                         @keydown.down="down"
                         @keydown.up="up"
-                        @keydown.enter="hit"
+                        @keydown.enter.prevent="hit"
                         @keydown.esc="reset"
                         @blur="reset"
                         @input="update" />
