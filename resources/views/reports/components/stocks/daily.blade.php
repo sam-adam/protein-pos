@@ -10,6 +10,7 @@
                 <th class="text-right">Container Quantity</th>
                 <th>Source Branch</th>
                 <th>Target Branch</th>
+                <th class="text-right">Cost / Item</th>
                 <th>Remark</th>
             </tr>
         </thead>
@@ -26,11 +27,12 @@
                     <td class="text-right">{{ $movement->container ? number_format($movement->containerQuantity).' ('.number_format($movement->containerItemQuantity).' pcs per container)' : '-' }}</td>
                     <td>{{ $movement->sourceBranch ? $movement->sourceBranch->name : '-' }}</td>
                     <td>{{ $movement->targetBranch ? $movement->targetBranch->name : '-' }}</td>
+                    <td class="text-right">@money($movement->costPerItem)</td>
                     <td>{{ $movement->remark }}</td>
                 </tr>
             @endforeach
         <tr>
-            <td colspan="7"></td>
+            <td colspan="8"></td>
             <td class="text-right">
                 <strong>Total In: {{
                     number_format($movements->map(function ($movement) use ($branchId) {

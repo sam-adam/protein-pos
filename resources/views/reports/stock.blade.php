@@ -56,7 +56,7 @@
                 <div class="panel">
                     <div class="panel-body">
                         @if($mode === 'weekly' || $mode === 'monthly')
-                            @include('reports.components.stocks.weekly')
+                            @include('reports.components.stocks.weekly', ['branchId' => $branchId, 'movements' => $movements])
                         @else
                             @include('reports.components.stocks.daily', ['branchId' => $branchId, 'movements' => $movements])
                         @endif
