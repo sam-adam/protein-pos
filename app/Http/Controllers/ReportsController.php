@@ -146,7 +146,7 @@ class ReportsController extends AuthenticatedController
         if (!$branch || !$product) {
             $movements = new Collection();
         } else {
-            $movements = (new Collection($this->inventoryRepo->getMovements($product, $branch)))->map(function ($movement) {
+            $movements = (new Collection($this->inventoryRepo->getMovements($product, $branch, $from, $to)))->map(function ($movement) {
                 return (object) $movement;
             });
         }

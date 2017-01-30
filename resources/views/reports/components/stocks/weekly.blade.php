@@ -12,17 +12,17 @@
         @foreach($movements->groupBy(function ($movement) { return $movement->date->toFormattedDateString(); }) as $date => $groupedMovement)
             <tr>
                 <td width="50px">
-                    <a class="btn btn-primary btn-xs" href="{{ route('reports.stock', ['branch' => $branchId, 'product' => $productId, 'from' => $from->timestamp, 'to' => $to->timestamp, 'mode' => 'daily']) }}">
+                    <a class="btn btn-primary btn-xs" href="{{ route('reports.stock', ['branch' => $branchId, 'product' => $productId, 'from' => (new \Carbon\Carbon($date))->startOfDay()->timestamp, 'to' => (new \Carbon\Carbon($date))->endOfDay()->timestamp, 'mode' => 'daily']) }}">
                         <i class="fa fa-search-plus"></i>
                         See detail
                     </a>
                 </td>
                 <td>{{ $date }}</td>
                 <td class="text-right">
-                    {{ number_format($groupedMovement->map(function ($movement) { return $movement->direction === 'add' ? $movement->quantity : 0; })->sum()) }}
+                    {{ number_format($groupedMovement->map(function ($movement) use ($branchId) { return $movement->targetBranch && $movement->targetBranch->id == $branchId ? abs($movement->quantity) : 0; })->sum()) }}
                 </td>
                 <td class="text-right">
-                    {{ number_format($groupedMovement->map(function ($movement) { return $movement->direction === 'sub' ? $movement->quantity : 0; })->sum()) }}
+                    {{ number_format($groupedMovement->map(function ($movement) use ($branchId) { return $movement->sourceBranch && $movement->sourceBranch->id == $branchId ? abs($movement->quantity) * -1 : 0; })->sum()) }}
                 </td>
             </tr>
         @endforeach
