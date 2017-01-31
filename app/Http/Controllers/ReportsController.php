@@ -68,10 +68,14 @@ class ReportsController extends AuthenticatedController
 
             switch ($type) {
                 case 'walkin':
-                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', false);
+                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', false)
+                        ->where('sales.is_wholesale', '=', false);
                     break;
                 case 'delivery':
                     $salesQuery = $salesQuery->where('sales.is_delivery', '=', true);
+                    break;
+                case 'wholesale':
+                    $salesQuery = $salesQuery->where('sales.is_wholesale', '=', true);
                     break;
             }
 
@@ -94,6 +98,7 @@ class ReportsController extends AuthenticatedController
                         $sheet->fromArray($sales->map(function (Sale $sale) {
                             return [
                                 'Date'                 => $sale->opened_at->toDayDateTimeString(),
+                                'Type'                 => $sale->getType(),
                                 'Receipt SN'           => $sale->getCode(),
                                 'Cashier / User'       => $sale->openedBy->name,
                                 'Payment'              => $sale->payments->first()->payment_method,

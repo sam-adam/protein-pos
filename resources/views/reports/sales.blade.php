@@ -31,8 +31,9 @@
                     <div class="col-sm-4">
                         <select name="type" class="form-control">
                             <option value>All Type</option>
-                            <option value="walkin" @if($type === 'walkin') selected @endif>Walk In</option>
+                            <option value="walkin" @if($type === 'walkin') selected @endif>Normal</option>
                             <option value="delivery" @if($type === 'delivery') selected @endif>Delivery</option>
+                            <option value="wholesale" @if($type === 'wholesale') selected @endif>Wholesale</option>
                         </select>
                     </div>
                     <div class="col-sm-4">

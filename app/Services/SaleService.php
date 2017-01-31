@@ -61,12 +61,13 @@ class SaleService
         $newSale->sales_discount      = data_get($saleData, 'sales_discount', 0);
         $newSale->sales_discount_type = data_get($saleData, 'sales_discount_type', Sale::DISCOUNT_TYPE_PERCENTAGE);
         $newSale->is_delivery         = data_get($saleData, 'is_delivery', false);
+        $newSale->is_wholesale        = data_get($saleData, 'is_wholesale', false);
         $newSale->remark              = data_get($saleData, 'remark');
         $newSale->total               = 0;
         $newSale->saveOrFail();
 
-        $newSale->items()->initRelation([], 'items');
-        $newSale->items()->initRelation([], 'packages');
+        $newSale->setRelation('items', new Collection());
+        $newSale->setRelation('packages', new Collection());
 
         foreach (data_get($saleData, 'items', []) ?: [] as $item) {
             $product           = Product::findOrFail(data_get($item, 'id'));
@@ -104,13 +105,13 @@ class SaleService
                 }
             }
 
-            // save the total sale
-            $newSale->total = $newSale->calculateTotal();
-            $newSale->saveOrFail();
-
             // reorder priority
             $this->inventoryService->reOrderPriority($product, $openedBy->branch);
         }
+
+        // save the total sale
+        $newSale->total = $newSale->calculateTotal();
+        $newSale->saveOrFail();
 
         foreach (data_get($saleData, 'packages', []) ?: [] as $requestedPackage) {
             $package           = Package::findOrFail(data_get($requestedPackage, 'id'));
