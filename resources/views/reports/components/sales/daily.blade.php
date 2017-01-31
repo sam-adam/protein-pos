@@ -3,6 +3,7 @@
         <thead>
         <tr>
             <th>Date</th>
+            <th>Type</th>
             <th>Receipt SN</th>
             <th>Cashier / User</th>
             <th>Payment</th>
@@ -19,6 +20,7 @@
         @foreach($sales as $sale)
             <tr>
                 <td>{{ $sale->paid_at->toDayDateTimeString() }}</td>
+                <td>{{ $sale->getType() }}</td>
                 <td>{{ $sale->getCode() }}</td>
                 <td>{{ $sale->openedBy->name }}</td>
                 <td>{{ $sale->payments->first()->payment_method }}</td>

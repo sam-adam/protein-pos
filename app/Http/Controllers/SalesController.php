@@ -112,6 +112,7 @@ class SalesController extends AuthenticatedController
             'immediatePayment'    => $request->get('type') !== 'delivery',
             'defaultDiscountType' => Sale::DISCOUNT_TYPE_PERCENTAGE,
             'canModifyPrice'      => $user->can('modifyPrice', Sale::class) && $request->get('type') === 'wholesale',
+            'isWholesale'         => $request->get('type') === 'wholesale',
             'discount'            => [
                 'isEnabled'     => $request->get('type') === 'wholesale'
                     ? $user->can('giveWholeSaleDiscount', Sale::class) && $user->can_give_discount
@@ -135,7 +136,8 @@ class SalesController extends AuthenticatedController
                     'sales_discount'      => $request->get('sales_discount'),
                     'sales_discount_type' => $request->get('sales_discount_type'),
                     'remark'              => $request->get('remark'),
-                    'is_delivery'         => !$request->get('immediate_payment')
+                    'is_delivery'         => !$request->get('immediate_payment'),
+                    'is_wholesale'        => boolval($request->get('is_wholesale'))
                 ]);
 
                 if ($request->get('immediate_payment')) {

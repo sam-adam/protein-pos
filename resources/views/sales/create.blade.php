@@ -25,6 +25,7 @@
     <div id="app" v-cloak>
         <form method="post" action="{{ route('sales.store') }}" v-on:submit="confirm($event)">
             {{ csrf_field() }}
+            <input type="hidden" name="is_wholesale" value="{{ $isWholesale ? '1' : '0' }}" />
             <div class="row">
                 <div class="col-md-7">
                     <div class="panel panel-default">

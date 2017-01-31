@@ -61,6 +61,7 @@ class SaleService
         $newSale->sales_discount      = data_get($saleData, 'sales_discount', 0);
         $newSale->sales_discount_type = data_get($saleData, 'sales_discount_type', Sale::DISCOUNT_TYPE_PERCENTAGE);
         $newSale->is_delivery         = data_get($saleData, 'is_delivery', false);
+        $newSale->is_wholesale        = data_get($saleData, 'is_wholesale', false);
         $newSale->remark              = data_get($saleData, 'remark');
         $newSale->total               = 0;
         $newSale->saveOrFail();
