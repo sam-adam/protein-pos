@@ -32,20 +32,26 @@
                 </tr>
             @endforeach
         <tr>
-            <td colspan="8"></td>
-            <td class="text-right">
-                <strong>Total In: {{
-                    number_format($movements->map(function ($movement) use ($branchId) {
-                        return $movement->targetBranch && $movement->targetBranch->id == $branchId ? abs($movement->quantity) : 0;
-                    })->sum())
-                }}</strong>
-            </td>
-            <td class="text-right">
-                <strong>Total Out: {{
-                    number_format($movements->map(function ($movement) use ($branchId) {
-                        return $movement->sourceBranch && $movement->sourceBranch->id == $branchId ? abs($movement->quantity) * -1 : 0;
-                    })->sum())
-                }}</strong>
+            <td colspan="10" class="text-right">
+                <strong>
+                    Total In: {{
+                        number_format($movements->map(function ($movement) use ($branchId) {
+                            return $movement->targetBranch && $movement->targetBranch->id == $branchId ? abs($movement->quantity) : 0;
+                        })->sum())
+                    }}
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    Total Out: {{
+                        number_format($movements->map(function ($movement) use ($branchId) {
+                            return $movement->sourceBranch && $movement->sourceBranch->id == $branchId ? abs($movement->quantity) * -1 : 0;
+                        })->sum())
+                    }}
+                </strong>
             </td>
         </tr>
         </tbody>
