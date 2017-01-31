@@ -47,16 +47,16 @@ class ReportsController extends AuthenticatedController
             $sales = new Collection();
         } else {
             $salesQuery = Sale::with([
-                    'customer.group',
-                    'items',
-                    'packages',
-                    'refunds',
-                    'openedBy',
-                    'payments.sale.items',
-                    'payments.sale.packages',
-                    'payments.sale.refunds',
-                    'payments.sale.customer.group'
-                ])
+                'customer.group',
+                'items',
+                'packages',
+                'refunds',
+                'openedBy',
+                'payments.sale.items',
+                'payments.sale.packages',
+                'payments.sale.refunds',
+                'payments.sale.customer.group'
+            ])
                 ->finished()
                 ->paid()
                 ->select('sales.*')
@@ -154,6 +154,56 @@ class ReportsController extends AuthenticatedController
             $movements = (new Collection($this->inventoryRepo->getMovements($product, $branch, $from, $to)))->map(function ($movement) {
                 return (object) $movement;
             });
+
+            if ($mode === 'weekly') {
+                $movementLabels = [];
+
+                for ($start = $from->copy()->startOfWeek(); $start->lte($to); $start->addWeek(1)) {
+                    $movementKey                  = 'Week '.$start->format('W').' ('.$start->startOfWeek()->toDateString().')';
+                    $movementLabels[$movementKey] = [
+                        'from' => $start->copy()->startOfWeek(),
+                        'to'   => $start->copy()->endOfWeek(),
+                        'in'   => 0,
+                        'out'  => 0
+                    ];
+
+                    foreach ($movements as $movement) {
+                        if ((int) $movement->date->weekOfYear === (int) $start->weekOfYear) {
+                            if ($movement->targetBranch && $movement->targetBranch->id == $request->get('branch')) {
+                                $movementLabels[$movementKey]['in'] += abs($movement->quantity);
+                            } else {
+                                $movementLabels[$movementKey]['out'] += abs($movement->quantity);
+                            }
+                        }
+                    }
+                }
+
+                $movements = $movementLabels;
+            } elseif ($mode === 'monthly') {
+                $movementLabels = [];
+
+                for ($start = $from->copy()->startOfMonth(); $start->lte($to); $start->addMonth(1)) {
+                    $movementKey                  = $start->format('F Y');
+                    $movementLabels[$movementKey] = [
+                        'from' => $start->copy()->startOfMonth(),
+                        'to'   => $start->copy()->endOfMonth(),
+                        'in'   => 0,
+                        'out'  => 0
+                    ];
+
+                    foreach ($movements as $movement) {
+                        if ((int) $movement->date->month === (int) $start->month) {
+                            if ($movement->targetBranch && $movement->targetBranch->id == $request->get('branch')) {
+                                $movementLabels[$movementKey]['in'] += abs($movement->quantity);
+                            } else {
+                                $movementLabels[$movementKey]['out'] += abs($movement->quantity);
+                            }
+                        }
+                    }
+                }
+
+                $movements = $movementLabels;
+            }
         }
 
         return view('reports.stock', [
@@ -202,17 +252,17 @@ class ReportsController extends AuthenticatedController
             $sales = new Collection();
         } else {
             $sales = Sale::with([
-                    'customer.group',
-                    'items',
-                    'packages',
-                    'refunds.items',
-                    'refunds.packages',
-                    'openedBy',
-                    'payments.sale.items',
-                    'payments.sale.packages',
-                    'payments.sale.refunds',
-                    'payments.sale.customer.group'
-                ])
+                'customer.group',
+                'items',
+                'packages',
+                'refunds.items',
+                'refunds.packages',
+                'openedBy',
+                'payments.sale.items',
+                'payments.sale.packages',
+                'payments.sale.refunds',
+                'payments.sale.customer.group'
+            ])
                 ->select('sales.*')
                 ->leftJoin('sale_items', function (JoinClause $query) use ($product) {
                     return $query->on('sales.id', '=', 'sale_items.sale_id')
