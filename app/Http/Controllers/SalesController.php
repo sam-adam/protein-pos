@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Readers\LaravelExcelReader;
+use PHPExcel_Worksheet_HeaderFooterDrawing;
 
 /**
  * Class SalesController
@@ -244,7 +245,7 @@ class SalesController extends AuthenticatedController
 
         $saleCode = $sale->getCode();
 
-        Excel::load(resource_path('docs/ReceiptTemplate.xls'), function (LaravelExcelReader $reader) use ($sale, $saleCode) {
+        Excel::load(resource_path('docs/ReceiptTemplate.xlsx'), function (LaravelExcelReader $reader) use ($sale, $saleCode) {
             $startingRow = 14;
             $discountRow = 17;
             $totalRow    = 18;
@@ -275,8 +276,7 @@ class SalesController extends AuthenticatedController
 
             $worksheet->getCell('C'.($discountRow + ($currentRow - $startingRow - 2)))->setValue($sale->calculateTotal() - $sale->calculateSubTotal());
             $worksheet->getCell('C'.($totalRow + ($currentRow - $startingRow - 2)))->setValue($sale->calculateTotal());
-            $worksheet->getHeaderFooter()->setOddHeader('&L&G&');
-        })->setFileName('receipt-'.$saleCode)->export('xls');
+        })->setFileName('receipt-'.$saleCode)->export('xlsx');
     }
 
     public function viewRefund($saleId)
