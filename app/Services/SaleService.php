@@ -105,13 +105,13 @@ class SaleService
                 }
             }
 
-            // save the total sale
-            $newSale->total = $newSale->calculateTotal();
-            $newSale->saveOrFail();
-
             // reorder priority
             $this->inventoryService->reOrderPriority($product, $openedBy->branch);
         }
+
+        // save the total sale
+        $newSale->total = $newSale->calculateTotal();
+        $newSale->saveOrFail();
 
         foreach (data_get($saleData, 'packages', []) ?: [] as $requestedPackage) {
             $package           = Package::findOrFail(data_get($requestedPackage, 'id'));
