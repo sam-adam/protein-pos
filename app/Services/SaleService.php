@@ -66,8 +66,8 @@ class SaleService
         $newSale->total               = 0;
         $newSale->saveOrFail();
 
-        $newSale->items()->initRelation([], 'items');
-        $newSale->items()->initRelation([], 'packages');
+        $newSale->setRelation('items', new Collection());
+        $newSale->setRelation('packages', new Collection());
 
         foreach (data_get($saleData, 'items', []) ?: [] as $item) {
             $product           = Product::findOrFail(data_get($item, 'id'));
