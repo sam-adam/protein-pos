@@ -68,13 +68,14 @@ class ReportsController extends AuthenticatedController
 
             switch ($type) {
                 case 'walkin':
-                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', false);
+                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', false)
+                        ->where('sales.is_wholesale', '=', false);
                     break;
                 case 'delivery':
                     $salesQuery = $salesQuery->where('sales.is_delivery', '=', true);
                     break;
                 case 'wholesale':
-                    $salesQuery = $salesQuery->where('sales.is_delivery', '=', true);
+                    $salesQuery = $salesQuery->where('sales.is_wholesale', '=', true);
                     break;
             }
 
