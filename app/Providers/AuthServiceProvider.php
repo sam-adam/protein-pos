@@ -3,11 +3,11 @@
 namespace App\Providers;
 
 use App\Auth\CustomGuard;
-use App\DataObjects\Brand;
-use App\DataObjects\Package;
 use App\DataObjects\Report;
 use App\Models\Branch;
+use App\Models\Brand;
 use App\Models\Customer;
+use App\Models\Package;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductVariantGroup;
