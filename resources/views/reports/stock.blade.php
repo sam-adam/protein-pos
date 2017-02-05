@@ -81,7 +81,12 @@
                 var $date = $('.daterange');
 
                 $date.daterangepicker({
-                    format: 'YYYY-MM-DD',
+                    autoApply: true,
+                    autoUpdateInput: true,
+                    alwaysShowCalendars: true,
+                    locale: {
+                        format: 'YYYY-MM-DD'
+                    },
                     startDate: '{{ $from->toDateString() }}',
                     endDate: '{{ $to->toDateString() }}',
                     maxDate: '{{ \Carbon\Carbon::now()->toDateString() }}',

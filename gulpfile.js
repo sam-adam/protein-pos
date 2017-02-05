@@ -15,6 +15,7 @@ require('laravel-elixir-vue-2');
 
 elixir(mix => {
     mix.sass([
+        '../../../node_modules/bootstrap-daterangepicker/daterangepicker.scss',
         'font-awesome/font-awesome.scss',
         'app.scss'
     ], 'public/css/main.css');
@@ -33,7 +34,6 @@ elixir(mix => {
     mix.styles([
         '../../../node_modules/metismenu/dist/metisMenu.min.css',
         '../../../node_modules/toastr/build/toastr.min.css',
-        '../../../node_modules/daterangepicker/daterangepicker-bs3.min.css',
         '../../../public/css/third-party.css',
         '../../../public/css/main.css'
     ], 'public/css/app.css');
