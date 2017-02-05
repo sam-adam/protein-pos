@@ -262,7 +262,6 @@ class SaleService
         $newPayment->amount         = $newPayment->payment_method !== SalePayment::PAYMENT_METHOD_CASH
             ? $sale->total - $alreadyPaidAmount
             : data_get($paymentData, 'amount');
-        $newPayment->amount         = data_get($paymentData, 'amount');
 
         if (strtoupper($newPayment->payment_method) === SalePayment::PAYMENT_METHOD_CREDIT_CARD) {
             $newPayment->card_number = data_get($paymentData, 'card_number');
