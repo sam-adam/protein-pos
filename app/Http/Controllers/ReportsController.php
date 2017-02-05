@@ -37,7 +37,7 @@ class ReportsController extends AuthenticatedController
     public function sales(Request $request)
     {
         $branch      = Branch::find($request->get('branch'));
-        $from        = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
+        $from        = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->addDay(1)->timestamp)->startOfDay();
         $to          = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
         $mode        = $request->get('mode') ?: 'daily';
         $type        = $request->get('type') ?: 'all';
@@ -47,16 +47,16 @@ class ReportsController extends AuthenticatedController
             $sales = new Collection();
         } else {
             $salesQuery = Sale::with([
-                'customer.group',
-                'items',
-                'packages',
-                'refunds',
-                'openedBy',
-                'payments.sale.items',
-                'payments.sale.packages',
-                'payments.sale.refunds',
-                'payments.sale.customer.group'
-            ])
+                    'customer.group',
+                    'items',
+                    'packages',
+                    'refunds',
+                    'openedBy',
+                    'payments.sale.items',
+                    'payments.sale.packages',
+                    'payments.sale.refunds',
+                    'payments.sale.customer.group'
+                ])
                 ->finished()
                 ->paid()
                 ->select('sales.*')

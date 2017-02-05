@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="col-sm-2">
-                <div class="btn-group btn-block">
+                <div class="btn-group">
                     <button type="submit" class="btn btn-primary">Submit</button>
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="caret"></span>
@@ -65,6 +65,10 @@
                         </li>
                     </ul>
                 </div>
+                <a href="{{ route('reports.sales') }}" class="btn btn-danger">
+                    <i class="fa fa-times"></i>
+                    Reset
+                </a>
             </div>
         </div>
         <br/>
