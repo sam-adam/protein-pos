@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <form id="app">
+    <form id="app" v-cloak>
         <div class="row">
             <div class="col-sm-2">
                 <select name="branch" class="form-control">
@@ -22,6 +22,8 @@
                         <search-product
                                 src="{{ route('products.xhr.search') }}"
                                 :show-last-result="true"
+                                :initial-value="'{{ $product ? $product->name : '' }}'"
+                                :autofocus="false"
                                 v-on:product-selected="productId = $event.product.id"
                                 v-on:insufficient-stock="productId = $event.product.id"
                         ></search-product>
@@ -47,7 +49,11 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <button type="submit" class="btn btn-block btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <a href="{{ route('reports.stock') }}" class="btn btn-danger">
+                    <i class="fa fa-times"></i>
+                    Reset
+                </a>
             </div>
         </div>
         <br/>

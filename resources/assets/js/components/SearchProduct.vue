@@ -13,7 +13,7 @@
                         id="query"
                         placeholder="Input product name, code, or scan barcode"
                         class="form-control"
-                        autofocus
+                        v-bind:autofocus="autofocus"
                         v-model="query"
                         autocomplete="off"
                         @keydown.down="down"
@@ -58,7 +58,13 @@
 
     export default {
         extends: VueTypeahead,
-        props: ['src', 'existingItems', 'showLastResult'],
+        props: {
+            src: {},
+            existingItems: {},
+            showLastResult: {},
+            autofocus: { "default": true },
+            initialValue: { "default": null }
+        },
         data () {
             return {
                 queryParamName: 'query',
@@ -67,6 +73,13 @@
                 minChars: 3,
                 lastSelectedResult: null
             }
+        },
+        mounted: function () {
+            if (this.initialValue) {
+                this.lastSelectedResult = {name: this.initialValue};
+            }
+
+            this.reset();
         },
         methods: {
             calculateAvailable (product) {

@@ -144,7 +144,7 @@ class ReportsController extends AuthenticatedController
     {
         $branch  = Branch::find($request->get('branch'));
         $product = Product::find($request->get('product'));
-        $from    = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
+        $from    = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->addDay(1)->timestamp)->startOfDay();
         $to      = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
         $mode    = $request->get('mode') ?: 'daily';
 
@@ -223,7 +223,7 @@ class ReportsController extends AuthenticatedController
     {
         $branch    = Branch::find($request->get('branch'));
         $product   = Product::find($request->get('product'));
-        $from      = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->timestamp)->startOfDay();
+        $from      = Carbon::createFromTimestamp($request->get('from') ?: Carbon::now()->subWeek(1)->addDay(1)->timestamp)->startOfDay();
         $to        = Carbon::createFromTimestamp($request->get('to') ?: Carbon::now()->timestamp)->endOfDay();
         $mode      = $request->get('mode') ?: 'daily';
         $grouped   = [];
@@ -252,17 +252,17 @@ class ReportsController extends AuthenticatedController
             $sales = new Collection();
         } else {
             $sales = Sale::with([
-                'customer.group',
-                'items',
-                'packages',
-                'refunds.items',
-                'refunds.packages',
-                'openedBy',
-                'payments.sale.items',
-                'payments.sale.packages',
-                'payments.sale.refunds',
-                'payments.sale.customer.group'
-            ])
+                    'customer.group',
+                    'items',
+                    'packages',
+                    'refunds.items',
+                    'refunds.packages',
+                    'openedBy',
+                    'payments.sale.items',
+                    'payments.sale.packages',
+                    'payments.sale.refunds',
+                    'payments.sale.customer.group'
+                ])
                 ->select('sales.*')
                 ->leftJoin('sale_items', function (JoinClause $query) use ($product) {
                     return $query->on('sales.id', '=', 'sale_items.sale_id')
