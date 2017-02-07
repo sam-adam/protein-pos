@@ -83,7 +83,12 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <input id="search-box" class="form-control" placeholder="Search a product" v-model="query">
+                                <search-product
+                                        src="{{ route('products.xhr.search', ['limit' => 5]) }}"
+                                        :show-last-result="false"
+                                        v-on:product-selected="addItem($event.product, 1)"
+                                        v-on:insufficient-stock="addItem($event.product, 1)"
+                                ></search-product>
                                 @foreach($errors->get('products') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
@@ -107,34 +112,34 @@
 @section('scripts')
     <script type="text/javascript">
         var products = {!! $products->toJson() !!}.map(function (product) { return {value: product.name, data: product}; }),
-                app = new Vue({
-                    el: "#app",
-                    data: {
-                        items: [],
-                        query: ''
-                    },
-                    computed: {
-                        subtotal: function () {
-                            return this.items.reduce(function (firstItem, secondItem) {
-                                return firstItem.price + secondItem.price;
-                            });
-                        }
-                    },
-                    methods: {
-                        addItem: function (product, quantity) {
-                            if (this.items.filter(function (item) { return item.id === product.id}).length === 0) {
-                                product.quantity = quantity;
-
-                                this.items.push(product);
-                            }
-
-                            this.query = '';
-                        },
-                        removeItem: function (item) {
-                            this.items.splice(this.items.indexOf(item), 1);
-                        }
+            app = new Vue({
+                el: "#app",
+                data: {
+                    items: [],
+                    query: ''
+                },
+                computed: {
+                    subtotal: function () {
+                        return this.items.reduce(function (firstItem, secondItem) {
+                            return firstItem.price + secondItem.price;
+                        });
                     }
-                });
+                },
+                methods: {
+                    addItem: function (product, quantity) {
+                        if (this.items.filter(function (item) { return item.id === product.id}).length === 0) {
+                            product.quantity = quantity;
+
+                            this.items.push(product);
+                        }
+
+                        this.query = '';
+                    },
+                    removeItem: function (item) {
+                        this.items.splice(this.items.indexOf(item), 1);
+                    }
+                }
+            });
 
         var selectedProducts = {!! json_encode(old('products') === null ? $packageItems : old('products')) !!};
 

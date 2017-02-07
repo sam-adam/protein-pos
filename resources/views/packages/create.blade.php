@@ -86,7 +86,7 @@
                                         src="{{ route('products.xhr.search', ['limit' => 5]) }}"
                                         :show-last-result="false"
                                         v-on:product-selected="addItem($event.product)"
-                                        v-on:insufficient-stock="addItem($event)"
+                                        v-on:insufficient-stock="addItem($event.product)"
                                 ></search-product>
                                 @foreach($errors->get('products') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
