@@ -20,7 +20,6 @@ use App\Models\Inventory;
 use App\Models\InventoryRemoval;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductVariantGroup;
 use App\Repository\InventoryRepository;
 use App\Repository\PackageRepository;
 use App\Repository\ProductRepository;
@@ -179,7 +178,6 @@ class ProductsController extends AuthenticatedController
 
         return view('products.create', [
             'brands'     => Brand::orderBy('name', 'asc')->get(),
-            'variants'   => ProductVariantGroup::all(),
             'products'   => Product::nonContainer()->orderBy('name', 'asc')->get(),
             'categories' => ProductCategory::with('parent')
                 ->select('product_categories.*')
@@ -212,16 +210,13 @@ class ProductsController extends AuthenticatedController
 
             $brand    = $productItem->brand;
             $category = $productItem->category;
-            $variant  = null;
         } else {
             $brand    = Brand::find($request->get('brand'));
             $category = ProductCategory::find($request->get('category'));
-            $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
         }
 
-        $newProduct->brand_id                 = $brand ? $brand->id : null;
-        $newProduct->product_category_id      = $category ? $category->id : null;
-        $newProduct->product_variant_group_id = $variant ? $variant->id : null;
+        $newProduct->brand_id            = $brand ? $brand->id : null;
+        $newProduct->product_category_id = $category ? $category->id : null;
         $newProduct->saveOrFail();
 
         return redirect(route('products.index'))->with('flashes.success', 'Product added');
@@ -325,8 +320,7 @@ class ProductsController extends AuthenticatedController
                 ->orderBy('parent.name', 'asc')
                 ->orderBy('product_categories.name', 'asc')
                 ->get(),
-            'brands'     => Brand::orderBy('name', 'asc')->get(),
-            'variants'   => ProductVariantGroup::all()
+            'brands'     => Brand::orderBy('name', 'asc')->get()
         ]);
     }
 
@@ -356,17 +350,14 @@ class ProductsController extends AuthenticatedController
 
                 $brand    = $productItem->brand;
                 $category = $productItem->category;
-                $variant  = null;
             } else {
                 $brand    = Brand::find($request->get('brand'));
                 $category = ProductCategory::find($request->get('category'));
-                $variant  = ProductVariantGroup::find($request->get('product_variant_group_id'));
             }
 
-            $product->brand_id                 = $brand ? $brand->id : null;
-            $product->product_category_id      = $category ? $category->id : null;
-            $product->product_variant_group_id = $variant ? $variant->id : null;
-            $product->is_service               = $request->get('is_service') ?: false;
+            $product->brand_id            = $brand ? $brand->id : null;
+            $product->product_category_id = $category ? $category->id : null;
+            $product->is_service          = $request->get('is_service') ?: false;
             $product->saveOrFail();
         });
 

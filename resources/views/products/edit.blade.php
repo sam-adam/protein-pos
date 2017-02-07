@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <div id="edit-product" class="row">
+    <div id="edit-product" class="row" v-cloak>
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -125,22 +125,6 @@
                                     @endforeach
                                 </select>
                                 @foreach($errors->get('category') as $error)
-                                    <span class="label label-danger">{{ $error }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                        <div class="form-group {{ $errors->has('product_variant_group_id') ? 'has-error' : '' }}" v-bind:class="{hidden: is_service || is_bulk_container}">
-                            <label for="product_variant_group_id" class="col-sm-2 control-label">Variant</label>
-                            <div class="col-sm-5">
-                                <select id="product_variant_group_id" name="product_variant_group_id" class="form-control">
-                                    <option value @if($product->product_variant_group_id === null) selected @endif>Select Variant</option>
-                                    @foreach($variants as $variant)
-                                        <option value="{{ $variant->id }}" @if(((old('product_variant_group_id') ?: $product->product_variant_group_id)) == $variant->id) selected @endif>
-                                            {{ $variant->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @foreach($errors->get('product_variant_group_id') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
                             </div>
