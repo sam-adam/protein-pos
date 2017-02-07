@@ -143,7 +143,7 @@
                 this.lastSelectedList = list;
                 this.lastSelectedResult = item;
 
-                if (this.lastSelectedList === 'product') {
+                if (this.lastSelectedList === 'products') {
                     var product = this.lastSelectedResult;
 
                     if (product.stock > 0) {

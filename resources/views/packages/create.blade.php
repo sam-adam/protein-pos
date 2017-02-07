@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <div id="app" class="row">
+    <div id="app" class="row" v-cloak>
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -82,7 +82,12 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <input id="search-box" class="form-control" placeholder="Search a product" v-model="query">
+                                <search-product
+                                        src="{{ route('products.xhr.search', ['limit' => 5]) }}"
+                                        :show-last-result="false"
+                                        v-on:product-selected="addItem($event.product)"
+                                        v-on:insufficient-stock="addItem($event)"
+                                ></search-product>
                                 @foreach($errors->get('products') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
