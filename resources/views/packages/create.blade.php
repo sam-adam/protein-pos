@@ -24,6 +24,15 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="form-group {{ $errors->has('code') ? 'has-error' : '' }}">
+                            <label for="code" class="col-sm-2 control-label">Code</label>
+                            <div class="col-sm-5">
+                                <input type="text" id="code" name="code" class="form-control" placeholder="Eg: pack-cps" required value="{{ old('code') }}" />
+                                @foreach($errors->get('code') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group {{ $errors->has('cost') ? 'has-error' : '' }}">
                             <label for="price" class="col-sm-2 control-label">Price</label>
                             <div class="col-sm-5">

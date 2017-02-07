@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('money_format')) {
+if (!function_exists('money_format')) {
     function money_format($format, $number)
     {
         $regex  = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?'.

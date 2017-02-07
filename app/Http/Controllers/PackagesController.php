@@ -83,6 +83,7 @@ class PackagesController extends AuthenticatedController
         DB::transaction(function () use ($request) {
             $newPackage                  = new Package();
             $newPackage->name            = $request->get('name');
+            $newPackage->code            = $request->get('code');
             $newPackage->price           = $request->get('price');
             $newPackage->is_customizable = $request->get('is_customizable') ?: false;
             $newPackage->saveOrFail();
@@ -126,6 +127,7 @@ class PackagesController extends AuthenticatedController
 
         DB::transaction(function () use ($package, $request) {
             $package->name            = $request->get('name');
+            $package->code            = $request->get('code');
             $package->price           = $request->get('price');
             $package->is_customizable = $request->get('is_customizable') ?: false;
             $package->saveOrFail();
