@@ -7,6 +7,7 @@ use App\Models\BranchInventory;
 use App\Models\InventoryMovement;
 use App\Models\InventoryMovementItem;
 use App\Models\InventoryRemoval;
+use App\Models\Package;
 use App\Models\Product;
 use App\Services\InventoryService;
 use Carbon\Carbon;
@@ -58,6 +59,35 @@ class InventoryRepository
         }
 
         return new Collection($stocks);
+    }
+
+    /**
+     * Get stocks of products in a package
+     *
+     * @param Package     $package
+     * @param Branch|null $inBranch
+     *
+     * @return Collection
+     */
+    public function getStocksByPackage(Package $package, Branch $inBranch = null)
+    {
+        $products = [];
+
+        foreach ($package->items as $item) {
+            if (!isset($products[$item->product->id])) {
+                $products[$item->product->id] = $item->product;
+
+                if ($item->product->variantGroup) {
+                    foreach ($item->product->variantGroup->products as $variant) {
+                        if (!isset($products[$variant->id])) {
+                            $products[$variant->id] = $variant;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->getProductStocks(new Collection($products), $inBranch);
     }
 
     /**

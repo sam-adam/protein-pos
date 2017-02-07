@@ -47,4 +47,23 @@ class PackageRepository
 
         return new Collection($foundPackages);
     }
+
+    /**
+     * Find packages by query
+     *
+     * @param string $query
+     * @param int    $limit
+     * @param int    $offset
+     *
+     * @return Collection
+     */
+    public function findByQuery($query, $limit = 5, $offset = 0)
+    {
+        return Package::select('packages.*')
+            ->where('packages.name', 'LIKE', "%{$query}%")
+            ->orWhere('packages.code', 'LIKE', "%{$query}%")
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+    }
 }

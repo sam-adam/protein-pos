@@ -32,10 +32,11 @@
                         <div class="panel-body" id="search-product-panel">
                             <div class="col-sm-12">
                                 <search-product
-                                        src="{{ route('products.xhr.search') }}"
+                                        src="{{ route('products.xhr.search', ['include-package' => '1', 'limit' => 3]) }}"
                                         :existing-items="cart.products"
                                         :show-last-result="false"
                                         v-on:product-selected="addProductToCart($event.product, 1, $event.availableQuantity)"
+                                        v-on:package-selected="addPackageToCart($event.package, 1)"
                                         v-on:insufficient-stock="notify('error', $event.remark)"
                                 ></search-product>
                             </div>

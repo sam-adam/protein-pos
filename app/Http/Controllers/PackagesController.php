@@ -43,23 +43,7 @@ class PackagesController extends AuthenticatedController
             return redirect()->back()->with('flashes.danger', 'Package not found');
         }
 
-        $products = [];
-
-        foreach ($package->items as $item) {
-            if (!isset($products[$item->product->id])) {
-                $products[$item->product->id] = $item->product;
-
-                if ($item->product->variantGroup) {
-                    foreach ($item->product->variantGroup->products as $variant) {
-                        if (!isset($products[$variant->id])) {
-                            $products[$variant->id] = $variant;
-                        }
-                    }
-                }
-            }
-        }
-
-        $stocks     = $this->inventoryRepo->getProductStocks(new Collection($products), Auth::user()->branch);
+        $stocks     = $this->inventoryRepo->getStocksByPackage($package, Auth::user()->branch);
         $dataObject = new \App\DataObjects\Package($package);
         $dataObject->addDecorator(new WithItemsDecorator($package, $stocks));
 

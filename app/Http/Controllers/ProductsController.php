@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\CollectionDataObject;
+use App\DataObjects\Decorators\Package\LabelDecorator;
+use App\DataObjects\Decorators\Package\SellableDecorator;
+use App\DataObjects\Decorators\Package\WithItemsDecorator;
 use App\DataObjects\Decorators\Product\BulkContainerDecorator;
 use App\DataObjects\Decorators\Product\PackageDecorator;
 use App\DataObjects\Decorators\Product\StockDecorator;
@@ -462,15 +465,17 @@ class ProductsController extends AuthenticatedController
 
     public function xhrSearch(Request $request)
     {
-        $method = 'normal';
-        $query  = $request->get('query');
-        $branch = Auth::user()->branch;
+        $method         = 'normal';
+        $query          = $request->get('query');
+        $branch         = Auth::user()->branch;
+        $includePackage = $request->get('include-package', false);
+        $limit          = $request->get('limit', 5);
 
         if ($product = $this->productRepo->findByBarcode($query)) {
             $products = new Collection([$product]);
             $method   = 'barcode';
         } else {
-            $products = $this->productRepo->findByQuery($query);
+            $products = $this->productRepo->findByQuery($query, $limit);
         }
 
         $collection = new CollectionDataObject();
@@ -486,6 +491,23 @@ class ProductsController extends AuthenticatedController
             $dataObject->addDecorator(new PackageDecorator($product, $packages->get($product->id)));
 
             $collection->add($dataObject);
+        }
+
+        if ($includePackage) {
+            $packagesResult = [];
+
+            foreach ($this->packageRepo->findByQuery($query, $limit) as $package) {
+                $stocksByPackage = $this->inventoryRepo->getStocksByPackage($package);
+
+                $dataObject = new \App\DataObjects\Package($package);
+                $dataObject->addDecorator(new SellableDecorator($package, $stocksByPackage));
+                $dataObject->addDecorator(new LabelDecorator($package));
+                $dataObject->addDecorator(new WithItemsDecorator($package, $stocksByPackage));
+
+                array_push($packagesResult, $dataObject);
+            }
+
+            $collection->addAttributes('packages', $packagesResult);
         }
 
         $collection->addAttributes('method', $method);

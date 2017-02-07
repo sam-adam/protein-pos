@@ -26,7 +26,7 @@
             </div>
         </div>
         <ul v-show="hasItems">
-            <li v-for="(product, index) in items" :class="activeClass(index)" @mousedown="hit" @mousemove="setActive(index)">
+            <li v-for="(product, index) in items.products" :class="activeClass('products', index)" @mousedown="hit" @mousemove="setActive('products', index)">
                 <div class="row">
                     <div class="col-xs-10">
                         <div class="name">
@@ -49,6 +49,22 @@
                     </div>
                 </div>
             </li>
+            <li class="divider" v-if="hasPackages && hasProducts"></li>
+            <li v-for="(package, index) in items.packages" :class="activeClass('packages', index)" @mousedown="hit" @mousemove="setActive('packages', index)">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="name">
+                            {{ package.name }}
+                            <span v-show="!package.canBeSold" class="label label-danger">
+                                <i class="fa fa-fw fa-exclamation-circle"></i>
+                                Out of stock
+                            </span>
+                        </div>
+                        <div class="screen-name">{{ package.label }}</div>
+                        <div class="screen-name">Price: {{ package.price }}</div>
+                    </div>
+                </div>
+            </li>
         </ul>
     </div>
 </template>
@@ -61,15 +77,26 @@
         props: {
             src: {},
             existingItems: {},
+            includePackage: {"default": false},
             showLastResult: {},
-            autofocus: { "default": true },
-            initialValue: { "default": null }
+            autofocus: {"default": true},
+            initialValue: {"default": null}
+        },
+        computed: {
+            hasProducts () {
+                return this.items.hasOwnProperty("products") && this.items.products.length > 0;
+            },
+            hasPackages () {
+                return this.items.hasOwnProperty("packages") && this.items.packages.length > 0;
+            },
+            hasItems () {
+                return this.hasProducts || this.hasPackages;
+            }
         },
         data () {
             return {
                 queryParamName: 'query',
                 selectFirst: true,
-                limit: 5,
                 minChars: 3,
                 lastSelectedResult: null
             }
@@ -82,6 +109,18 @@
             this.reset();
         },
         methods: {
+            setActive (list, index) {
+                this.current = {
+                    list: list,
+                    index: index
+                }
+            },
+            activeClass (list, index) {
+                return {
+                    [list]: true,
+                    active: this.current.list === list && this.current.index === index
+                }
+            },
             calculateAvailable (product) {
                 var inCartQuantity = 0;
 
@@ -95,26 +134,49 @@
 
                 return product.stock - inCartQuantity;
             },
-            onHit (product) {
-                this.lastSelectedResult = product;
+            hit () {
+                if (this.current !== -1) {
+                    this.onHit(this.current.list, this.items[this.current.list][this.current.index]);
+                }
+            },
+            onHit (list, item) {
+                this.lastSelectedList = list;
+                this.lastSelectedResult = item;
 
-                if (product.stock > 0) {
-                    this.$emit('product-selected', {
-                        product: product,
-                        availableQuantity: product.stock
-                    });
-                } else if (product.stock === 0) {
-                    this.$emit('insufficient-stock', {
-                        product: product,
-                        remark: "Out of stock"
-                    })
+                if (this.lastSelectedList === 'product') {
+                    var product = this.lastSelectedResult;
+
+                    if (product.stock > 0) {
+                        this.$emit('product-selected', {
+                            product: product,
+                            availableQuantity: product.stock
+                        });
+                    } else if (product.stock === 0) {
+                        this.$emit('insufficient-stock', {
+                            product: product,
+                            remark: "Out of stock"
+                        })
+                    }
+                } else {
+                    var packageObj = this.lastSelectedResult;
+
+                    if (packageObj.canBeSold) {
+                        this.$emit('package-selected', {
+                            "package": packageObj
+                        });
+                    } else {
+                        this.$emit('insufficient-stock', {
+                            "package": packageObj,
+                            remark: "Out of stock"
+                        })
+                    }
                 }
             },
             prepareResponseData (response) {
                 if (response.method === 'barcode') {
                     this.onHit(response.products[0]);
                 } else {
-                    return response.products;
+                    return response;
                 }
             },
             reset () {
@@ -164,8 +226,12 @@
         border-bottom: 0;
     }
 
-    .active {
+    .active.products {
         background-color: #3aa373;
+    }
+
+    .active.packages {
+        background-color: #4c64a3;
     }
 
     .active div {
