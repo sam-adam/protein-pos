@@ -174,7 +174,10 @@
             },
             prepareResponseData (response) {
                 if (response.method === 'barcode') {
-                    this.onHit(response.products[0]);
+                    this.onHit("products", response.products[0]);
+                    this.reset();
+
+                    return response.products;
                 } else {
                     return response;
                 }
