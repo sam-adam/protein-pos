@@ -153,7 +153,7 @@ class SaleService
                 }
 
                 // get the branch inventories
-                $usedInventories = $this->useInventory($selectedProduct, $openedBy->branch, $requestedQuantity);
+                $usedInventories = $this->useInventory($selectedProduct, $openedBy->branch, $requestedQuantity * $packageItem->quantity);
 
                 foreach ($usedInventories as $usedInventory) {
                     $newSalePackageItem                      = new SalePackageItem();
