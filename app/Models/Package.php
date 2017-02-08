@@ -18,6 +18,11 @@ class Package extends BaseModel
         return $this->hasMany(PackageProduct::class);
     }
 
+    public function variants()
+    {
+        return $this->hasMany(PackageVariant::class);
+    }
+
     public function canBeSold($stocks)
     {
         $insufficientStockProducts = [];

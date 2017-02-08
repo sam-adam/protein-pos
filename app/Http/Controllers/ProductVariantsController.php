@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\DataObjects\CollectionDataObject;
 use App\Http\Requests\StoreProductVariant;
 use App\Models\Product;
 use App\Models\ProductVariantGroup;
 use App\Models\ProductVariantGroupItem;
+use App\Repository\ProductVariantRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -15,6 +18,15 @@ use Illuminate\Support\Facades\DB;
  */
 class ProductVariantsController extends AuthenticatedController
 {
+    protected $variantRepo;
+
+    public function __construct(ProductVariantRepository $variantRepo)
+    {
+        parent::__construct();
+
+        $this->variantRepo = $variantRepo;
+    }
+
     public function index()
     {
         return view('productVariants.index', ['productVariants' => ProductVariantGroup::paginate()]);
@@ -103,5 +115,20 @@ class ProductVariantsController extends AuthenticatedController
         });
 
         return redirect(route('product-variants.index'))->with('flashes.success', 'Product variant deleted');
+    }
+
+    public function xhrSearch(Request $request)
+    {
+        $query = $request->get('query');
+        $limit = $request->get('limit', 5);
+
+        $collection = new CollectionDataObject();
+        $collection->setKey('variantGroups');
+
+        foreach ($this->variantRepo->findByQuery($query, $limit) as $variantGroup) {
+            $collection->add(new \App\DataObjects\ProductVariantGroup($variantGroup));
+        }
+
+        return response()->json($collection);
     }
 }

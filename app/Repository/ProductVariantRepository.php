@@ -14,6 +14,24 @@ use Illuminate\Support\Collection;
 class ProductVariantRepository
 {
     /**
+     * Find variants by query
+     *
+     * @param string $query
+     * @param int    $limit
+     * @param int    $offset
+     *
+     * @return Collection
+     */
+    public function findByQuery($query, $limit = 5, $offset = 0)
+    {
+        return ProductVariantGroup::select('product_variant_groups.*')
+            ->where('product_variant_groups.name', 'LIKE', "%{$query}%")
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+    }
+
+    /**
      * Find variant groups of a product
      *
      * @param Product $product

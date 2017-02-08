@@ -19,6 +19,7 @@ Route::get('/products/xhr-search', 'ProductsController@xhrSearch')->name('produc
 Route::get('/products/xhr-find-variant-groups', 'ProductsController@xhrFindVariantGroups')->name('products.xhr.find_variant_groups');
 Route::resource('/products', 'ProductsController');
 //Route::resource('/inventory-movements', 'InventoryMovementsController');
+Route::get('/product-variants/xhr-search', 'ProductVariantsController@xhrSearch')->name('product_variants.xhr.search');
 Route::resource('/product-variants', 'ProductVariantsController');
 Route::get('/packages/{package}/xhr-info', 'PackagesController@xhrInfo')->name('packages.xhr.info');
 Route::resource('/packages', 'PackagesController');

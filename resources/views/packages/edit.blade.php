@@ -6,7 +6,7 @@
 
 @section('content')
     @parent
-    <div id="app" class="row">
+    <div id="app" class="row" v-cloak>
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
