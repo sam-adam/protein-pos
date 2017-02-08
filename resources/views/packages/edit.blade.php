@@ -94,6 +94,39 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="form-group {{ $errors->has('variants') ? 'has-error' : '' }}">
+                            <label for="price" class="col-sm-2 control-label">Variants</label>
+                            <div class="col-sm-5">
+                                <table class="table table-condensed table-middle table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Quantity</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="variant in variants">
+                                            <td>
+                                                @{{ variant.name }}
+                                                <input type="hidden" v-bind:name="'variants[' + variant.id + '][id]'" v-bind:value="variant.id" />
+                                            </td>
+                                            <td>@{{ parseInt(variant.quantity).toLocaleString() }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="removeItem(item)">
+                                                    <i class="fa fa-trash"></i>
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <input id="search-box" class="form-control" placeholder="Search a variant" v-model="variantQuery">
+                                @foreach($errors->get('variants') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-3">
                                 <button type="submit" class="btn btn-success btn-block">Update</button>
@@ -111,12 +144,15 @@
 
 @section('scripts')
     <script type="text/javascript">
-        var products = {!! $products->toJson() !!}.map(function (product) { return {value: product.name, data: product}; }),
+        var variants = {!! $variants->toJson() !!}.map(function (variant) { return {value: variant.name, data: variant}; }),
+            products = {!! $products->toJson() !!}.map(function (product) { return {value: product.name, data: product}; }),
             app = new Vue({
                 el: "#app",
                 data: {
                     items: [],
-                    query: ''
+                    variants: [],
+                    query: '',
+                    variantQuery: ''
                 },
                 computed: {
                     subtotal: function () {
@@ -126,6 +162,16 @@
                     }
                 },
                 methods: {
+                    addVariant: function (variant) {
+                        if (this.variants.filter(function (existingVariant) { return existingVariant.id === variant.id}).length === 0) {
+                            this.variants.push(variant);
+                        }
+
+                        this.variantQuery = '';
+                    },
+                    removeVariant: function (variant) {
+                        this.variants.splice(this.variants.indexOf(variant), 1);
+                    },
                     addItem: function (product, quantity) {
                         if (this.items.filter(function (item) { return item.id === product.id}).length === 0) {
                             product.quantity = quantity;
@@ -141,20 +187,29 @@
                 }
             });
 
-        var selectedProducts = {!! json_encode(old('products') === null ? $packageItems : old('products')) !!};
+        var selectedProducts = {!! json_encode(old('products') === null ? $packageItems : old('products')) !!},
+            selectedVariants = {!! json_encode(old('variants') === null ? $packageVariants : old('variants')) !!};
 
         for (productId in selectedProducts) {
-            var foundInSuggestion = products.find(product => product.data.id == productId);
+            const foundInSuggestion = products.find(product => product.data.id == productId);
 
             if (foundInSuggestion !== undefined) {
                 app.addItem(foundInSuggestion.data, selectedProducts[productId].quantity);
             }
         }
 
+        for (variantId in selectedVariants) {
+            const foundInSuggestion = variants.find(variant => variant.data.id == variantId);
+
+            if (foundInSuggestion !== undefined) {
+                app.addVariant(foundInSuggestion.data, 0);
+            }
+        }
+
         $("#search-box").autocomplete({
-            lookup: products,
+            lookup: variants,
             onSelect: function (suggestion) {
-                app.addItem(suggestion.data, 0);
+                app.addVariant(suggestion.data, 0);
             }
         });
     </script>

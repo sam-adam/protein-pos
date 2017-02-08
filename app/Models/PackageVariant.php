@@ -20,6 +20,6 @@ class PackageVariant extends Model
 
     public function variant()
     {
-        return $this->belongsTo(ProductVariantGroup::class);
+        return $this->belongsTo(ProductVariantGroup::class, 'product_variant_group_id');
     }
 }

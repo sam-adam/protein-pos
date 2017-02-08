@@ -46,6 +46,12 @@
                                                         <td>{{ number_format($item->quantity) }}</td>
                                                     </tr>
                                                 @endforeach
+                                                @foreach($package->variants as $variant)
+                                                    <tr>
+                                                        <td>{{ $variant->variant->name }}</td>
+                                                        <td>{{ number_format($variant->variant->quantity) }}</td>
+                                                    </tr>
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </td>

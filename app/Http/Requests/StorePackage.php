@@ -33,7 +33,8 @@ class StorePackage extends FormRequest
             'name'                => "bail|required|unique:packages,name,{$packageId},id,deleted_at,NULL",
             'price'               => 'bail|required|numeric|min:0',
             'products.*.id'       => 'bail|required|exists:products,id|not_service_product',
-            'products.*.quantity' => 'bail|required|numeric|min:1'
+            'products.*.quantity' => 'bail|required|numeric|min:1',
+            'variants.*.id'       => 'bail|required|exists:product_variant_groups,id'
         ];
 
         return $rules;

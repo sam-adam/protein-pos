@@ -6,7 +6,9 @@ use App\DataObjects\Decorators\Package\WithItemsDecorator;
 use App\Http\Requests\StorePackage;
 use App\Models\Package;
 use App\Models\PackageProduct;
+use App\Models\PackageVariant;
 use App\Models\Product;
+use App\Models\ProductVariantGroup;
 use App\Repository\InventoryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -51,6 +53,7 @@ class PackagesController extends AuthenticatedController
             'package'     => $package,
             'stocks'      => $stocks,
             'packageJson' => json_encode($dataObject),
+            'variants'    => ProductVariantGroup::all(),
             'intent'      => $request->get('intent')
         ]);
     }
@@ -58,7 +61,8 @@ class PackagesController extends AuthenticatedController
     public function create()
     {
         return view('packages.create', [
-            'products' => Product::select('id', 'name', 'price')->where('is_service', '=', false)->get()
+            'products' => Product::select('id', 'name', 'price')->where('is_service', '=', false)->get(),
+            'variants' => ProductVariantGroup::all(),
         ]);
     }
 
@@ -95,9 +99,11 @@ class PackagesController extends AuthenticatedController
         }
 
         return view('packages.edit', [
-            'package'      => $package,
-            'packageItems' => $package->items->keyBy('product_id')->map(function (PackageProduct $item) { return ['id' => $item->product_id, 'quantity' => $item->quantity]; }),
-            'products'     => Product::select('id', 'name', 'price')->where('is_service', '=', false)->get()
+            'package'         => $package,
+            'packageItems'    => $package->items->keyBy('product_id')->map(function (PackageProduct $item) { return ['id' => $item->product_id, 'quantity' => $item->quantity]; }),
+            'products'        => Product::select('id', 'name', 'price')->where('is_service', '=', false)->get(),
+            'packageVariants' => $package->variants->keyBy('product_variant_group_id')->map(function (PackageVariant $item) { return ['id' => $item->product_variant_group_id]; }),
+            'variants'        => ProductVariantGroup::all()
         ]);
     }
 
@@ -117,13 +123,21 @@ class PackagesController extends AuthenticatedController
             $package->saveOrFail();
 
             PackageProduct::where('package_id', '=', $package->id)->delete();
+            PackageVariant::where('package_id', '=', $package->id)->delete();
 
-            foreach ($request->get('products') as $productData) {
+            foreach ($request->get('products', []) as $productData) {
                 $newPackageItem             = new PackageProduct();
                 $newPackageItem->product_id = data_get($productData, 'id');
                 $newPackageItem->quantity   = data_get($productData, 'quantity');
 
                 $package->items()->save($newPackageItem);
+            }
+
+            foreach ($request->get('variants', []) as $variantData) {
+                $newPackageVariant                           = new PackageVariant();
+                $newPackageVariant->product_variant_group_id = data_get($variantData, 'id');
+
+                $package->variants()->save($newPackageVariant);
             }
 
             return $package;
