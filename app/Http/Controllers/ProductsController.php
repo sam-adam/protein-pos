@@ -492,6 +492,7 @@ class ProductsController extends AuthenticatedController
                 $dataObject->addDecorator(new PackageDecorators\SellableDecorator($package, $stocksByPackage));
                 $dataObject->addDecorator(new PackageDecorators\LabelDecorator($package));
                 $dataObject->addDecorator(new PackageDecorators\WithItemsDecorator($package, $stocksByPackage));
+                $dataObject->addDecorator(new PackageDecorators\WithVariantsDecorator($package, $stocksByPackage));
 
                 array_push($packagesResult, $dataObject);
             }

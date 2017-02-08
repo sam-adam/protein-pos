@@ -33,14 +33,12 @@ class WithItemsDecorator implements Decorator
         foreach ($this->package->items as $packageItem) {
             $packageProduct   = new PackageProduct($packageItem);
             $stockDecorator   = new StockDecorator($packageItem->product);
-            $variantDecorator = new VariantDecorator($packageItem->product, $this->productStocks);
             $stockDecorator->setStockCallback(function (Product $product) {
                 return isset($this->productStocks[$product->id])
                     ? $this->productStocks[$product->id]
                     : 0;
             });
 
-            $packageProduct->addEagerLoadDecorator('product', $variantDecorator);
             $packageProduct->addEagerLoadDecorator('product', $stockDecorator);
 
             $attributes['items'][] = $packageProduct;

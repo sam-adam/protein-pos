@@ -28,6 +28,10 @@ class LabelDecorator implements Decorator
             array_push($attributes['label'], $packageItem->quantity.'x '.$packageItem->product->name);
         }
 
+        foreach ($this->package->variants as $packageVariant) {
+            array_push($attributes['label'], $packageVariant->variant->name);
+        }
+
         $attributes['label'] = implode(', ', $attributes['label']);
 
         return $attributes;
