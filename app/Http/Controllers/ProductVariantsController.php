@@ -28,8 +28,9 @@ class ProductVariantsController extends AuthenticatedController
     public function store(StoreProductVariant $request)
     {
         DB::transaction(function () use ($request) {
-            $newVariant       = new ProductVariantGroup();
-            $newVariant->name = $request->get('name');
+            $newVariant           = new ProductVariantGroup();
+            $newVariant->name     = $request->get('name');
+            $newVariant->quantity = $request->get('quantity');
             $newVariant->saveOrFail();
 
             foreach ($request->get('products') as $productId => $productData) {
@@ -65,7 +66,8 @@ class ProductVariantsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($variant, $request) {
-            $variant->name = $request->get('name');
+            $variant->name     = $request->get('name');
+            $variant->quantity = $request->get('quantity');
             $variant->saveOrFail();
 
             ProductVariantGroupItem::where('product_variant_group_id', '=', $variant->id)->delete();

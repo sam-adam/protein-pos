@@ -19,6 +19,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
+                                    <th class="text-right">Quantity</th>
                                     <th>Products</th>
                                     <th></th>
                                 </tr>
@@ -28,6 +29,7 @@
                                 <tr>
                                     <td>{{ $productVariant->id }}</td>
                                     <td>{{ $productVariant->name }}</td>
+                                    <td class="text-right">{{ $productVariant->quantity }}</td>
                                     <td>
                                         @if($productVariant->items->count() > 0)
                                             <ul>

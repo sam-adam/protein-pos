@@ -25,6 +25,15 @@
                                 @endforeach
                             </div>
                         </div>
+                        <div class="form-group {{ $errors->has('quantity') ? 'has-error' : '' }}">
+                            <label for="name" class="col-sm-2 control-label">Quantity</label>
+                            <div class="col-sm-1">
+                                <input type="number" id="quantity" name="quantity" class="form-control" placeholder="Eg: 2" required value="{{ old('quantity') ?: $variant->quantity }}" min="1" />
+                                @foreach($errors->get('quantity') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group {{ $errors->has('products') ? 'has-error' : '' }}">
                             <label for="price" class="col-sm-2 control-label">Products</label>
                             <div class="col-sm-5">
