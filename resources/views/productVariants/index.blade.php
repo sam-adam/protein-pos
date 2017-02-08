@@ -29,11 +29,11 @@
                                     <td>{{ $productVariant->id }}</td>
                                     <td>{{ $productVariant->name }}</td>
                                     <td>
-                                        @if($productVariant->products->count() > 0)
+                                        @if($productVariant->items->count() > 0)
                                             <ul>
-                                                @foreach($productVariant->products as $product)
+                                                @foreach($productVariant->items as $variantItem)
                                                     <li>
-                                                        <a href="{{ route('products.show', $product->id) }}">{{ $product->name }}</a>
+                                                        <a href="{{ route('products.show', $variantItem->product->id) }}">{{ $variantItem->product->name }}</a>
                                                     </li>
                                                 @endforeach
                                             </ul>

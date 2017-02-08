@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -14,8 +13,8 @@ class ProductVariantGroup extends BaseModel
 {
     use SoftDeletes;
 
-    public function products()
+    public function items()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(ProductVariantGroupItem::class);
     }
 }

@@ -48,11 +48,6 @@ class Product extends BaseModel
         return $this->belongsTo(Brand::class);
     }
 
-    public function variantGroup()
-    {
-        return $this->belongsTo(ProductVariantGroup::class, 'product_variant_group_id');
-    }
-
     public function item()
     {
         return $this->hasOne(Product::class, 'id', 'product_item_id');

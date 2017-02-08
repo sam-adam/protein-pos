@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductVariant;
+use App\Models\Product;
 use App\Models\ProductVariantGroup;
+use App\Models\ProductVariantGroupItem;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -25,9 +27,20 @@ class ProductVariantsController extends AuthenticatedController
 
     public function store(StoreProductVariant $request)
     {
-        $newVariant = new ProductVariantGroup();
-        $newVariant->name = $request->get('name');
-        $newVariant->saveOrFail();
+        DB::transaction(function () use ($request) {
+            $newVariant       = new ProductVariantGroup();
+            $newVariant->name = $request->get('name');
+            $newVariant->saveOrFail();
+
+            foreach ($request->get('products') as $productId => $productData) {
+                $product = Product::findOrFail($productId);
+
+                $newVariantItem                           = new ProductVariantGroupItem();
+                $newVariantItem->product_variant_group_id = $newVariant->id;
+                $newVariantItem->product_id               = $product->id;
+                $newVariantItem->saveOrFail();
+            }
+        });
 
         return redirect(route('product-variants.index'))->with('flashes.success', 'Product variant added');
     }
@@ -51,8 +64,21 @@ class ProductVariantsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product variant not found');
         }
 
-        $variant->name = $request->get('name');
-        $variant->saveOrFail();
+        DB::transaction(function () use ($variant, $request) {
+            $variant->name = $request->get('name');
+            $variant->saveOrFail();
+
+            ProductVariantGroupItem::where('product_variant_group_id', '=', $variant->id)->delete();
+
+            foreach ($request->get('products') as $productId => $productData) {
+                $product = Product::findOrFail($productId);
+
+                $newVariantItem                           = new ProductVariantGroupItem();
+                $newVariantItem->product_variant_group_id = $variant->id;
+                $newVariantItem->product_id               = $product->id;
+                $newVariantItem->saveOrFail();
+            }
+        });
 
         return redirect(route('product-variants.index'))->with('flashes.success', 'Product variant edited');
     }
