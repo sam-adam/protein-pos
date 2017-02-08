@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\CollectionDataObject;
-use App\DataObjects\Decorators\Package\LabelDecorator;
-use App\DataObjects\Decorators\Package\SellableDecorator;
-use App\DataObjects\Decorators\Package\WithItemsDecorator;
-use App\DataObjects\Decorators\Product\BulkContainerDecorator;
-use App\DataObjects\Decorators\Product\PackageDecorator;
-use App\DataObjects\Decorators\Product\StockDecorator;
+use App\DataObjects\Decorators\Package as PackageDecorators;
+use App\DataObjects\Decorators\Product as ProductDecorators;
+use App\DataObjects\ProductVariantGroup;
 use App\Http\Requests\MoveInventoryToOtherBranch;
 use App\Http\Requests\RemoveInventory;
 use App\Http\Requests\StoreProduct;
@@ -20,9 +17,7 @@ use App\Models\Inventory;
 use App\Models\InventoryRemoval;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Repository\InventoryRepository;
-use App\Repository\PackageRepository;
-use App\Repository\ProductRepository;
+use App\Repository as Repositories;
 use App\Services\InventoryService;
 use App\Services\MovementService;
 use Carbon\Carbon;
@@ -47,13 +42,15 @@ class ProductsController extends AuthenticatedController
     protected $inventoryRepo;
     protected $packageRepo;
     protected $productRepo;
+    protected $variantRepo;
 
     public function __construct(
         MovementService $movementService,
         InventoryService $inventoryService,
-        InventoryRepository $inventoryRepo,
-        PackageRepository $packageRepo,
-        ProductRepository $productRepo
+        Repositories\InventoryRepository $inventoryRepo,
+        Repositories\PackageRepository $packageRepo,
+        Repositories\ProductRepository $productRepo,
+        Repositories\ProductVariantRepository $variantRepo
     ) {
         parent::__construct();
 
@@ -62,6 +59,7 @@ class ProductsController extends AuthenticatedController
         $this->inventoryRepo    = $inventoryRepo;
         $this->packageRepo      = $packageRepo;
         $this->productRepo      = $productRepo;
+        $this->variantRepo      = $variantRepo;
     }
 
     public function index(Request $request)
@@ -152,9 +150,9 @@ class ProductsController extends AuthenticatedController
                 ->sum('stock');
 
             $dataObject = new \App\DataObjects\Product($product);
-            $dataObject->addDecorator(new BulkContainerDecorator($product));
-            $dataObject->addDecorator(new StockDecorator($product, $stocks->get($product->id)));
-            $dataObject->addDecorator(new PackageDecorator($product, $packages->get($product->id)));
+            $dataObject->addDecorator(new ProductDecorators\BulkContainerDecorator($product));
+            $dataObject->addDecorator(new ProductDecorators\StockDecorator($product, $stocks->get($product->id)));
+            $dataObject->addDecorator(new ProductDecorators\PackageDecorator($product, $packages->get($product->id)));
 
             $productsJson[$product->id] = $dataObject;
         }
@@ -477,9 +475,9 @@ class ProductsController extends AuthenticatedController
 
         foreach ($products as $product) {
             $dataObject = new \App\DataObjects\Product($product);
-            $dataObject->addDecorator(new BulkContainerDecorator($product));
-            $dataObject->addDecorator(new StockDecorator($product, $stocks->get($product->id)));
-            $dataObject->addDecorator(new PackageDecorator($product, $packages->get($product->id)));
+            $dataObject->addDecorator(new ProductDecorators\BulkContainerDecorator($product));
+            $dataObject->addDecorator(new ProductDecorators\StockDecorator($product, $stocks->get($product->id)));
+            $dataObject->addDecorator(new ProductDecorators\PackageDecorator($product, $packages->get($product->id)));
 
             $collection->add($dataObject);
         }
@@ -491,9 +489,9 @@ class ProductsController extends AuthenticatedController
                 $stocksByPackage = $this->inventoryRepo->getStocksByPackage($package);
 
                 $dataObject = new \App\DataObjects\Package($package);
-                $dataObject->addDecorator(new SellableDecorator($package, $stocksByPackage));
-                $dataObject->addDecorator(new LabelDecorator($package));
-                $dataObject->addDecorator(new WithItemsDecorator($package, $stocksByPackage));
+                $dataObject->addDecorator(new PackageDecorators\SellableDecorator($package, $stocksByPackage));
+                $dataObject->addDecorator(new PackageDecorators\LabelDecorator($package));
+                $dataObject->addDecorator(new PackageDecorators\WithItemsDecorator($package, $stocksByPackage));
 
                 array_push($packagesResult, $dataObject);
             }
@@ -502,6 +500,24 @@ class ProductsController extends AuthenticatedController
         }
 
         $collection->addAttributes('method', $method);
+
+        return response()->json($collection);
+    }
+
+    public function xhrFindVariantGroups(Request $request)
+    {
+        $product = Product::find($request->get('product'));
+
+        if (!$product) {
+            return response()->json();
+        }
+
+        $collection = new CollectionDataObject();
+        $collection->setKey('variantGroups');
+
+        foreach ($this->variantRepo->findGroupByProduct($product) as $variantGroup) {
+            $collection->add(new ProductVariantGroup($variantGroup));
+        }
 
         return response()->json($collection);
     }

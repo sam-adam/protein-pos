@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Models\Branch;
 use App\Models\BranchInventory;
 use App\Models\InventoryMovement;
-use App\Models\InventoryMovementItem;
 use App\Models\InventoryRemoval;
 use App\Models\Package;
 use App\Models\Product;
