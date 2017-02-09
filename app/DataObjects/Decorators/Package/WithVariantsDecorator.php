@@ -3,6 +3,7 @@
 namespace App\DataObjects\Decorators\Package;
 
 use App\DataObjects\Decorators\Decorator;
+use App\DataObjects\DecoratorsVariant\WithProductsDecorator;
 use App\DataObjects\PackageVariant;
 use App\Models\Package as PackageModel;
 
@@ -29,6 +30,7 @@ class WithVariantsDecorator implements Decorator
 
         foreach ($this->package->variants as $packageVariant) {
             $variant = new PackageVariant($packageVariant);
+            $variant->addEagerLoadDecorator('variant', new WithProductsDecorator($packageVariant->variant));
 
             $attributes['variants'][] = $variant;
         }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataObjects\CollectionDataObject;
+use App\DataObjects\DecoratorsVariant\WithProductsDecorator;
 use App\Http\Requests\StoreProductVariant;
 use App\Models\Product;
 use App\Models\ProductVariantGroup;
@@ -126,7 +127,10 @@ class ProductVariantsController extends AuthenticatedController
         $collection->setKey('variantGroups');
 
         foreach ($this->variantRepo->findByQuery($query, $limit) as $variantGroup) {
-            $collection->add(new \App\DataObjects\ProductVariantGroup($variantGroup));
+            $dataObject = new \App\DataObjects\ProductVariantGroup($variantGroup);
+            $dataObject->addDecorator(new WithProductsDecorator($variantGroup));
+
+            $collection->add($dataObject);
         }
 
         return response()->json($collection);
