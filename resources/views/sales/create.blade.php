@@ -210,10 +210,7 @@
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(product, index) in packageVariant.variant.products">
-                                                                <td>
-                                                                    @{{ product.name }}
-                                                                    <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][variants][' + packageVariant.variant.id + ']'" v-model="packageVariant.variant.id" />
-                                                                </td>
+                                                                <td>@{{ product.name }}</td>
                                                                 <td class="text-center" style="width: 150px;">
                                                                     <div class="input-group">
                                                                         <span class="input-group-btn">
@@ -628,8 +625,29 @@
 
                     return false;
                 },
+                hasNoUnfulfilledVariant: function () {
+                    var result = true;
+
+                    this.cart.packages.forEach(function (cartPackageItem) {
+                        if (cartPackageItem.package.isCustomizable) {
+                            cartPackageItem.package.variants.forEach(function (packageVariant) {
+                                var maxQuantity = packageVariant.variant.quantity * cartPackageItem.quantity,
+                                    currentTotal = packageVariant.variant.products.reduce(function (total, product) {
+                                        return total + product.quantity;
+                                    }, 0);
+
+                                if (currentTotal < maxQuantity) {
+                                    result = false;
+                                }
+                            });
+                        }
+                    });
+
+                    return result;
+                },
                 isCompletable: function () {
                     return this.isAnyProductSelected
+                        && this.hasNoUnfulfilledVariant
                         && this.isCustomerSelected
                         && this.isPaymentCompleted;
                 },

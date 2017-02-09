@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\BranchInventory;
 use App\Models\Customer;
 use App\Models\Package;
+use App\Models\PackageVariant;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
@@ -128,47 +129,59 @@ class SaleService
             $newSalePackage->subtotal       = $newSalePackage->calculateSubTotal();
             $newSalePackage->saveOrFail();
 
-            $newSalePackage->items()->initRelation([], 'items');
+            $newSalePackage->setRelation('items', new Collection());
 
             foreach ($package->items as $packageItem) {
-                $selectedProduct = null;
-
-                // find the selected product or variant
-                foreach (data_get($requestedPackage, 'products') as $productId) {
-                    if ($selectedProduct === null) {
-                        if ((int) $packageItem->product->id === (int) $productId) {
-                            $selectedProduct = Product::findOrFail($productId);
-                        } elseif ($packageItem->product->variantGroup) {
-                            foreach ($packageItem->product->variantGroup->products as $variant) {
-                                if ((int) $packageItem->product->id === (int) $variant->id) {
-                                    $selectedProduct = $variant;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ($selectedProduct === null) {
-                    throw (new ModelNotFoundException())->setModel(Product::class, $packageItem->product->id);
-                }
+                $product           = Product::findOrFail($packageItem->product_id);
+                $requestedQuantity = $packageItem->quantity;
 
                 // get the branch inventories
-                $usedInventories = $this->useInventory($selectedProduct, $openedBy->branch, $requestedQuantity * $packageItem->quantity);
+                $usedInventories = $this->useInventory($product, $openedBy->branch, $requestedQuantity * $packageItem->quantity);
 
                 foreach ($usedInventories as $usedInventory) {
                     $newSalePackageItem                      = new SalePackageItem();
                     $newSalePackageItem->sale_package_id     = $newSalePackage->id;
-                    $newSalePackageItem->product_id          = $selectedProduct->id;
+                    $newSalePackageItem->product_id          = $product->id;
                     $newSalePackageItem->branch_inventory_id = $usedInventory['branchInventory']->id;
                     $newSalePackageItem->quantity            = $usedInventory['availableQuantity'];
-                    $newSalePackageItem->original_price      = $selectedProduct->price;
+                    $newSalePackageItem->original_price      = $product->price;
                     $newSalePackageItem->saveOrFail();
 
                     $newSalePackage->items->push($newSalePackageItem);
                 }
 
                 // reorder priority
-                $this->inventoryService->reOrderPriority($selectedProduct, $openedBy->branch);
+                $this->inventoryService->reOrderPriority($product, $openedBy->branch);
+            }
+
+            if ($package->is_customizable) {
+                foreach ($package->variants as $packageVariant) {
+                    if (!isset($requestedPackage['variants'][$packageVariant->product_variant_group_id])) {
+                        throw new ModelNotFoundException(PackageVariant::class);
+                    }
+
+                    foreach ($requestedPackage['variants'][$packageVariant->product_variant_group_id] as $variantProductId => $variantProductRequestData) {
+                        if ($variantProductRequestData['quantity'] > 0) {
+                            $variantProduct  = Product::findOrFail($variantProductId);
+                            $usedInventories = $this->useInventory($variantProduct, $openedBy->branch, $requestedQuantity * $variantProductRequestData['quantity']);
+
+                            foreach ($usedInventories as $usedInventory) {
+                                $newSalePackageItem                           = new SalePackageItem();
+                                $newSalePackageItem->sale_package_id          = $newSalePackage->id;
+                                $newSalePackageItem->product_id               = $variantProduct->id;
+                                $newSalePackageItem->branch_inventory_id      = $usedInventory['branchInventory']->id;
+                                $newSalePackageItem->quantity                 = $usedInventory['availableQuantity'];
+                                $newSalePackageItem->original_price           = $variantProduct->price;
+                                $newSalePackageItem->product_variant_group_id = $packageVariant->product_variant_group_id1;
+                                $newSalePackageItem->saveOrFail();
+
+                                $newSalePackage->items->push($newSalePackageItem);
+                            }
+
+                            $this->inventoryService->reOrderPriority($variantProduct, $openedBy->branch);
+                        }
+                    }
+                }
             }
 
             $newSale->packages->push($newSalePackage);
