@@ -127,10 +127,7 @@ class ProductVariantsController extends AuthenticatedController
         $collection->setKey('variantGroups');
 
         foreach ($this->variantRepo->findByQuery($query, $limit) as $variantGroup) {
-            $dataObject = new \App\DataObjects\ProductVariantGroup($variantGroup);
-            $dataObject->addDecorator(new WithProductsDecorator($variantGroup));
-
-            $collection->add($dataObject);
+            $collection->add(new \App\DataObjects\ProductVariantGroup($variantGroup));
         }
 
         return response()->json($collection);

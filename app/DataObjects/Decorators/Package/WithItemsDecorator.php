@@ -4,10 +4,7 @@ namespace App\DataObjects\Decorators\Package;
 
 use App\DataObjects\Decorators\Decorator;
 use App\DataObjects\Decorators\Product\StockDecorator;
-use App\DataObjects\Decorators\Product\VariantDecorator;
-use App\DataObjects\DecoratorsVariant\WithProductsDecorator;
 use App\DataObjects\PackageProduct;
-use App\DataObjects\PackageVariant;
 use App\Models\Package as PackageModel;
 use App\Models\Product;
 

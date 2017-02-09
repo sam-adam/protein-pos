@@ -145,7 +145,10 @@
                                                     <i class="fa fa-times-circle fa-2x"></i>
                                                 </a>
                                             </td>
-                                            <td style="vertical-align: middle;">@{{ packageItem.package.name }}</td>
+                                            <td style="vertical-align: middle;">
+                                                @{{ packageItem.package.name }}
+                                                <span class="label label-success" v-show="packageItem.package.isCustomizable">Customizable</span>
+                                            </td>
                                             <td style="vertical-align: middle;" class="text-center">@{{ packageItem.package.price }}</td>
                                             <td class="text-center" style="width: 150px; vertical-align: middle;">
                                                 <input v-bind:name="'packages[' + packageItem.package.id + '][id]'" type="hidden" v-model="packageItem.package.id"/>
@@ -173,7 +176,6 @@
                                                         <tr>
                                                             <th>
                                                                 Package Item
-                                                                <span class="label label-success" v-show="packageItem.package.isCustomizable">Customizable</span>
                                                             </th>
                                                             <th class="text-center">Quantity</th>
                                                             <th class="text-center">Stock</th>
@@ -183,15 +185,8 @@
                                                         <template v-for="packageProduct in packageItem.package.items">
                                                             <tr>
                                                                 <td>
-                                                                    <select v-if="packageItem.package.isCustomizable" class="form-control" v-bind:name="'packages[' + packageItem.package.id + '][products][]'">
-                                                                        <option v-for="variant in packageProduct.product.allVariants" v-model="variant.id">
-                                                                            @{{ variant.name }}
-                                                                        </option>
-                                                                    </select>
-                                                                    <p v-if="!packageItem.package.isCustomizable" class="form-control-static">
-                                                                        @{{ packageProduct.product.name }}
-                                                                        <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][products][]'" v-model="packageProduct.product.id" />
-                                                                    </p>
+                                                                    @{{ packageProduct.product.name }}
+                                                                    <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][products][]'" v-model="packageProduct.product.id" />
                                                                 </td>
                                                                 <td class="text-center">@{{ packageProduct.quantity }}</td>
                                                                 <td class="text-center">@{{ packageProduct.product.stock }}</td>
@@ -199,6 +194,47 @@
                                                         </template>
                                                     </tbody>
                                                 </table>
+                                                <template v-for="(packageVariant, index) in packageItem.package.variants">
+                                                    <table class="table table-condensed table-middle" v-if="packageItem.package.isCustomizable && packageItem.package.variants">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    Variant - @{{ packageVariant.variant.name }}
+                                                                    <span class="label label-primary">
+                                                                        Max Qty. @{{ packageVariant.variant.quantity * packageItem.quantity }}
+                                                                    </span>
+                                                                </th>
+                                                                <th class="text-center">Quantity</th>
+                                                                <th class="text-center">Stock</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(product, index) in packageVariant.variant.products">
+                                                                <td>
+                                                                    @{{ product.name }}
+                                                                    <input type="hidden" v-bind:name="'packages[' + packageItem.package.id + '][variants][' + packageVariant.variant.id + ']'" v-model="packageVariant.variant.id" />
+                                                                </td>
+                                                                <td class="text-center" style="width: 150px;">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-btn">
+                                                                            <button class="btn btn-primary" type="button" v-on:click="product.quantity--">
+                                                                                <i class="fa fa-minus"></i>
+                                                                            </button>
+                                                                        </span>
+                                                                        <input type="hidden" class="form-control" v-model="product.id" v-bind:name="'packages[' + packageItem.package.id + '][variants][' + packageVariant.variant.id + '][' + product.id + '][id]'" />
+                                                                        <input type="number" class="form-control" v-model="product.quantity" min="0" v-bind:name="'packages[' + packageItem.package.id + '][variants][' + packageVariant.variant.id + '][' + product.id + '][quantity]'" />
+                                                                        <span class="input-group-btn">
+                                                                            <button class="btn btn-primary" type="button" v-on:click="product.quantity++">
+                                                                                <i class="fa fa-plus"></i>
+                                                                            </button>
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">@{{ product.stock }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
                                             </td>
                                         </tr>
                                     </template>
@@ -514,6 +550,20 @@
 
                                 item.quantity = item.package.stock;
                             }
+
+                            if (item.package.isCustomizable) {
+                                item.package.variants.forEach(function (packageVariant) {
+                                    packageVariant.variant.products.forEach(function (product) {
+                                        if (product.quantity < 0) {
+                                            product.quantity = 0;
+                                        } else if (product.quantity > product.stock) {
+                                            $this.notify("error", "Insufficient stock");
+
+                                            product.quantity = product.stock;
+                                        }
+                                    });
+                                });
+                            }
                         });
                     }
                 },
@@ -580,8 +630,8 @@
                 },
                 isCompletable: function () {
                     return this.isAnyProductSelected
-                            && this.isCustomerSelected
-                            && this.isPaymentCompleted;
+                        && this.isCustomerSelected
+                        && this.isPaymentCompleted;
                 },
                 itemsTotal: function () {
                     var itemsTotal = 0,
@@ -678,9 +728,10 @@
                 },
                 addPackageToCart: function (package, quantity) {
                     var samePackage = false,
-                        shouldAdd = true;
+                        shouldAdd = true,
+                        $this = this;
 
-                    this.cart.packages.forEach(function (cartItem) {
+                    $this.cart.packages.forEach(function (cartItem) {
                         if (cartItem.package.id === package.id) {
                             cartItem.quantity += quantity;
                             samePackage = true;
@@ -688,11 +739,36 @@
                     });
 
                     if (!samePackage && shouldAdd) {
-                        this.cart.packages.push({
+                        var newCartItem = {
                             package: package,
                             quantity: quantity,
                             discount: 0
-                        })
+                        };
+
+                        if (newCartItem.package.hasOwnProperty("variants")) {
+                            newCartItem.package.variants.forEach(function (packageVariant) {
+                                packageVariant.variant.products.forEach(function (product) {
+                                    Vue.set(product, "quantity", 0);
+
+                                    $this.$watch(function () {
+                                        return product.quantity
+                                    }, function (newQuantity, oldQuantity) {
+                                        var maxQuantity = packageVariant.variant.quantity * newCartItem.quantity,
+                                            currentTotal = packageVariant.variant.products.reduce(function (total, product) {
+                                                return total + product.quantity;
+                                            }, 0);
+
+                                        if (currentTotal > maxQuantity) {
+                                            $this.notify("error", "Max " + maxQuantity + " item(s)");
+
+                                            product.quantity = oldQuantity;
+                                        }
+                                    }, {deep: true});
+                                });
+                            });
+                        }
+
+                        this.cart.packages.push(newCartItem)
                     }
                 },
                 removeProductFromCart: function (index) {

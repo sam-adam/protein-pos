@@ -75,13 +75,13 @@ class InventoryRepository
         foreach ($package->items as $item) {
             if (!isset($products[$item->product->id])) {
                 $products[$item->product->id] = $item->product;
+            }
+        }
 
-                if ($item->product->variantGroup) {
-                    foreach ($item->product->variantGroup->products as $variant) {
-                        if (!isset($products[$variant->id])) {
-                            $products[$variant->id] = $variant;
-                        }
-                    }
+        foreach ($package->variants as $packageVariant) {
+            foreach ($packageVariant->variant->items as $variantItem) {
+                if (!isset($products[$variantItem->product->id])) {
+                    $products[$variantItem->product->id] = $variantItem->product;
                 }
             }
         }

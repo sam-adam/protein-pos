@@ -30,7 +30,7 @@ class WithVariantsDecorator implements Decorator
 
         foreach ($this->package->variants as $packageVariant) {
             $variant = new PackageVariant($packageVariant);
-            $variant->addEagerLoadDecorator('variant', new WithProductsDecorator($packageVariant->variant));
+            $variant->addEagerLoadDecorator('variant', new WithProductsDecorator($packageVariant->variant, $this->productStocks));
 
             $attributes['variants'][] = $variant;
         }
