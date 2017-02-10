@@ -515,6 +515,7 @@
                     packages: [],
                     persistentItems: {!! json_encode($persistentItems) !!}
                 },
+                newCartItem: {},
                 customer: {!! json_encode($customerData) !!},
                 payment: {
                     method: 'cash',
@@ -757,21 +758,19 @@
                     });
 
                     if (!samePackage && shouldAdd) {
-                        var newCartItem = {
-                            package: package,
-                            quantity: quantity,
-                            discount: 0
-                        };
+                        Vue.set($this.newCartItem, "package", package);
+                        Vue.set($this.newCartItem, "quantity", quantity);
+                        Vue.set($this.newCartItem, "discount", 0);
 
-                        if (newCartItem.package.hasOwnProperty("variants")) {
-                            newCartItem.package.variants.forEach(function (packageVariant) {
+                        if ($this.newCartItem.package.hasOwnProperty("variants")) {
+                            $this.newCartItem.package.variants.forEach(function (packageVariant) {
                                 packageVariant.variant.products.forEach(function (product) {
                                     Vue.set(product, "quantity", 0);
 
                                     $this.$watch(function () {
                                         return product.quantity
                                     }, function (newQuantity, oldQuantity) {
-                                        var maxQuantity = packageVariant.variant.quantity * newCartItem.quantity,
+                                        var maxQuantity = packageVariant.variant.quantity * $this.newCartItem.quantity,
                                             currentTotal = packageVariant.variant.products.reduce(function (total, product) {
                                                 return total + product.quantity;
                                             }, 0);
@@ -784,9 +783,34 @@
                                     }, {deep: true});
                                 });
                             });
+
+                            $this.$watch(function () {
+                                return $this.newCartItem.quantity;
+                            }, function (newQuantity, oldQuantity) {
+                                if (newQuantity < oldQuantity) {
+                                    var canAdd = true;
+
+                                    $this.newCartItem.package.variants.forEach(function (packageVariant) {
+                                        if (canAdd) {
+                                            var maxQuantity = packageVariant.variant.quantity * newQuantity,
+                                                currentTotal = packageVariant.variant.products.reduce(function (total, product) {
+                                                    return total + product.quantity;
+                                                }, 0);
+
+                                            canAdd = currentTotal <= maxQuantity;
+                                        }
+                                    });
+
+                                    if (!canAdd) {
+                                        $this.notify("error", "Variant quantity is too much");
+
+                                        $this.newCartItem.quantity = oldQuantity;
+                                    }
+                                }
+                            }, {deep: true});
                         }
 
-                        this.cart.packages.push(newCartItem)
+                        this.cart.packages.push($this.newCartItem)
                     }
                 },
                 removeProductFromCart: function (index) {
