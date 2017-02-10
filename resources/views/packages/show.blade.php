@@ -66,38 +66,33 @@
                                     <tbody>
                                         @foreach($package->items as $item)
                                             <tr>
-                                                <td>
-                                                    {{ $item->product->name }}
-                                                    @if($package->is_customizable && $item->product->variantGroup)
-                                                        <table class="table table-condensed">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Variant</th>
-                                                                    <th>Price</th>
-                                                                    <th>Quantity</th>
-                                                                    <th>Stock</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach($item->product->variantGroup->products as $variant)
-                                                                    @if($variant->id !== $item->product_id)
-                                                                        <tr>
-                                                                            <td>{{ $variant->name }}</td>
-                                                                            <td>@money($variant->price)</td>
-                                                                            <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
-                                                                            <td>{{ number_format($stocks[$variant->id]) }}</td>
-                                                                        </tr>
-                                                                        @endif
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    @endif
-                                                </td>
+                                                <td>{{ $item->product->name }}</td>
                                                 <td>@money($item->product->price)</td>
                                                 <td style="width: 20px;">{{ number_format($item->quantity) }}</td>
                                                 <td>{{ number_format($stocks[$item->product->id]) }}</td>
                                             </tr>
                                         @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="price" class="col-sm-2 control-label">Variants</label>
+                            <div class="col-sm-7">
+                                <table class="table table-condensed table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($package->variants as $variant)
+                                        <tr>
+                                            <td>{{ $variant->variant->name }}</td>
+                                            <td style="width: 20px;">{{ number_format($variant->variant->quantity) }}</td>
+                                        </tr>
+                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>

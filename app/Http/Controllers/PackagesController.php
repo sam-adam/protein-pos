@@ -39,7 +39,7 @@ class PackagesController extends AuthenticatedController
     public function show(Request $request, $packageId)
     {
         /** @var Package $package */
-        $package = Package::with('items.product.variantGroup.products')->find($packageId);
+        $package = Package::with('items.product')->find($packageId);
 
         if (!$package) {
             return redirect()->back()->with('flashes.danger', 'Package not found');
