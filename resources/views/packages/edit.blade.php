@@ -113,7 +113,7 @@
                                             </td>
                                             <td>@{{ parseInt(variant.quantity).toLocaleString() }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="removeItem(item)">
+                                                <button type="button" class="btn btn-sm btn-danger" v-on:click="removeVariant(item)">
                                                     <i class="fa fa-trash"></i>
                                                     Remove
                                                 </button>
