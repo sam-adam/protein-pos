@@ -76,11 +76,7 @@
             <div class="col-sm-12">
                 <div class="panel">
                     <div class="panel-body">
-                        @if($mode === 'weekly' || $mode === 'monthly')
-                            @include('reports.components.sales.weekly')
-                        @else
-                            @include('reports.components.sales.daily')
-                        @endif
+                        @include('reports.components.sales.'.$mode)
                     </div>
                 </div>
             </div>
