@@ -77,17 +77,33 @@
                         @endif
                         @can('update', \App\Models\Product::class)
                             <div class="form-group">
-                                <div class="col-sm-offset-2 col-sm-5">
-                                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary btn-block">
-                                        <i class="fa fa-pencil fa-fw"></i>
-                                        Edit
-                                    </a>
-                                </div>
-                                <div class="col-sm-5">
-                                    <a href="{{ Session::get('last_product_page') ?: route('products.index') }}" class="btn btn-default btn-block">
-                                        <i class="fa fa-arrow-left fa-fw"></i>
-                                        Back
-                                    </a>
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary btn-block">
+                                                <i class="fa fa-pencil fa-fw"></i>
+                                                Edit
+                                            </a>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <a href="{{ Session::get('last_product_page') ?: route('products.index') }}" class="btn btn-default btn-block">
+                                                <i class="fa fa-arrow-left fa-fw"></i>
+                                                Back
+                                            </a>
+                                        </div>
+                                        @can('delete', \App\Models\Product::class)
+                                            <div class="col-sm-4">
+                                                <form method="post" action="{{ route('products.destroy', $product->id) }}" class="inline" @if($inventories->count() > 0) onsubmit="return confirm('Product contains stock! Delete?');" @endif>
+                                                    {{ method_field('DELETE') }}
+                                                    {{ csrf_field() }}
+                                                    <button type="submit" class="btn btn-danger btn-block">
+                                                        <i class="fa fa-trash"></i>
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endcan
+                                    </div>
                                 </div>
                             </div>
                         @endcan

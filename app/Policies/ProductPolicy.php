@@ -16,6 +16,11 @@ class ProductPolicy extends BasePolicy
         return in_array($user->role, ['admin', 'tech_admin']);
     }
 
+    public function delete(User $user)
+    {
+        return in_array($user->role, ['admin', 'tech_admin', 'manager']);
+    }
+
     public function seeAllBranch(User $user)
     {
         return in_array($user->role, ['cashier', 'manager', 'admin', 'tech_admin']);

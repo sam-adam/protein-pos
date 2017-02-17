@@ -362,6 +362,19 @@ class ProductsController extends AuthenticatedController
         return redirect(route('products.show', $productId))->with('flashes.success', 'Product edited');
     }
 
+    public function destroy($productId)
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return redirect()->back()->with('flashes.error', 'Product not found');
+        }
+
+        $product->delete();
+
+        return redirect(route('products.index'))->with('flashes.success', 'Product deleted');
+    }
+
     public function addInventory(AddProductMovement $request, $productId)
     {
         $this->authorize('update', Product::class);
