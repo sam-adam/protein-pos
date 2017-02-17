@@ -47,7 +47,7 @@ class MovementService
         $movement->from_branch_id        = $fromBranch ? $fromBranch->id : null;
         $movement->to_branch_id          = $toBranch->id;
         $movement->remark                = $remark;
-        $movement->movement_effective_at = $effectiveAt ?: Carbon::now();
+        $movement->movement_effective_at = Carbon::createFromFormat('Y-m-d', $effectiveAt)->setTime(Carbon::now()->hour, Carbon::now()->minute, Carbon::now()->second) ?: Carbon::now();
         $movement->saveOrFail();
 
         foreach ($items as $item) {
