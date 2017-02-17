@@ -21,7 +21,7 @@ class IdleSessionMiddleware
 
             switch (Auth::user()->role) {
                 case 'admin':
-                    $timeoutInMinutes = 10;
+                    $timeoutInMinutes = 15;
                     break;
                 case 'cashier':
                     $timeoutInMinutes = 20;
