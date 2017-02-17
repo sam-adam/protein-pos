@@ -70,11 +70,13 @@
                                             Create - Delivery
                                         </a>
                                     </li>
-                                    <li>
-                                        <a href="{{ url('sales/create?type=wholesale') }}">
-                                            Create - Wholesale
-                                        </a>
-                                    </li>
+                                    @can('makeWholeSale', \App\Models\Sale::class)
+                                        <li>
+                                            <a href="{{ url('sales/create?type=wholesale') }}">
+                                                Create - Wholesale
+                                            </a>
+                                        </li>
+                                    @endcan
                                 @endcan
                             </ul>
                         </li>

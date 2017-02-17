@@ -13,6 +13,11 @@ use Carbon\Carbon;
  */
 class SalePolicy extends BasePolicy
 {
+    public function makeWholeSale(User $user)
+    {
+        return $user->role === 'admin';
+    }
+
     public function giveWholeSaleDiscount(User $user)
     {
         return $user->role === 'admin';
