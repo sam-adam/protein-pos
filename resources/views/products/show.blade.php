@@ -253,14 +253,16 @@
                                         @else
                                             <p>No movement yet</p>
                                         @endif
-                                        <div class="row">
-                                            <div class="col-sm-4">
-                                                <a href="#add-inventory-modal" class="btn btn-primary" data-toggle="modal">
-                                                    <i class="fa fa-plus"></i>
-                                                    Add Inventory
-                                                </a>
+                                        @can('update', \App\Models\Product::class)
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <a href="#add-inventory-modal" class="btn btn-primary" data-toggle="modal">
+                                                        <i class="fa fa-plus"></i>
+                                                        Add Inventory
+                                                    </a>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endcan
                                     </div>
                                     @foreach($otherBranches as $branch)
                                         <div role="tabpanel" class="tab-pane" id="breakdown-{{ $branch->id }}">
