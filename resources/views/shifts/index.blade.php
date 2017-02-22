@@ -107,15 +107,6 @@
                                 <p class="form-control-static" id="opened-cash"></p>
                             </div>
                         </div>
-                        <div class="form-group {{ $errors->has('closing_balance') ? 'has-error' : '' }}">
-                            <label for="closing-balance" class="col-sm-4 control-label">Closing cash</label>
-                            <div class="col-sm-5">
-                                <input type="text" id="closing-balance" name="closing_balance" class="form-control" placeholder="Eg: 100" value="{{ old('closing_balance') }}" required />
-                                @foreach($errors->get('closing_balance') as $error)
-                                    <span class="label label-danger">{{ $error }}</span>
-                                @endforeach
-                            </div>
-                        </div>
                         <div class="form-group {{ $errors->has('remark') ? 'has-error' : '' }}">
                             <label for="remark" class="col-sm-4 control-label">Remark</label>
                             <div class="col-sm-7">
