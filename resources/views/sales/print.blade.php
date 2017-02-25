@@ -41,14 +41,6 @@
                                 New Sale
                             </a>
                         </div>
-                        <div class="col-xs-6 text-right">
-                            @if($sale->isRefundable() && Auth::user()->can('refund', $sale))
-                                <a href="{{ route('sales.refund', $sale->id) }}" class="btn btn-danger">
-                                    <i class="fa fa-exclamation-triangle fa-fw"></i>
-                                    Refund
-                                </a>
-                            @endif
-                        </div>
                     </div>
                 </div>
             </div>

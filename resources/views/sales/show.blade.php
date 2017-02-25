@@ -180,6 +180,12 @@
                             Print
                         </a>
                     @endif
+                    @if($sale->isRefundable() && Auth::user()->can('refund', $sale))
+                        <a href="{{ route('sales.refund', $sale->id) }}" class="btn btn-danger btn-lg btn-block" style="margin-bottom: 10px;">
+                            <i class="fa fa-exclamation-triangle fa-fw"></i>
+                            Refund
+                        </a>
+                    @endif
                     @if($sale->is_delivery && !$sale->isFinished())
                         <form method="post" action="{{ route('sales.complete', $sale->id) }}" onsubmit="return confirm('Completing delivery! Are you sure?');" style="margin-bottom: 10px;">
                             {{ csrf_field() }}
