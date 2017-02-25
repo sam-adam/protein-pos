@@ -24,6 +24,11 @@
                 <a class="navbar-brand" href="{{ url('/') }}">Protein PoS</a>
             </div>
             <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown hidden">
+                    <a href="#" onclick="toggleFullScreen(true)">
+                        <i class="fa fa-arrows-alt"></i>
+                    </a>
+                </li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i>
