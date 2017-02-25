@@ -271,7 +271,7 @@ class SaleService
 
         $newPayment                 = new SalePayment();
         $newPayment->sale_id        = $sale->id;
-        $newPayment->payment_method = data_get($paymentData, 'method');
+        $newPayment->payment_method = strtoupper(data_get($paymentData, 'method'));
         $newPayment->amount         = $newPayment->payment_method !== SalePayment::PAYMENT_METHOD_CASH
             ? $sale->total - $alreadyPaidAmount
             : data_get($paymentData, 'amount');
