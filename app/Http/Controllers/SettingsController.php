@@ -29,6 +29,7 @@ class SettingsController extends AuthenticatedController
         }
 
         return view('settings.index', [
+            'timezone'           => config('app.timezone'),
             'creditCardTax'      => Setting::getValueByKey(Setting::KEY_CREDIT_CARD_TAX, 2),
             'salesPointBaseline' => Setting::getValueByKey(Setting::KEY_SALES_POINT_BASELINE, 0),
             'deliveryProductId'  => Setting::getValueByKey(Setting::KEY_DELIVERY_PRODUCT_ID),

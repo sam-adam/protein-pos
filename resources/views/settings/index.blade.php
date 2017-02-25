@@ -12,6 +12,15 @@
                 <div class="panel-body">
                     <form class="form-horizontal" method="post" action="{{ route('settings.update') }}">
                         {{ csrf_field() }}
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Current Timezone</label>
+                            <div class="col-sm-1">
+                                <p class="form-control-static">{{  }}</p>
+                                @foreach($errors->get('credit_card_tax') as $error)
+                                    <span class="label label-danger">{{ $error }}</span>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="form-group {{ $errors->has('credit_card_tax') ? 'has-error' : '' }}">
                             <label class="control-label col-sm-3" for="credit-card-tax">Credit Card Tax (%)</label>
                             <div class="col-sm-1">
