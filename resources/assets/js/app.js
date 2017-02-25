@@ -164,4 +164,4 @@ window.adjustFullScreen = function () {
     $("body").toggleClass("fullscreen", isFullScreen !== null && isFullScreen !== false);
 };
 
-window.adjustFullScreen();
+// window.adjustFullScreen();

@@ -110,7 +110,7 @@ body {
     z-index: 1;
     position: absolute;
     width: 205px;
-    margin-top: 51px;
+    margin-top: 41px;
   }
   .navbar-top-links .dropdown-messages,
   .navbar-top-links .dropdown-tasks,
@@ -12429,7 +12429,7 @@ table#sales-summary-table tr#summary-grand-total td {
 }
 
 table#sales-summary-table tr.dashed > td {
-  border: 1px dashed #D0D3D8;
+  border-top: 1px dashed #D0D3D8;
 }
 
 table#sales-summary-table tr.dashed > td:first-child {

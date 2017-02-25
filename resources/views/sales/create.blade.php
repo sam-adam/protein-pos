@@ -333,33 +333,52 @@
                                     </td>
                                 </tr>
                                 <tr v-show="discountSetting.isEnabled">
-                                    <td>
-                                        Sales Discount:
-                                        <div class="btn-group" style="margin-left: 5px;">
-                                            <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PERCENTAGE'}">
-                                                <input type="radio" name="sales_discount_type" autocomplete="off" value="PERCENTAGE" v-model="salesDiscountType" /> Percent
-                                            </label>
-                                            <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PRICE'}">
-                                                <input type="radio" name="sales_discount_type" autocomplete="off" value="PRICE" v-model="salesDiscountType" /> Price
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="input-group">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-primary" type="button" v-on:click="salesDiscount--">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </span>
-                                            <input type="number" name="sales_discount" class="form-control text-right" v-model="salesDiscount" min="0" v-bind:max="maxSaleDiscount"/>
-                                            <span class="input-group-addon">
-                                                @{{ this.salesDiscountType === 'PERCENTAGE' ? '%' : 'AED' }}
-                                            </span>
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-primary" type="button" v-on:click="salesDiscount++">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </span>
+                                    <td>Sales Discount:</td>
+                                    <td></td>
+                                </tr>
+                                <tr v-show="discountSetting.isEnabled">
+                                    <td colspan="2">
+                                        <div class="row">
+                                            <div class="col-sm-7 text-left">
+                                                <div class="btn-group">
+                                                    <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PERCENTAGE'}">
+                                                        <input type="radio" name="sales_discount_type" autocomplete="off" value="PERCENTAGE" v-model="salesDiscountType" /> Percent
+                                                    </label>
+                                                    <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PRICE'}">
+                                                        <input type="radio" name="sales_discount_type" autocomplete="off" value="PRICE" v-model="salesDiscountType" /> Price
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5 text-right">
+                                                <div class="input-group">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary hidden-md hidden-sm hidden-xs" type="button" v-on:click="salesDiscount--">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </span>
+                                                    <input type="number" name="sales_discount" class="form-control text-right" v-model="salesDiscount" min="0" v-bind:max="maxSaleDiscount"/>
+                                                    <span class="input-group-addon">
+                                                        @{{ this.salesDiscountType === 'PERCENTAGE' ? '%' : 'AED' }}
+                                                    </span>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary hidden-md hidden-sm hidden-xs" type="button" v-on:click="salesDiscount++">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                <div class="btn-group btn-group-justified hidden-lg">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary btn-block" type="button" v-on:click="salesDiscount--">
+                                                            <i class="fa fa-minus"></i>
+                                                        </button>
+                                                    </span>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-primary btn-block" type="button" v-on:click="salesDiscount++">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -398,15 +417,24 @@
                                     <tr class="dashed">
                                         <td colspan="2">
                                             <h5 class="sales-info">Payment</h5>
-                                            <br/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
                                             <div class="row">
-                                                <div class="col-xs-8 text-left">
-                                                    <button type="button" class="btn" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
-                                                    <button type="button" class="btn" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">Credit Card</button>
-                                                </div>
-                                                <div class="col-xs-4">
-                                                    <div class="input-group" v-show="payment.method === 'cash'">
+                                                <div class="col-sm-7 text-left">
+                                                    <div class="btn-group btn-group-justified">
                                                         <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-block" v-on:click="setPaymentMethod('cash')" v-bind:class="{ 'btn-success': payment.method === 'cash' }">Cash</button>
+                                                        </span>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-block" v-on:click="setPaymentMethod('credit_card')" v-bind:class="{ 'btn-success': payment.method === 'credit_card' }">CC</button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-5 text-right">
+                                                    <div class="input-group" v-show="payment.method === 'cash'">
+                                                        <span class="input-group-btn hidden-md hidden-sm hidden-xs">
                                                             <button class="btn btn-primary" type="button" v-on:click="payment.amount--">
                                                                 <i class="fa fa-minus"></i>
                                                             </button>
@@ -420,19 +448,31 @@
                                                             min="0"
                                                             v-bind:required="payment.method === 'cash'"
                                                         />
-                                                        <span class="input-group-btn">
+                                                        <span class="input-group-btn hidden-md hidden-sm hidden-xs">
                                                             <button class="btn btn-primary" type="button" v-on:click="payment.amount++">
                                                                 <i class="fa fa-plus"></i>
                                                             </button>
                                                         </span>
                                                     </div>
+                                                    <div class="btn-group btn-group-justified hidden-lg">
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-primary btn-block" type="button" v-on:click="payment.amount--">
+                                                                <i class="fa fa-minus"></i>
+                                                            </button>
+                                                        </span>
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-primary btn-block" type="button" v-on:click="payment.amount++">
+                                                                <i class="fa fa-plus"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
                                                     <input
-                                                            type="hidden"
-                                                            name="credit_card_number"
-                                                            class="form-control text-right"
-                                                            placeholder="Enter credit card num."
-                                                            v-model="payment.cardNumber"
-                                                            v-show="payment.method === 'credit_card'"
+                                                        type="hidden"
+                                                        name="credit_card_number"
+                                                        class="form-control text-right"
+                                                        placeholder="Enter credit card num."
+                                                        v-model="payment.cardNumber"
+                                                        v-show="payment.method === 'credit_card'"
                                                     />
                                                 </div>
                                             </div>
@@ -444,7 +484,7 @@
                                     <input type="hidden" name="immediate_payment" value="{{ $immediatePayment ? 1 : 0 }}" />
                                     <input type="hidden" name="payment_method" value="cash" />
                                 @endif
-                                <tr>
+                                <tr class="dashed">
                                     <td colspan="2">
                                         <button type="submit" class="btn btn-block btn-primary" v-bind:disabled="!isCompletable">
                                             {{ $immediatePayment ? 'Complete Sale' : 'Book Delivery' }}

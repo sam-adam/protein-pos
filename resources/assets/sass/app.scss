@@ -197,7 +197,7 @@ table#sales-summary-table {
 
   tr.dashed {
     & > td {
-      border: 1px dashed #D0D3D8;
+      border-top: 1px dashed #D0D3D8;
     }
 
     & > td:first-child {

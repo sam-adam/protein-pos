@@ -11292,7 +11292,7 @@ table#sales-summary-table tr#summary-grand-total td {
 }
 
 table#sales-summary-table tr.dashed > td {
-  border: 1px dashed #D0D3D8;
+  border-top: 1px dashed #D0D3D8;
 }
 
 table#sales-summary-table tr.dashed > td:first-child {
