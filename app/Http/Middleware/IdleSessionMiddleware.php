@@ -41,8 +41,10 @@ class IdleSessionMiddleware
 
                 if ($isSessionExpired) {
                     Session::flush();
-                    Session::flash('flashes.error', 'Logged out because of idle activity');
                     Auth::logout();
+
+                    return redirect(url('/login'))
+                        ->with('flashes.error', 'Logged out because of idle activity');
                 }
             }
         }
