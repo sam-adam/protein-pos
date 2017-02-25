@@ -41,7 +41,7 @@ class LoginSessionLogger
     {
         $user = $event->user;
 
-        if ($user->role === 'cashier') {
+        if ($user && $user->role === 'cashier') {
             $branch              = $user->branch;
             $currentLoginSession = $branch->currentlyLoggedInSessions()->where('user_id', '=', $user->id)->first();
 
