@@ -13,8 +13,8 @@
                     <form class="form-horizontal" method="post" action="{{ route('settings.update') }}">
                         {{ csrf_field() }}
                         <div class="form-group">
-                            <label class="control-label col-sm-3">Current Timezone</label>
-                            <div class="col-sm-1">
+                            <label class="control-label col-md-3 col-sm-4">Current Timezone</label>
+                            <div class="col-md-1 col-sm-2">
                                 <p class="form-control-static">{{ $timezone }}</p>
                                 @foreach($errors->get('credit_card_tax') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
@@ -22,8 +22,8 @@
                             </div>
                         </div>
                         <div class="form-group {{ $errors->has('credit_card_tax') ? 'has-error' : '' }}">
-                            <label class="control-label col-sm-3" for="credit-card-tax">Credit Card Tax (%)</label>
-                            <div class="col-sm-1">
+                            <label class="control-label col-sm-4 col-md-3" for="credit-card-tax">Credit Card Tax (%)</label>
+                            <div class="col-md-1 col-sm-2">
                                 <input type="text" class="form-control" name="credit_card_tax" value="{{ old('credit_card_tax') ?: $creditCardTax }}" placeholder="In percent" />
                                 @foreach($errors->get('credit_card_tax') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
@@ -31,8 +31,8 @@
                             </div>
                         </div>
                         <div class="form-group {{ $errors->has('sales_point_baseline') ? 'has-error' : '' }}">
-                            <label class="control-label col-sm-3" for="sales-point-baseline">Sales Point Earning Baseline</label>
-                            <div class="col-sm-1">
+                            <label class="control-label col-sm-4 col-md-3" for="sales-point-baseline">Sales Point Earning Baseline</label>
+                            <div class="col-md-1 col-sm-2">
                                 <input type="text" class="form-control" name="sales_point_baseline" value="{{ old('sales_point_baseline') ?: $salesPointBaseline }}" placeholder="How much a customer need to purchase for a point" />
                                 @foreach($errors->get('sales_point_baseline') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
@@ -40,7 +40,7 @@
                             </div>
                         </div>
                         <div class="form-group {{ $errors->has('delivery_product_id') ? 'has-error' : '' }}">
-                            <label class="control-label col-sm-3" for="Delivery Product Id">Delivery Service</label>
+                            <label class="control-label col-sm-4 col-md-3" for="Delivery Product Id">Delivery Service</label>
                             <div class="col-sm-3">
                                 <select name="delivery_product_id" class="form-control">
                                     <option value>Select Product</option>
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                         <div class="form-group {{ $errors->has('walk_in_customer_id') ? 'has-error' : '' }}">
-                            <label class="control-label col-sm-3" for="Delivery Product Id">Walk In Customer</label>
+                            <label class="control-label col-sm-4 col-md-3" for="Delivery Product Id">Walk In Customer</label>
                             <div class="col-sm-3">
                                 <select name="walk_in_customer_id" class="form-control">
                                     <option value>Select Customer</option>
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-4">
+                            <div class="col-sm-offset-4 col-md-offset-2 col-sm-4">
                                 <button type="submit" class="btn btn-success btn-lg btn-block">
                                     <i class="fa fa-disk"></i>
                                     Save
