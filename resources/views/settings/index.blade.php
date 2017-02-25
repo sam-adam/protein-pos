@@ -15,7 +15,7 @@
                         <div class="form-group">
                             <label class="control-label col-sm-3">Current Timezone</label>
                             <div class="col-sm-1">
-                                <p class="form-control-static">{{  }}</p>
+                                <p class="form-control-static">{{ $timezone }}</p>
                                 @foreach($errors->get('credit_card_tax') as $error)
                                     <span class="label label-danger">{{ $error }}</span>
                                 @endforeach
