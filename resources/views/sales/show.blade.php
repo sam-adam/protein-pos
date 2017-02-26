@@ -129,7 +129,7 @@
                         <div class="form-group">
                             <label for="address" class="col-sm-4 control-label">Post Tax</label>
                             <div class="col-sm-8">
-                                <p class="form-control-static">@money($sale->payments->first()->getNetPaid())</p>
+                                <p class="form-control-static">@money($sale->calculateTotal())</p>
                             </div>
                         </div>
                         <div class="form-group">
@@ -264,6 +264,10 @@
                                 <td class="text-right">@money($item->calculateSubtotal())</td>
                             </tr>
                         @endforeach
+                        <tr>
+                            <td colspan="3" class="text-right">Total</td>
+                            <td class="text-right">@money($sale->calculateSubTotal())</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
