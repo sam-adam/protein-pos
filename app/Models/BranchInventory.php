@@ -14,6 +14,7 @@ use Illuminate\Database\Query\JoinClause;
 class BranchInventory extends Model
 {
     protected $guarded = ['id'];
+    protected $dates = ['expired_at'];
 
     protected static function boot()
     {
