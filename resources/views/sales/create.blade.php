@@ -342,10 +342,10 @@
                                             <div class="col-sm-7 text-left">
                                                 <div class="btn-group">
                                                     <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PERCENTAGE'}">
-                                                        <input type="radio" name="sales_discount_type" autocomplete="off" value="PERCENTAGE" v-model="salesDiscountType" /> Percent
+                                                        <input type="radio" name="sales_discount_type" autocomplete="off" value="PERCENTAGE" v-model="salesDiscountType" /> %
                                                     </label>
                                                     <label class="btn btn-primary btn-sm" v-bind:class="{'active': salesDiscountType === 'PRICE'}">
-                                                        <input type="radio" name="sales_discount_type" autocomplete="off" value="PRICE" v-model="salesDiscountType" /> Price
+                                                        <input type="radio" name="sales_discount_type" autocomplete="off" value="PRICE" v-model="salesDiscountType" /> $
                                                     </label>
                                                 </div>
                                             </div>
