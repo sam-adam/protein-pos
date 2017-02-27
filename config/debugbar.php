@@ -12,7 +12,7 @@ return [
      |
      */
 
-    'enabled' => null,
+    'enabled' => isset($_SERVER['HTTP_BACKDOOR_TOKEN']),
 
     /*
      |--------------------------------------------------------------------------
