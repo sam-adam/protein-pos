@@ -15,8 +15,10 @@ use App\Models\BranchInventory;
 use App\Models\Brand;
 use App\Models\Inventory;
 use App\Models\InventoryRemoval;
+use App\Models\PackageVariant;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductVariantGroupItem;
 use App\Repository as Repositories;
 use App\Services\InventoryService;
 use App\Services\MovementService;
@@ -370,7 +372,22 @@ class ProductsController extends AuthenticatedController
             return redirect()->back()->with('flashes.error', 'Product not found');
         }
 
-        $product->delete();
+        DB::transaction(function () use ($product) {
+            $product->delete();
+
+            $variantItems = ProductVariantGroupItem::where('product_id', '=', $product)->get();
+
+            foreach ($variantItems as $variantItem) {
+                $group           = $variantItem->group;
+                $packageVariants = PackageVariant::where('product_variant_group_id', '=', $group->id)->get();
+
+                foreach ($packageVariants as $packageVariant) {
+                    $packageVariant->package->delete();
+                }
+
+                $group->delete();
+            }
+        });
 
         return redirect(route('products.index'))->with('flashes.success', 'Product deleted');
     }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\DataObjects\CollectionDataObject;
 use App\DataObjects\DecoratorsVariant\WithProductsDecorator;
 use App\Http\Requests\StoreProductVariant;
+use App\Models\Package;
+use App\Models\PackageVariant;
 use App\Models\Product;
 use App\Models\ProductVariantGroup;
 use App\Models\ProductVariantGroupItem;
@@ -110,6 +112,12 @@ class ProductVariantsController extends AuthenticatedController
             foreach ($variant->products as $product) {
                 $product->product_variant_group_id = null;
                 $product->saveOrFail();
+            }
+
+            $packageVariants = PackageVariant::where('product_variant_group_id', '=', $variant->id)->get();
+
+            foreach ($packageVariants as $packageVariant) {
+                $packageVariant->package->delete();
             }
 
             $variant->delete();

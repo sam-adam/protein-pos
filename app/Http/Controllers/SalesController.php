@@ -127,38 +127,34 @@ class SalesController extends AuthenticatedController
 
     public function store(StoreSale $request)
     {
-        try {
-            $sale = DB::transaction(function () use ($request) {
-                $customer = Customer::findOrFail($request->get('customer_id'));
-                $cashier  = Auth::user();
-                $newSale  = $this->saleService->createSale($customer, $cashier, [
-                    'items'               => $request->get('products'),
-                    'packages'            => $request->get('packages'),
-                    'sales_discount'      => $request->get('sales_discount'),
-                    'sales_discount_type' => $request->get('sales_discount_type'),
-                    'remark'              => $request->get('remark'),
-                    'is_delivery'         => !$request->get('immediate_payment'),
-                    'is_wholesale'        => boolval($request->get('is_wholesale'))
-                ]);
-
-                if ($request->get('immediate_payment')) {
-                    return $this->saleService->finishSale($newSale, Auth::user(), [
-                        'method'      => $request->get('payment_method'),
-                        'amount'      => $request->get('payment_amount'),
-                        'card_number' => $request->get('credit_card_number')
-                    ]);
-                }
-
-                return $newSale;
-            });
-
-            return redirect(route('sales.print', $sale->id))->with([
-                'flashes.success' => 'Transaction completed',
-                'doPrint'         => true
+        $sale = DB::transaction(function () use ($request) {
+            $customer = Customer::findOrFail($request->get('customer_id'));
+            $cashier  = Auth::user();
+            $newSale  = $this->saleService->createSale($customer, $cashier, [
+                'items'               => $request->get('products'),
+                'packages'            => $request->get('packages'),
+                'sales_discount'      => $request->get('sales_discount'),
+                'sales_discount_type' => $request->get('sales_discount_type'),
+                'remark'              => $request->get('remark'),
+                'is_delivery'         => !$request->get('immediate_payment'),
+                'is_wholesale'        => boolval($request->get('is_wholesale'))
             ]);
-        } catch (\Exception $ex) {
-            return redirect()->back()->with('flashes.error', $ex->getMessage());
-        }
+
+            if ($request->get('immediate_payment')) {
+                return $this->saleService->finishSale($newSale, Auth::user(), [
+                    'method'      => $request->get('payment_method'),
+                    'amount'      => $request->get('payment_amount'),
+                    'card_number' => $request->get('credit_card_number')
+                ]);
+            }
+
+            return $newSale;
+        });
+
+        return redirect(route('sales.print', $sale->id))->with([
+            'flashes.success' => 'Transaction completed',
+            'doPrint'         => true
+        ]);
     }
 
     public function complete($saleId)
