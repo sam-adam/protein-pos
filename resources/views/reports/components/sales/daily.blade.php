@@ -35,7 +35,7 @@
                 </td>
                 <td class="text-right">@money($sale->calculateTotal())</td>
                 <td class="text-right">@money($sale->payments->first()->amount)</td>
-                <td class="text-right">@money($sale->payments->first()->getNetPaid())</td>
+                <td class="text-right">@money($sale->payments->first()->calculateTotal())</td>
                 <td class="text-right">
                     <a href="{{ route('sales.show', $sale->id) }}" class="btn btn-primary btn-sm" target="_blank">
                         <i class="fa fa-search-plus"></i>
