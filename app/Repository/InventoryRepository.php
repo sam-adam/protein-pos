@@ -37,10 +37,10 @@ class InventoryRepository
         }
 
         $stocksQuery = BranchInventory::select(
-            'branch_inventories.id',
-            'inventories.product_id',
-            DB::raw('SUM(branch_inventories.stock) AS total_stock')
-        )
+                'branch_inventories.id',
+                'inventories.product_id',
+                DB::raw('SUM(branch_inventories.stock) AS total_stock')
+            )
             ->join('inventories', 'branch_inventories.inventory_id', '=', 'inventories.id')
             ->whereIn('inventories.product_id', $productIds)
             ->groupBy('inventories.product_id');
@@ -103,7 +103,7 @@ class InventoryRepository
         $stocks = $this->getProductStocks(new Collection([$product]), $inBranch);
 
         return $stocks->has($product->id)
-        && $quantity <= $stocks->get($product->id);
+            && $quantity <= $stocks->get($product->id);
     }
 
     /**

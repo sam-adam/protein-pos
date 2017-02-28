@@ -46,7 +46,9 @@ class InventoryService
      */
     public function adjustContainerStock(BranchInventory $branchInventory, $containerMovementQuantity = 0, $movementType = self::MOVEMENT_TYPE_ADDITION)
     {
-        if ($container = $branchInventory->container) { // inventory belongs to a container
+        $container = $branchInventory->container;
+
+        if ($container && $container->inventory->product) { // inventory belongs to a container, and product is still valid
             $container->stock = round(floor($branchInventory->stock / $container->content_quantity));
             $container->saveOrFail();
 

@@ -373,8 +373,7 @@ class ProductsController extends AuthenticatedController
         }
 
         DB::transaction(function () use ($product) {
-            $product->delete();
-
+            // delete variants
             $variantItems = ProductVariantGroupItem::where('product_id', '=', $product)->get();
 
             foreach ($variantItems as $variantItem) {
@@ -387,6 +386,8 @@ class ProductsController extends AuthenticatedController
 
                 $group->delete();
             }
+
+            $product->delete();
         });
 
         return redirect(route('products.index'))->with('flashes.success', 'Product deleted');
