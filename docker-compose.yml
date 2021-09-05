@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www/protein-pos
+    volumes:
+      - ".:/var/www/protein-pos"
+    networks:
+      - protein-network
+
+  webserver:
+    image: nginx:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8034:8000"
+      - "9034:9000"
+    volumes:
+      - ".:/var/www/protein-pos"
+      - "./nginx-site.conf:/etc/nginx/conf.d/site.conf"
+    networks:
+      - protein-network
+
+networks:
+  protein-network:
+    driver: bridge
