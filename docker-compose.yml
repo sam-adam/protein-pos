@@ -19,7 +19,8 @@ services:
       - "9034:9000"
     volumes:
       - ".:/var/www/protein-pos"
-      - "./nginx-site.conf:/etc/nginx/conf.d/site.conf"
+      - "./access.log:/var/log/nginx/access-pos.log"
+      - "./error.log:/var/log/nginx/error-pos.log"
     networks:
       - protein-network
 

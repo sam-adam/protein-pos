@@ -14,6 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (config('app.force_https')) {
+            \URL::forceScheme('https');
+        }
+
         Blade::directive('money', function ($expression) {
             return "<?php echo money_format('%.2n', {$expression}); ?>";
         });

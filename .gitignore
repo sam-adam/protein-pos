@@ -2,6 +2,8 @@
 /public/storage
 /vendor
 /.idea
+access.log
+error.log
 Homestead.json
 Homestead.yaml
 .env
