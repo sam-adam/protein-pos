@@ -16,7 +16,6 @@ services:
     tty: true
     ports:
       - "8034:8000"
-      - "9034:9000"
     volumes:
       - ".:/var/www/protein-pos"
       - "./access.log:/var/log/nginx/access-pos.log"
